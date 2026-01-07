@@ -698,28 +698,33 @@ export const MunicipalityActionPlanModal = ({
         
         <Separator />
         
-        {/* Secção de Impacto - Layout lado a lado desde o título */}
-        <div className="bg-muted/30 rounded-lg p-4">
-          <div className="flex gap-4">
-            {/* Coluna Esquerda: Título + Barras */}
-            <div className="flex-1">
-              {/* Header */}
-              <div className="mb-4">
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="p-2 rounded-lg bg-muted">
-                    <TrendingDown className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-lg">Impacto das Medidas Selecionadas</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Estimativas baseadas em cenários típicos. Os resultados reais podem variar conforme a implementação.
-                    </p>
-                  </div>
+        {/* Secção de Impacto - Layout conforme mockup com 3 áreas */}
+        <div className="bg-muted/30 rounded-lg overflow-hidden">
+          
+          {/* ÁREA 1: Header (Título | Medidas) */}
+          <div className="flex border-b border-border/50">
+            {/* Título - Esquerda */}
+            <div className="flex-1 p-5 pr-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted">
+                  <TrendingDown className="h-4 w-4 text-muted-foreground" />
                 </div>
+                <h4 className="font-medium text-lg">Impacto das Medidas Selecionadas</h4>
               </div>
-              
-              {/* Barras */}
-              <div className="space-y-2 mt-6">
+            </div>
+            
+            {/* Medidas - Direita */}
+            <div className="w-48 shrink-0 p-5 pl-6 border-l border-border/50">
+              <p className="text-xs text-muted-foreground">Medidas</p>
+              <p className="font-semibold text-xl">{selectedMeasures.length}</p>
+            </div>
+          </div>
+          
+          {/* ÁREA 2: Conteúdo Principal (Barras | Totais) */}
+          <div className="flex border-b border-border/50">
+            {/* Barras - Esquerda */}
+            <div className="flex-1 p-5 pr-6">
+              <div className="space-y-3">
                 {/* Barra Intensidade Atual */}
                 <div className="flex items-center gap-3">
                   <span className="text-sm w-32 shrink-0">Intensidade atual</span>
@@ -768,13 +773,10 @@ export const MunicipalityActionPlanModal = ({
               </div>
             </div>
             
-            {/* Coluna Direita: Card Totais - alinhado com o topo */}
-            <div className="w-48 shrink-0 p-4 bg-background rounded-lg border flex flex-col justify-between">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">Medidas</p>
-                  <p className="font-semibold text-lg">{selectedMeasures.length}</p>
-                </div>
+            {/* Totais - Direita */}
+            <div className="w-48 shrink-0 p-5 pl-6 border-l border-border/50">
+              <div className="space-y-4">
+                {/* Redução Estimada */}
                 <div>
                   <p className="text-xs text-muted-foreground">Redução Estimada</p>
                   <p className={`font-semibold text-lg ${totalReduction > 0 ? 'text-green-600' : ''}`}>
@@ -782,6 +784,8 @@ export const MunicipalityActionPlanModal = ({
                     <span className="text-sm font-normal ml-1">({reductionPct.toFixed(0)}%)</span>
                   </p>
                 </div>
+                
+                {/* Investimento Total */}
                 <div>
                   <p className="text-xs text-muted-foreground">Investimento Total</p>
                   <p className="font-semibold text-lg">
@@ -789,9 +793,21 @@ export const MunicipalityActionPlanModal = ({
                   </p>
                 </div>
               </div>
-              
-              {/* Estado da Meta */}
-              <div className={`flex items-center gap-2 pt-3 border-t mt-3 ${reachedTarget ? 'text-green-600' : 'text-muted-foreground'}`}>
+            </div>
+          </div>
+          
+          {/* ÁREA 3: Rodapé (Disclaimer | Meta) */}
+          <div className="flex">
+            {/* Disclaimer - Esquerda */}
+            <div className="flex-1 p-4 pr-6">
+              <p className="text-xs text-muted-foreground">
+                Estimativas baseadas em cenários típicos. Os resultados reais podem variar conforme a implementação.
+              </p>
+            </div>
+            
+            {/* Estado da Meta - Direita */}
+            <div className="w-48 shrink-0 p-4 pl-6 border-l border-border/50">
+              <div className={`flex items-center gap-2 ${reachedTarget ? 'text-green-600' : 'text-muted-foreground'}`}>
                 {reachedTarget ? (
                   <>
                     <CheckCircle className="h-4 w-4" />
