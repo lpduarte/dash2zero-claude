@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Supplier } from '@/types/supplier';
@@ -49,6 +49,7 @@ export const MunicipalityActionPlanModal = ({
 }: MunicipalityActionPlanModalProps) => {
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [selectedMeasures, setSelectedMeasures] = useState<string[]>([]);
+  const [recommendedApplied, setRecommendedApplied] = useState(false);
   if (!supplier) return null;
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1 as Step);
@@ -59,11 +60,19 @@ export const MunicipalityActionPlanModal = ({
   const handleClose = () => {
     setCurrentStep(1);
     setSelectedMeasures([]);
+    setRecommendedApplied(false);
     onOpenChange(false);
   };
 
-  // Função para selecionar melhores medidas automaticamente
+  // Função para selecionar melhores medidas automaticamente (toggle)
   const selectBestMeasures = () => {
+    // Se já aplicadas, limpar seleção
+    if (recommendedApplied) {
+      setSelectedMeasures([]);
+      setRecommendedApplied(false);
+      return;
+    }
+    
     // Obter medidas aplicáveis
     const applicableMeasures = getApplicableMeasures({
       sector: supplier.sector,
@@ -124,6 +133,7 @@ export const MunicipalityActionPlanModal = ({
       }
     }
     setSelectedMeasures(selectedIds);
+    setRecommendedApplied(true);
   };
   const getDimensionLabel = (size: string) => {
     const labels: Record<string, string> = {
@@ -486,9 +496,10 @@ export const MunicipalityActionPlanModal = ({
     const newIntensity = currentIntensity * (1 - reductionRatio);
     const reachedTarget = newIntensity <= avgSectorIntensity;
 
-    // Toggle medida
+    // Toggle medida (resetar estado recommendedApplied quando seleção manual muda)
     const toggleMeasure = (measureId: string) => {
       setSelectedMeasures(prev => prev.includes(measureId) ? prev.filter(id => id !== measureId) : [...prev, measureId]);
+      setRecommendedApplied(false);
     };
 
     // Render card de medida
@@ -619,7 +630,18 @@ export const MunicipalityActionPlanModal = ({
     const newBarWidth = maxIntensity > 0 ? newIntensity / maxIntensity * 100 : 0;
     const avgBarWidth = maxIntensity > 0 ? avgSectorIntensity / maxIntensity * 100 : 0;
     return <div className="space-y-6">
-        {/* Header com botão Melhores Medidas */}
+        {/* Estilo da animação shadow-pulse */}
+        <style>{`
+          @keyframes shadow-pulse {
+            0%, 100% { box-shadow: 0 0 10px 2px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 25px 5px rgba(16, 185, 129, 0.5); }
+          }
+          .animate-shadow-pulse {
+            animation: shadow-pulse 2s ease-in-out infinite;
+          }
+        `}</style>
+        
+        {/* Header com botão Melhores Medidas (toggle) */}
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-semibold text-2xl mb-1">Seleção de Medidas</h3>
@@ -627,9 +649,27 @@ export const MunicipalityActionPlanModal = ({
               Selecione medidas até a intensidade ficar abaixo da média do setor.
             </p>
           </div>
-          <button onClick={selectBestMeasures} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium">
-            <Sparkles className="h-4 w-4" />
-            Aplicar medidas recomendadas   
+          <button 
+            onClick={selectBestMeasures} 
+            className={`
+              flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+              ${recommendedApplied 
+                ? 'bg-white border border-border text-muted-foreground hover:bg-muted/50' 
+                : 'bg-primary text-primary-foreground hover:bg-primary/90 animate-shadow-pulse'
+              }
+            `}
+          >
+            {recommendedApplied ? (
+              <>
+                <RotateCcw className="h-4 w-4" />
+                Repor seleção
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Aplicar medidas recomendadas
+              </>
+            )}
           </button>
         </div>
         
