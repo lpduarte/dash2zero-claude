@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw, Calendar, Wallet, FileCheck } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Supplier } from '@/types/supplier';
@@ -12,7 +12,7 @@ import type { Measure, Scope } from '@/types/actionPlan';
 import { sectorLabels } from './SupplierLabel';
 import { mockMeasures, getApplicableMeasures, isMeasureRecommended } from '@/data/mockMeasures';
 import { cascaisInfrastructure } from '@/data/mockInfrastructure';
-import { mockFunding, getFundingByCategory } from '@/data/mockFunding';
+import { mockFunding, getFundingByCategory, getApplicableFunding } from '@/data/mockFunding';
 interface MunicipalityActionPlanModalProps {
   supplier: Supplier | null;
   riskLevel: 'alto' | 'medio' | 'normal';
@@ -50,6 +50,7 @@ export const MunicipalityActionPlanModal = ({
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [selectedMeasures, setSelectedMeasures] = useState<string[]>([]);
   const [recommendedApplied, setRecommendedApplied] = useState(false);
+  const [selectedFunding, setSelectedFunding] = useState<string[]>([]);
   if (!supplier) return null;
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1 as Step);
@@ -61,6 +62,7 @@ export const MunicipalityActionPlanModal = ({
     setCurrentStep(1);
     setSelectedMeasures([]);
     setRecommendedApplied(false);
+    setSelectedFunding([]);
     onOpenChange(false);
   };
 
@@ -794,6 +796,271 @@ export const MunicipalityActionPlanModal = ({
         </div>
       </div>;
   };
+
+  // ============================================
+  // STEP 3: FINANCIAMENTO
+  // ============================================
+  const renderFinanciamentoContent = () => {
+    // Obter categorias das medidas selecionadas
+    const applicableMeasures = getApplicableMeasures({
+      sector: supplier.sector,
+      companySize: supplier.companySize,
+      totalEmissions: supplier.totalEmissions
+    });
+    const selectedMeasuresData = applicableMeasures.filter(m => selectedMeasures.includes(m.id));
+    const selectedCategories = [...new Set(selectedMeasuresData.map(m => m.category))];
+    
+    // Calcular investimento total das medidas
+    const totalInvestment = selectedMeasuresData.reduce((sum, m) => sum + m.investment, 0);
+    
+    // Obter fundos aplicáveis
+    const applicableFunding = getApplicableFunding(
+      selectedCategories,
+      supplier.companySize,
+      supplier.sector
+    );
+    
+    // Agrupar por tipo
+    const fundingByType = {
+      subsidio: applicableFunding.filter(f => f.fund.type === 'subsidio'),
+      incentivo: applicableFunding.filter(f => f.fund.type === 'incentivo'),
+      financiamento: applicableFunding.filter(f => f.fund.type === 'financiamento'),
+    };
+    
+    const typeLabels = {
+      subsidio: 'Subsídios',
+      incentivo: 'Incentivos',
+      financiamento: 'Financiamento',
+    };
+    
+    const typeColors = {
+      subsidio: { border: 'border-green-500', bg: 'bg-green-50 dark:bg-green-950/30', text: 'text-green-700 dark:text-green-300', headerBg: 'bg-green-100 dark:bg-green-900/50' },
+      incentivo: { border: 'border-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-700 dark:text-blue-300', headerBg: 'bg-blue-100 dark:bg-blue-900/50' },
+      financiamento: { border: 'border-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', text: 'text-purple-700 dark:text-purple-300', headerBg: 'bg-purple-100 dark:bg-purple-900/50' },
+    };
+    
+    // Toggle fundo
+    const toggleFunding = (fundingId: string) => {
+      setSelectedFunding(prev => 
+        prev.includes(fundingId) 
+          ? prev.filter(id => id !== fundingId)
+          : [...prev, fundingId]
+      );
+    };
+    
+    // Calcular cobertura
+    const selectedFundingData = applicableFunding
+      .filter(f => selectedFunding.includes(f.fund.id) && f.eligible)
+      .map(f => f.fund);
+    
+    const totalCoverage = selectedFundingData.reduce((sum, fund) => {
+      if (fund.percentage) {
+        // Calcular baseado na percentagem do investimento total
+        const maxFromPercentage = totalInvestment * (fund.percentage / 100);
+        return sum + Math.min(fund.maxAmount, maxFromPercentage);
+      }
+      return sum + fund.maxAmount;
+    }, 0);
+    
+    const coveragePercentage = totalInvestment > 0 
+      ? Math.min((totalCoverage / totalInvestment) * 100, 100) 
+      : 0;
+    
+    // Render card de fundo
+    const renderFundingCard = (item: { fund: typeof mockFunding[0]; eligible: boolean; reason?: string }) => {
+      const { fund, eligible, reason } = item;
+      const isSelected = selectedFunding.includes(fund.id);
+      
+      return (
+        <div
+          key={fund.id}
+          onClick={() => eligible && toggleFunding(fund.id)}
+          className={`
+            p-4 rounded-lg border-2 transition-all
+            ${!eligible 
+              ? 'border-muted bg-muted/30 opacity-60 cursor-not-allowed' 
+              : isSelected 
+                ? 'border-primary bg-primary/5 cursor-pointer' 
+                : 'border-border bg-background hover:border-primary/50 cursor-pointer'
+            }
+          `}
+        >
+          <div className="flex items-start gap-3">
+            {/* Checkbox */}
+            <div className={`
+              w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 mt-0.5
+              ${!eligible 
+                ? 'border-muted-foreground/30 bg-muted' 
+                : isSelected 
+                  ? 'bg-primary border-primary' 
+                  : 'border-muted-foreground/50'
+              }
+            `}>
+              {isSelected && eligible && <Check className="h-3 w-3 text-primary-foreground" />}
+            </div>
+            
+            {/* Conteúdo */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="font-medium text-sm">
+                  {fund.name}
+                </span>
+              </div>
+              
+              <p className="text-xs text-muted-foreground mb-2">
+                {fund.provider}
+              </p>
+              
+              {/* Info principal */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 text-xs">
+                  <Euro className="h-3 w-3 text-muted-foreground" />
+                  <span>
+                    Até {fund.maxAmount.toLocaleString('pt-PT')}€
+                    {fund.percentage && ` (${fund.percentage}%)`}
+                    {fund.interestRate && ` • ${fund.interestRate}`}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span>
+                    {fund.deadline === 'Contínuo' 
+                      ? 'Candidatura contínua' 
+                      : `Prazo: ${new Date(fund.deadline!).toLocaleDateString('pt-PT')}`
+                    }
+                  </span>
+                </div>
+                
+                {fund.remainingBudget && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Wallet className="h-3 w-3" />
+                    <span>Disponível: {fund.remainingBudget.toLocaleString('pt-PT')}€</span>
+                  </div>
+                )}
+                
+                {fund.requirements.length > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <FileCheck className="h-3 w-3" />
+                    <span className="line-clamp-1">{fund.requirements.join(' • ')}</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Razão de não elegibilidade */}
+              {!eligible && reason && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  {reason}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+    
+    // Render coluna por tipo
+    const renderTypeColumn = (type: 'subsidio' | 'incentivo' | 'financiamento') => {
+      const funds = fundingByType[type];
+      const colors = typeColors[type];
+      
+      return (
+        <div className="space-y-3">
+          {/* Header da coluna */}
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${colors.headerBg}`}>
+            <span className={`font-semibold text-sm ${colors.text}`}>
+              {typeLabels[type]}
+            </span>
+            <Badge variant="secondary" className="text-xs">
+              {funds.length}
+            </Badge>
+          </div>
+          
+          {/* Lista de fundos */}
+          <div className="space-y-2">
+            {funds.length > 0 ? (
+              funds.map(item => renderFundingCard(item))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Nenhum fundo disponível
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-2xl mb-1">Financiamento Disponível</h3>
+            <p className="text-muted-foreground">
+              Fundos sugeridos de acordo com as medidas selecionadas. Selecione os que pretende incluir no plano.
+            </p>
+          </div>
+          
+          {/* Badge de cobertura */}
+          <div className="text-right shrink-0">
+            <p className="text-xs text-muted-foreground mb-1">Cobertura possível</p>
+            <p className="font-semibold text-lg">
+              {totalCoverage.toLocaleString('pt-PT')}€
+              <span className="text-sm font-normal text-muted-foreground ml-1">
+                de {totalInvestment.toLocaleString('pt-PT')}€ ({coveragePercentage.toFixed(0)}%)
+              </span>
+            </p>
+          </div>
+        </div>
+        
+        {/* Aviso se não há medidas selecionadas */}
+        {selectedMeasures.length === 0 && (
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <p className="text-sm text-amber-700 dark:text-amber-300">
+              Selecione medidas no passo anterior para ver os fundos aplicáveis.
+            </p>
+          </div>
+        )}
+        
+        {/* Grid 3 colunas por tipo */}
+        {selectedMeasures.length > 0 && (
+          <div className="grid grid-cols-3 gap-4">
+            {renderTypeColumn('subsidio')}
+            {renderTypeColumn('incentivo')}
+            {renderTypeColumn('financiamento')}
+          </div>
+        )}
+        
+        <Separator />
+        
+        {/* Resumo */}
+        <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border">
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground mb-1">Fundos Selecionados</p>
+            <p className="font-semibold text-xl">{selectedFunding.length}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground mb-1">Comparticipação Possível</p>
+            <p className="font-semibold text-lg">
+              Até {totalCoverage.toLocaleString('pt-PT')}€
+              <span className="text-sm font-normal text-muted-foreground ml-1">
+                ({coveragePercentage.toFixed(0)}% do investimento)
+              </span>
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground mb-1">Valor a Financiar</p>
+            <p className="font-semibold text-lg">
+              {Math.max(0, totalInvestment - totalCoverage).toLocaleString('pt-PT')}€
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderStepContent = () => {
     // Step 1: Análise - Conteúdo direto (sem Card exterior)
     if (currentStep === 1) {
@@ -809,7 +1076,14 @@ export const MunicipalityActionPlanModal = ({
         </div>;
     }
 
-    // Steps 3, 4: Placeholder
+    // Step 3: Financiamento
+    if (currentStep === 3) {
+      return <div className="p-6">
+          {renderFinanciamentoContent()}
+        </div>;
+    }
+
+    // Step 4: Placeholder
     const StepIcon = stepConfig[currentStep - 1].icon;
     return <div className="flex-1 flex flex-col items-center justify-center p-8">
         <Card className="w-full max-w-2xl p-8 text-center border-dashed border-2">

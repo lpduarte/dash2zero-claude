@@ -48,13 +48,16 @@ export interface FundingSource {
   type: FundingType;
   name: string;
   provider: string;             // "Estado", "CM Cascais", "UE"
+  description?: string;         // Descrição do fundo
   maxAmount: number;            // €
   percentage?: number;          // % do investimento
-  deadline?: string;            // "2025-03-31" ou "rolling"
+  interestRate?: string;        // Taxa de juro (para financiamentos)
+  deadline?: string;            // "2025-03-31" ou "Contínuo"
   requirements: string[];
   applicableTo: {
     measureCategories?: MeasureCategory[];
     maxCompanySize?: 'micro' | 'pequena' | 'media' | 'grande';
+    sectors?: string[];         // Sectores elegíveis
   };
   // Novos campos
   currentlyOpen?: boolean;
