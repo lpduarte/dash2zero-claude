@@ -698,75 +698,78 @@ export const MunicipalityActionPlanModal = ({
         
         <Separator />
         
-        {/* Secção de Impacto */}
+        {/* Secção de Impacto - Layout lado a lado desde o título */}
         <div className="bg-muted/30 rounded-lg p-4">
-          {/* Header com Disclaimer como subtítulo */}
-          <div className="mb-3">
-            <div className="flex items-center gap-2 mb-0.5">
-              <TrendingDown className="h-4 w-4 text-muted-foreground" />
-              <h4 className="font-medium text-lg">Impacto das Medidas Selecionadas</h4>
-            </div>
-            <div className="flex items-center gap-1.5 ml-6">
-              <Info className="h-3.5 w-3.5 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">
-                Estimativas baseadas em cenários típicos. Os resultados reais podem variar conforme a implementação.
-              </p>
-            </div>
-          </div>
-          
-          {/* Layout: Barras + Totais lado a lado */}
-          <div className="flex gap-4 items-start">
-            {/* Coluna Barras */}
-            <div className="flex-1 space-y-2">
-              {/* Barra Atual */}
-              <div className="flex items-center gap-3">
-                <span className="text-sm w-28 shrink-0">Atual</span>
-                <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-red-400 rounded-full w-full" />
+          <div className="flex gap-4">
+            {/* Coluna Esquerda: Título + Barras */}
+            <div className="flex-1">
+              {/* Header */}
+              <div className="mb-4">
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="p-2 rounded-lg bg-muted">
+                    <TrendingDown className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-lg">Impacto das Medidas Selecionadas</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Estimativas baseadas em cenários típicos. Os resultados reais podem variar conforme a implementação.
+                    </p>
+                  </div>
                 </div>
-                <span className="text-sm font-semibold w-32 text-right">
-                  {currentIntensity.toFixed(2)} kg CO₂e/€
-                </span>
               </div>
               
-              {/* Barra Com Medidas */}
-              <div className="flex items-center gap-3">
-                <span className="text-sm w-28 shrink-0">Com medidas</span>
-                <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                  {selectedMeasures.length > 0 ? (
+              {/* Barras */}
+              <div className="space-y-2 mt-6">
+                {/* Barra Intensidade Atual */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm w-32 shrink-0">Intensidade atual</span>
+                  <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-red-400 rounded-full w-full" />
+                  </div>
+                  <span className="text-sm font-semibold w-32 text-right">
+                    {currentIntensity.toFixed(2)} kg CO₂e/€
+                  </span>
+                </div>
+                
+                {/* Barra Com Medidas */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm w-32 shrink-0">Com medidas</span>
+                  <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    {selectedMeasures.length > 0 ? (
+                      <div 
+                        className={`h-full rounded-full transition-all ${reachedTarget ? 'bg-green-500' : 'bg-amber-400'}`}
+                        style={{ width: `${Math.max((newIntensity / currentIntensity) * 100, 5)}%` }}
+                      />
+                    ) : (
+                      <div className="h-full bg-gray-300 rounded-full w-full" />
+                    )}
+                  </div>
+                  <span className={`text-sm w-32 text-right ${selectedMeasures.length > 0 ? (reachedTarget ? 'font-semibold text-green-600' : 'font-semibold') : 'text-muted-foreground'}`}>
+                    {selectedMeasures.length > 0 
+                      ? `${newIntensity.toFixed(2)} kg CO₂e/€`
+                      : 'Selecione medidas'
+                    }
+                  </span>
+                </div>
+                
+                {/* Barra Média Setor */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm w-32 shrink-0">Média do setor</span>
+                  <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full rounded-full transition-all ${reachedTarget ? 'bg-green-500' : 'bg-amber-400'}`}
-                      style={{ width: `${Math.max((newIntensity / currentIntensity) * 100, 5)}%` }}
+                      className="h-full bg-green-400 rounded-full"
+                      style={{ width: `${(avgSectorIntensity / currentIntensity) * 100}%` }}
                     />
-                  ) : (
-                    <div className="h-full bg-gray-300 rounded-full w-full" />
-                  )}
+                  </div>
+                  <span className="text-sm font-semibold w-32 text-right">
+                    {avgSectorIntensity.toFixed(2)} kg CO₂e/€
+                  </span>
                 </div>
-                <span className={`text-sm w-32 text-right ${selectedMeasures.length > 0 ? (reachedTarget ? 'font-semibold text-green-600' : 'font-semibold') : 'text-muted-foreground'}`}>
-                  {selectedMeasures.length > 0 
-                    ? `${newIntensity.toFixed(2)} kg CO₂e/€`
-                    : 'Selecione medidas'
-                  }
-                </span>
-              </div>
-              
-              {/* Barra Média Setor */}
-              <div className="flex items-center gap-3">
-                <span className="text-sm w-28 shrink-0">Média do setor</span>
-                <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-green-400 rounded-full"
-                    style={{ width: `${(avgSectorIntensity / currentIntensity) * 100}%` }}
-                  />
-                </div>
-                <span className="text-sm font-semibold w-32 text-right">
-                  {avgSectorIntensity.toFixed(2)} kg CO₂e/€
-                </span>
               </div>
             </div>
             
-            {/* Coluna Totais */}
-            <div className="w-48 shrink-0 p-4 bg-background rounded-lg border">
+            {/* Coluna Direita: Card Totais - alinhado com o topo */}
+            <div className="w-48 shrink-0 p-4 bg-background rounded-lg border flex flex-col justify-between">
               <div className="space-y-3">
                 <div>
                   <p className="text-xs text-muted-foreground">Medidas</p>
@@ -785,21 +788,21 @@ export const MunicipalityActionPlanModal = ({
                     {totalInvestment.toLocaleString('pt-PT')}€
                   </p>
                 </div>
-                
-                {/* Estado da Meta - SEMPRE VISÍVEL */}
-                <div className={`flex items-center gap-2 pt-3 border-t ${reachedTarget ? 'text-green-600' : 'text-muted-foreground'}`}>
-                  {reachedTarget ? (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="text-sm font-medium">Meta atingida!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Target className="h-4 w-4" />
-                      <span className="text-sm">Meta não atingida</span>
-                    </>
-                  )}
-                </div>
+              </div>
+              
+              {/* Estado da Meta */}
+              <div className={`flex items-center gap-2 pt-3 border-t mt-3 ${reachedTarget ? 'text-green-600' : 'text-muted-foreground'}`}>
+                {reachedTarget ? (
+                  <>
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="text-sm font-medium">Meta atingida!</span>
+                  </>
+                ) : (
+                  <>
+                    <Target className="h-4 w-4" />
+                    <span className="text-sm">Meta não atingida</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
