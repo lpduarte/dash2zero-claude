@@ -1115,7 +1115,7 @@ export const MunicipalityActionPlanModal = ({
       </div>;
   };
   return <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 border-b shrink-0">
           <div className="flex items-start justify-between pr-10">
@@ -1197,7 +1197,7 @@ export const MunicipalityActionPlanModal = ({
         </div>
         
         {/* Footer Navigation */}
-        <div className="p-4 border-t flex items-center justify-between shrink-0 bg-background">
+        <div className="p-4 border-t flex items-center justify-between shrink-0 bg-background rounded-b-lg">
           <Button variant="outline" onClick={handlePrevious} disabled={currentStep === 1} className="gap-2">
             <ChevronLeft className="h-4 w-4" />
             Anterior
