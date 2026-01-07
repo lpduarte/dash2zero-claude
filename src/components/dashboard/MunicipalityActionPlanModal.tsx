@@ -164,8 +164,8 @@ export const MunicipalityActionPlanModal = ({
 
     return (
       <div className="space-y-6">
-        {/* HEADER: Título Risco + Tag Multiplier */}
-        <div className="flex items-center justify-between">
+        {/* HEADER: Título Risco + Tag Multiplier - ENCOSTADOS */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-full ${config.iconBg} flex items-center justify-center`}>
               <RiskIcon className={`h-5 w-5 ${config.iconColor}`} />
@@ -218,33 +218,56 @@ export const MunicipalityActionPlanModal = ({
         
         <Separator />
         
-        {/* SECÇÃO 2: Consequências (Vermelho) */}
+        {/* SECÇÃO 2: Consequências (Vermelho) - VISÃO MUNICÍPIO */}
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <p className="text-sm font-medium text-red-700 dark:text-red-300">
-              Consequências (intensidade {'>'}1.5x média)
-            </p>
+            <h4 className="font-medium text-sm text-red-700 dark:text-red-300">
+              Consequências para o Município (intensidade {'>'}1.5x média)
+            </h4>
           </div>
           
-          <ul className="space-y-1.5 text-sm text-red-700 dark:text-red-300">
-            <li className="flex items-start gap-2">
-              <span>•</span>
-              <span>Aumento de até 60% nos custos regulatórios</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span>•</span>
-              <span>Dificuldade de acesso a crédito verde</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span>•</span>
-              <span>Risco de obsolescência tecnológica</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span>•</span>
-              <span>Pressão de stakeholders (investidores, clientes)</span>
-            </li>
-          </ul>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+            {/* Coluna 1 */}
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Empresa em risco de <strong>encerramento ou deslocalização</strong></span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Potencial <strong>perda de postos de trabalho</strong> no município</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Menor <strong>atratividade do território</strong> para investimento sustentável</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span><strong>Risco reputacional</strong> para o ecossistema empresarial local</span>
+              </li>
+            </ul>
+            
+            {/* Coluna 2 */}
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Perda de <strong>elegibilidade para fundos</strong> europeus e nacionais</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Exclusão de <strong>programas de apoio municipal</strong> à transição energética</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Dificuldade em atingir <strong>metas municipais</strong> de descarbonização</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <span className="text-red-400 mt-0.5">•</span>
+                <span>Aumento de <strong>custos regulatórios</strong> que afetam competitividade local</span>
+              </li>
+            </ul>
+          </div>
         </div>
         
         <Separator />
@@ -414,37 +437,41 @@ export const MunicipalityActionPlanModal = ({
       <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 border-b shrink-0">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-start justify-between">
             {/* Lado Esquerdo: Ícone + Título */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="p-2.5 rounded-lg bg-primary/10">
                 <Target className="h-5 w-5 text-primary" />
               </div>
-              <DialogTitle className="text-lg">
-                <span className="font-semibold">Plano de Ação</span>
-                <span className="font-normal text-muted-foreground"> — {supplier.name}</span>
-              </DialogTitle>
+              <div>
+                <DialogTitle className="text-2xl">
+                  <span className="font-bold">Plano de Ação</span>
+                  <span className="font-normal text-muted-foreground"> — {supplier.name}</span>
+                </DialogTitle>
+              </div>
             </div>
             
-            {/* Lado Direito: Tags */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-muted/30 text-xs">
-              <span className="text-muted-foreground">
-                Setor: <span className="text-foreground font-medium">{sectorLabels[supplier.sector] || supplier.sector}</span>
-              </span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">
-                Dimensão: <span className="text-foreground font-medium">{getDimensionLabel(supplier.companySize)}</span>
-              </span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">
-                Freguesia: <span className="text-foreground font-medium">{supplier.parish}</span>
-              </span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">
-                Risco: <span className={`font-medium ${riskLevel === 'alto' ? 'text-red-600 dark:text-red-400' : riskLevel === 'medio' ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}`}>
+            {/* Lado Direito: Tags + Close - ALINHADOS AO CENTRO */}
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 border rounded-lg bg-muted/30 text-sm">
+                <span className="text-muted-foreground">Setor: </span>
+                <span className="font-medium">{sectorLabels[supplier.sector] || supplier.sector}</span>
+                <span className="mx-2 text-muted-foreground">•</span>
+                <span className="text-muted-foreground">Dimensão: </span>
+                <span className="font-medium">{getDimensionLabel(supplier.companySize)}</span>
+                <span className="mx-2 text-muted-foreground">•</span>
+                <span className="text-muted-foreground">Freguesia: </span>
+                <span className="font-medium">{supplier.parish || 'N/A'}</span>
+                <span className="mx-2 text-muted-foreground">•</span>
+                <span className="text-muted-foreground">Risco: </span>
+                <span className={`font-medium ${
+                  riskLevel === 'alto' ? 'text-red-600' : 
+                  riskLevel === 'medio' ? 'text-amber-600' : 'text-green-600'
+                }`}>
                   {riskLevel === 'alto' ? 'Alto' : riskLevel === 'medio' ? 'Médio' : 'Baixo'}
                 </span>
-              </span>
+              </div>
+              {/* O botão close nativo do Dialog já está alinhado */}
             </div>
           </div>
         </DialogHeader>
