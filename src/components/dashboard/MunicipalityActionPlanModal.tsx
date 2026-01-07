@@ -437,7 +437,7 @@ export const MunicipalityActionPlanModal = ({
       <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 border-b shrink-0">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between pr-10">
             {/* Lado Esquerdo: Ícone + Título */}
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-primary/10">
