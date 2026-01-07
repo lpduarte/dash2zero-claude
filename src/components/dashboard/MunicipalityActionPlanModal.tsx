@@ -449,12 +449,15 @@ export const MunicipalityActionPlanModal = ({
     const reductionPct = supplier.totalEmissions > 0 
       ? (totalReduction / supplier.totalEmissions) * 100 : 0;
     
-    // Calcular nova intensidade
+    // Calcular intensidades
+    // Nota: emissionsPerRevenue já está em kg CO₂e/€
     const currentIntensity = supplier.emissionsPerRevenue || 0;
-    const newEmissions = Math.max(0, supplier.totalEmissions - totalReduction);
-    const newIntensity = supplier.revenue && supplier.revenue > 0 
-      ? (newEmissions / supplier.revenue) * 1000 
-      : currentIntensity * (1 - reductionPct / 100);
+    
+    // Calcular nova intensidade com base na redução proporcional
+    const reductionRatio = supplier.totalEmissions > 0 
+      ? totalReduction / supplier.totalEmissions 
+      : 0;
+    const newIntensity = currentIntensity * (1 - reductionRatio);
     const reachedTarget = newIntensity <= avgSectorIntensity;
     
     // Toggle medida
@@ -652,23 +655,30 @@ export const MunicipalityActionPlanModal = ({
               </div>
             </div>
             
-            {/* Barra Com Medidas (só mostra se houver seleção) */}
-            {selectedMeasures.length > 0 && (
-              <div className="space-y-1">
-                <span className="text-xs text-muted-foreground">Com medidas selecionadas</span>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full rounded-full transition-all ${reachedTarget ? 'bg-green-500' : 'bg-amber-500'}`}
-                      style={{ width: `${newBarWidth}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium w-28 text-right shrink-0">
-                    {newIntensity.toFixed(2)} kg CO₂e/€
-                  </span>
+            {/* Barra Com Medidas (sempre visível para evitar salto) */}
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground">Com medidas selecionadas</span>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all ${
+                      selectedMeasures.length > 0 
+                        ? (reachedTarget ? 'bg-green-500' : 'bg-amber-500')
+                        : 'bg-gray-400'
+                    }`}
+                    style={{ width: `${selectedMeasures.length > 0 ? newBarWidth : currentBarWidth}%` }}
+                  />
                 </div>
+                <span className={`text-xs font-medium w-28 text-right shrink-0 ${
+                  selectedMeasures.length === 0 ? 'text-muted-foreground' : ''
+                }`}>
+                  {selectedMeasures.length > 0 
+                    ? `${newIntensity.toFixed(2)} kg CO₂e/€`
+                    : 'Selecione medidas'
+                  }
+                </span>
               </div>
-            )}
+            </div>
             
             {/* Barra Média Setor */}
             <div className="space-y-1">
