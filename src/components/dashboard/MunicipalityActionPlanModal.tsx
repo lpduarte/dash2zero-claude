@@ -1209,10 +1209,24 @@ export const MunicipalityActionPlanModal = ({
             </span>
           </div>
           
-          <Button onClick={handleNext} disabled={currentStep === 4} className="gap-2">
-            Próximo
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <div className="relative group">
+            <Button 
+              onClick={handleNext} 
+              disabled={currentStep === 4 || (currentStep === 2 && selectedMeasures.length === 0)} 
+              className="gap-2"
+            >
+              Próximo
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            
+            {/* Tooltip quando disabled no Step 2 */}
+            {currentStep === 2 && selectedMeasures.length === 0 && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Selecione pelo menos uma medida
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+              </div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>;
