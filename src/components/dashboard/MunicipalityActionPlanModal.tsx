@@ -648,7 +648,7 @@ export const MunicipalityActionPlanModal = ({
         `}</style>
         
         {/* Header do step - Fixo */}
-        <div className="shrink-0 p-6 pb-4">
+        <div className="shrink-0 p-6 pb-4 border-b border-border/50">
           <div className="flex items-start justify-between">
             <div>
               <h3 className="font-semibold text-2xl mb-1">Seleção de Medidas</h3>
@@ -682,7 +682,7 @@ export const MunicipalityActionPlanModal = ({
         </div>
         
         {/* Colunas dos âmbitos - Scrollável */}
-        <div className="flex-1 overflow-y-auto px-6 min-h-0">
+        <div className="flex-1 overflow-y-auto px-6 pt-4 min-h-0">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4">
             {renderScopeColumn(1)}
             {renderScopeColumn(2)}
@@ -844,9 +844,9 @@ export const MunicipalityActionPlanModal = ({
     };
     
     const typeColors = {
-      subsidio: { border: 'border-green-500', bg: 'bg-green-50 dark:bg-green-950/30', text: 'text-green-700 dark:text-green-300', headerBg: 'bg-green-100 dark:bg-green-900/50' },
-      incentivo: { border: 'border-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-700 dark:text-blue-300', headerBg: 'bg-blue-100 dark:bg-blue-900/50' },
-      financiamento: { border: 'border-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', text: 'text-purple-700 dark:text-purple-300', headerBg: 'bg-purple-100 dark:bg-purple-900/50' },
+      subsidio: { border: 'border-green-500', bg: 'bg-green-50 dark:bg-green-950/30', text: 'text-green-700 dark:text-green-300', headerBg: 'bg-green-50 dark:bg-green-950/30', badge: 'bg-green-600 dark:bg-green-500' },
+      incentivo: { border: 'border-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-700 dark:text-blue-300', headerBg: 'bg-blue-50 dark:bg-blue-950/30', badge: 'bg-blue-600 dark:bg-blue-500' },
+      financiamento: { border: 'border-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', text: 'text-purple-700 dark:text-purple-300', headerBg: 'bg-purple-50 dark:bg-purple-950/30', badge: 'bg-purple-600 dark:bg-purple-500' },
     };
     
     // Toggle fundo
@@ -981,14 +981,14 @@ export const MunicipalityActionPlanModal = ({
       
       return (
         <div className="space-y-3">
-          {/* Header da coluna */}
-          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${colors.headerBg}`}>
-            <span className={`font-semibold text-sm ${colors.text}`}>
+          {/* Header da coluna - estilo igual às medidas */}
+          <div className={`flex items-center justify-between p-3 rounded-lg mb-3 ${colors.headerBg}`}>
+            <span className={`font-medium text-sm ${colors.text}`}>
               {typeLabels[type]}
             </span>
-            <Badge variant="secondary" className="text-xs">
+            <span className={`w-6 h-6 rounded-full text-white text-xs font-medium flex items-center justify-center ${colors.badge}`}>
               {funds.length}
-            </Badge>
+            </span>
           </div>
           
           {/* Lista de fundos */}
@@ -1008,7 +1008,7 @@ export const MunicipalityActionPlanModal = ({
     return (
       <div className="flex flex-col h-full">
         {/* Header do step - Fixo */}
-        <div className="shrink-0 p-6 pb-4">
+        <div className="shrink-0 p-6 pb-4 border-b border-border/50">
           <div>
             <h3 className="font-semibold text-2xl mb-1">Financiamento Disponível</h3>
             <p className="text-sm text-muted-foreground">
@@ -1028,7 +1028,7 @@ export const MunicipalityActionPlanModal = ({
         </div>
         
         {/* Colunas dos tipos de financiamento - Scrollável */}
-        <div className="flex-1 overflow-y-auto px-6 min-h-0">
+        <div className="flex-1 overflow-y-auto px-6 pt-4 min-h-0">
           {selectedMeasures.length > 0 && (
             <div className="grid grid-cols-3 gap-4 pb-4">
               {renderTypeColumn('subsidio')}
