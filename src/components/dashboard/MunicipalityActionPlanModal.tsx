@@ -64,12 +64,12 @@ export const MunicipalityActionPlanModal = ({
     notas: true,
   });
   
-  // Chave única para esta empresa
-  const storageKey = `actionPlan_${supplier.id}`;
+  // Chave única para esta empresa (com fallback para evitar erro se supplier é null)
+  const storageKey = supplier ? `actionPlan_${supplier.id}` : '';
   
   // Carregar estado ao abrir modal
   useEffect(() => {
-    if (open) {
+    if (open && storageKey) {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
         try {
@@ -88,7 +88,7 @@ export const MunicipalityActionPlanModal = ({
   
   // Guardar estado automaticamente
   useEffect(() => {
-    if (open) {
+    if (open && storageKey) {
       const dataToSave = {
         selectedMeasures,
         selectedFunding,
@@ -100,7 +100,9 @@ export const MunicipalityActionPlanModal = ({
       localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     }
   }, [selectedMeasures, selectedFunding, municipalityNotes, currentStep, expandedSections, storageKey, open]);
+  
   if (!supplier) return null;
+  
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1 as Step);
   };
