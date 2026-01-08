@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
-import { Award, TrendingDown, Euro, BarChart3, ChevronDown } from "lucide-react";
+import { Award, Trophy, TrendingDown, Euro, BarChart3, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
@@ -85,10 +85,14 @@ export const TopSuppliersHighlight = ({
     <Card className="border-success/50 bg-gradient-to-br from-success/10 via-primary/5 to-accent/10">
       <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-2xl">
-            <Award className="h-6 w-6 text-success" />
-            As melhores empresas
-          </CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted">
+              <Trophy className="h-5 w-5 text-success" />
+            </div>
+            <CardTitle className="text-lg font-semibold">
+              As melhores empresas
+            </CardTitle>
+          </div>
           <div className="flex items-center gap-2">
             <Select value={selectedSector} onValueChange={setSelectedSector}>
               <SelectTrigger className="w-[280px]">

@@ -52,6 +52,7 @@ export const MunicipalityActionPlanModal = ({
   const [selectedMeasures, setSelectedMeasures] = useState<string[]>([]);
   const [recommendedApplied, setRecommendedApplied] = useState(false);
   const [selectedFunding, setSelectedFunding] = useState<string[]>([]);
+  const [emailSent, setEmailSent] = useState(false);
   const [municipalityNotes, setMunicipalityNotes] = useState<string>('');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     proximosPassos: true,
@@ -113,6 +114,7 @@ export const MunicipalityActionPlanModal = ({
           if (parsed.municipalityNotes) setMunicipalityNotes(parsed.municipalityNotes);
           if (parsed.currentStep) setCurrentStep(parsed.currentStep);
           if (parsed.expandedSections) setExpandedSections(parsed.expandedSections);
+          if (parsed.emailSent) setEmailSent(parsed.emailSent);
         } catch (e) {
           console.error('Error loading saved action plan:', e);
         }
@@ -122,7 +124,15 @@ export const MunicipalityActionPlanModal = ({
   
   // Guardar estado automaticamente
   useEffect(() => {
-    if (open && storageKey) {
+    if (open && storageKey && supplier) {
+      // Calcular se atingiu a meta (necessário para status)
+      const selectedMeasureObjects = mockMeasures.filter(m => selectedMeasures.includes(m.id));
+      const totalReduction = selectedMeasureObjects.reduce((sum, m) => sum + m.emissionReduction, 0);
+      const reductionRatio = supplier.totalEmissions > 0 ? totalReduction / supplier.totalEmissions : 0;
+      const currentIntensity = supplier.emissionsPerRevenue || 0;
+      const newIntensity = currentIntensity * (1 - reductionRatio);
+      const reachedTarget = newIntensity <= avgSectorIntensity;
+      
       const dataToSave = {
         selectedMeasures,
         selectedFunding,
@@ -130,10 +140,13 @@ export const MunicipalityActionPlanModal = ({
         currentStep,
         expandedSections,
         lastUpdated: new Date().toISOString(),
+        // Flags para estado do plano
+        completedStep4: currentStep === 4,
+        reachedTarget: reachedTarget,
       };
       localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     }
-  }, [selectedMeasures, selectedFunding, municipalityNotes, currentStep, expandedSections, storageKey, open]);
+  }, [selectedMeasures, selectedFunding, municipalityNotes, currentStep, expandedSections, storageKey, open, supplier, avgSectorIntensity]);
   
   if (!supplier) return null;
   
@@ -1713,11 +1726,26 @@ export const MunicipalityActionPlanModal = ({
               </Button>
               <Button
                 variant="outline"
-                onClick={() => {/* TODO: Implementar envio email */}}
+                onClick={() => {
+                  // Marcar email como enviado
+                  setEmailSent(true);
+                  // Actualizar localStorage imediatamente
+                  if (storageKey) {
+                    const stored = localStorage.getItem(storageKey);
+                    if (stored) {
+                      const data = JSON.parse(stored);
+                      data.emailSent = true;
+                      data.emailSentAt = new Date().toISOString();
+                      localStorage.setItem(storageKey, JSON.stringify(data));
+                    }
+                  }
+                  // TODO: Implementar envio de email real
+                }}
                 className="gap-2"
+                disabled={emailSent}
               >
                 <Mail className="h-4 w-4" />
-                Enviar Email
+                {emailSent ? 'Email Enviado' : 'Enviar Email'}
               </Button>
               <Button
                 variant="outline"

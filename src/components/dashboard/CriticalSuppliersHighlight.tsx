@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target } from "lucide-react";
-import { useState, useMemo } from "react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, MoreHorizontal } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -15,6 +15,105 @@ import { useUser } from "@/contexts/UserContext";
 import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { calculateSuppliersRisk, SupplierRisk } from "@/lib/riskAnalysis";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
+// Tipos para estado do plano
+type PlanStatus = 'sem_plano' | 'em_preparacao' | 'plano_pronto' | 'enviado';
+
+interface PlanData {
+  selectedMeasures: string[];
+  selectedFunding: string[];
+  completedStep4?: boolean;
+  emailSent?: boolean;
+  emailSentAt?: string;
+  reachedTarget?: boolean;
+  lastStep?: number;
+}
+
+// Helper para obter dados do plano do localStorage
+const getPlanData = (supplierId: string): PlanData | null => {
+  try {
+    const stored = localStorage.getItem(`actionPlan_${supplierId}`);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Erro ao ler dados do plano:', e);
+  }
+  return null;
+};
+
+// Calcular estado do plano
+const getPlanStatus = (planData: PlanData | null): PlanStatus => {
+  if (!planData || !planData.selectedMeasures || planData.selectedMeasures.length === 0) {
+    return 'sem_plano';
+  }
+  
+  if (planData.emailSent) {
+    return 'enviado';
+  }
+  
+  if (planData.completedStep4) {
+    return 'plano_pronto';
+  }
+  
+  return 'em_preparacao';
+};
+
+// Configuração visual dos estados
+const statusConfig = {
+  sem_plano: {
+    label: 'Sem plano',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    icon: XCircle,
+    targetStep: 1,
+  },
+  em_preparacao: {
+    label: 'Em preparação',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+    borderColor: 'border-amber-200',
+    icon: Clock,
+    targetStep: 2,
+  },
+  plano_pronto: {
+    label: 'Plano pronto',
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    icon: CheckCircle,
+    targetStep: 4,
+  },
+  enviado: {
+    label: 'Enviado',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    icon: Mail,
+    targetStep: 4,
+  },
+};
+
+// Helper para nível de risco baseado em intensidade
+const getRiskLevel = (intensity: number, avgSector: number): string => {
+  const ratio = intensity / avgSector;
+  if (ratio >= 2) return 'Crítico';
+  if (ratio >= 1.5) return 'Alto';
+  if (ratio >= 1) return 'Médio';
+  return 'Baixo';
+};
+
+const getRiskColor = (level: string): string => {
+  switch (level) {
+    case 'Crítico': return 'text-red-600';
+    case 'Alto': return 'text-orange-600';
+    case 'Médio': return 'text-amber-600';
+    case 'Baixo': return 'text-green-600';
+    default: return 'text-muted-foreground';
+  }
+};
 
 interface CriticalSuppliersHighlightProps {
   suppliers: Supplier[];
@@ -208,24 +307,28 @@ export const CriticalSuppliersHighlight = ({
         )}>
           <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
             <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-2xl">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted">
                   {isMunicipio ? (
-                    <Landmark className="h-6 w-6 text-primary" />
+                    <Target className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <AlertTriangle className="h-6 w-6 text-danger" />
+                    <AlertTriangle className="h-5 w-5 text-danger" />
                   )}
-                  {isMunicipio 
-                    ? 'Top 5 Empresas para Monitorização'
-                    : 'Empresas críticas e alternativas'
-                  }
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {isMunicipio 
-                    ? 'Empresas prioritárias para apoio à descarbonização e acesso a fundos'
-                    : 'Parceiros com maior impacto ambiental na supply chain'
-                  }
-                </p>
+                </div>
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                    {isMunicipio 
+                      ? 'Empresas a Monitorizar'
+                      : 'Empresas críticas e alternativas'
+                    }
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {isMunicipio 
+                      ? 'Acompanhamento de planos de descarbonização'
+                      : 'Parceiros com maior impacto ambiental na supply chain'
+                    }
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {!isMunicipio && (
@@ -270,14 +373,13 @@ export const CriticalSuppliersHighlight = ({
           </CardHeader>
           <CollapsibleContent>
             <CardContent>
-              {/* Vista de tabela para municípios */}
+              {/* Vista de tabela para municípios - REESTRUTURADA */}
               {isMunicipio && (
                 <div className="space-y-4">
                   <div className="overflow-x-auto rounded-lg border border-border">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted/50">
-                          <TableHead className="w-[50px] text-center">#</TableHead>
                           <TableHead>
                             <button 
                               onClick={() => handleSort('name')}
@@ -288,138 +390,191 @@ export const CriticalSuppliersHighlight = ({
                             </button>
                           </TableHead>
                           <TableHead>
-                            <button 
-                              onClick={() => handleSort('sector')}
-                              className="flex items-center gap-1 hover:text-primary transition-colors"
-                            >
-                              Setor
-                              <ArrowUpDown className="h-3 w-3" />
-                            </button>
-                          </TableHead>
-                          <TableHead>Dimensão</TableHead>
-                          <TableHead>Freguesia</TableHead>
-                          <TableHead className="text-right">
-                            <button 
-                              onClick={() => handleSort('emissions')}
-                              className="flex items-center gap-1 hover:text-primary transition-colors ml-auto"
-                            >
-                              Emissões
-                              <ArrowUpDown className="h-3 w-3" />
-                            </button>
-                          </TableHead>
-                          <TableHead className="text-right">
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <button 
                                     onClick={() => handleSort('risk')}
-                                    className="flex items-center gap-1 hover:text-primary transition-colors ml-auto"
+                                    className="flex items-center gap-1 hover:text-primary transition-colors"
                                   >
-                                    Risco
+                                    Intensidade
                                     <Info className="h-3 w-3" />
                                     <ArrowUpDown className="h-3 w-3" />
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent side="top" className="max-w-[280px]">
                                   <div className="space-y-2 text-xs">
-                                    <p className="font-medium">Risco financeiro baseado em intensidade de carbono vs média do setor.</p>
+                                    <p className="font-medium">Intensidade de carbono vs média do setor.</p>
                                     <div className="space-y-1">
-                                      <p><Badge variant="destructive" className="text-[10px] px-1 py-0 mr-1">Alto</Badge> {">"} 1.5x: Riscos regulatórios e financeiros</p>
-                                      <p><Badge variant="default" className="text-[10px] px-1 py-0 mr-1">Médio</Badge> 1.2-1.5x: Atenção recomendada</p>
-                                      <p><Badge variant="secondary" className="text-[10px] px-1 py-0 mr-1">Normal</Badge> {"<"} 1.2x: Zona segura</p>
+                                      <p><span className="text-red-600 font-medium">Crítico:</span> ≥2x média do setor</p>
+                                      <p><span className="text-orange-600 font-medium">Alto:</span> 1.5-2x média</p>
+                                      <p><span className="text-amber-600 font-medium">Médio:</span> 1-1.5x média</p>
+                                      <p><span className="text-green-600 font-medium">Baixo:</span> {"<"}1x média</p>
                                     </div>
                                   </div>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
                           </TableHead>
-                          <TableHead className="w-[80px] text-center">Ação</TableHead>
+                          <TableHead>Estado</TableHead>
+                          <TableHead>Medidas/Fundos</TableHead>
+                          <TableHead className="w-[60px] text-center">Ação</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {sortedMunicipioSuppliers.map((item, index) => (
-                          <TableRow key={item.supplier.id} className="hover:bg-primary/5">
-                            <TableCell className="text-center font-medium text-muted-foreground">
-                              {index + 1}
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {item.supplier.name}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {sectorLabels[item.supplier.sector] || item.supplier.sector}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-xs">
-                                {getDimensionLabel(item.supplier.companySize)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {item.supplier.parish}
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                              {item.supplier.totalEmissions.toLocaleString('pt-PT')} t
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <TooltipProvider>
-                                <Tooltip delayDuration={100}>
-                                  <TooltipTrigger asChild>
-                                    <div className="inline-block cursor-help">
-                                      {getRiskBadge(item.riskLevel, item.riskMultiplier)}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="left" className="max-w-[280px]">
-                                    <div className="space-y-2 text-xs">
-                                      <p className="font-semibold">{item.supplier.name}</p>
-                                      <div className="space-y-1 text-muted-foreground">
-                                        <p>Intensidade: <span className="font-medium text-foreground">{item.supplier.emissionsPerRevenue.toFixed(2)} kg CO₂e/€</span></p>
-                                        <p>Média {sectorLabels[item.supplier.sector] || item.supplier.sector}: <span className="font-medium text-foreground">{item.avgSectorIntensity.toFixed(2)} kg CO₂e/€</span></p>
-                                      </div>
-                                      <p className={cn(
-                                        "pt-1 border-t border-border",
-                                        item.riskLevel === 'alto' ? 'text-destructive' : 
-                                        item.riskLevel === 'medio' ? 'text-warning' : 'text-success'
-                                      )}>
-                                        {item.riskLevel === 'alto' && 'Empresa em risco financeiro. Prioritária para apoio municipal.'}
-                                        {item.riskLevel === 'medio' && 'Atenção recomendada. Considerar apoio preventivo.'}
-                                        {item.riskLevel === 'normal' && 'Zona segura. Monitorização regular suficiente.'}
-                                      </p>
-                                    </div>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-8 px-2 gap-1"
-                                onClick={() => {
-                                  setSelectedMunicipalitySupplier({
-                                    supplier: item.supplier,
-                                    riskLevel: item.riskLevel,
-                                    riskMultiplier: item.riskMultiplier,
-                                    avgSectorIntensity: item.avgSectorIntensity
-                                  });
-                                  setMunicipalityPlanOpen(true);
-                                }}
-                              >
-                                <Target className="h-3.5 w-3.5" />
-                                Plano
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {sortedMunicipioSuppliers.map((item) => {
+                          const planData = getPlanData(item.supplier.id);
+                          const status = getPlanStatus(planData);
+                          const config = statusConfig[status];
+                          const StatusIcon = config.icon;
+                          const measuresCount = planData?.selectedMeasures?.length || 0;
+                          const fundingCount = planData?.selectedFunding?.length || 0;
+                          const riskLevelLabel = getRiskLevel(item.supplier.emissionsPerRevenue, item.avgSectorIntensity);
+                          const isAboveAverage = item.supplier.emissionsPerRevenue > item.avgSectorIntensity;
+                          const showTarget = status === 'plano_pronto' || status === 'enviado';
+                          const targetReached = planData?.reachedTarget;
+                          
+                          return (
+                            <TableRow key={item.supplier.id} className="hover:bg-primary/5">
+                              {/* Coluna Empresa */}
+                              <TableCell className="font-medium">
+                                {item.supplier.name}
+                              </TableCell>
+                              
+                              {/* Coluna Intensidade + Risco */}
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{item.supplier.emissionsPerRevenue.toFixed(2)}</span>
+                                    <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
+                                    {isAboveAverage ? (
+                                      <TrendingUp className="h-3 w-3 text-red-500" />
+                                    ) : (
+                                      <TrendingDown className="h-3 w-3 text-green-500" />
+                                    )}
+                                  </div>
+                                  <span className={`text-xs font-medium ${getRiskColor(riskLevelLabel)}`}>
+                                    Risco {riskLevelLabel}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              
+                              {/* Coluna Estado */}
+                              <TableCell>
+                                <button
+                                  onClick={() => {
+                                    setSelectedMunicipalitySupplier({
+                                      supplier: item.supplier,
+                                      riskLevel: item.riskLevel,
+                                      riskMultiplier: item.riskMultiplier,
+                                      avgSectorIntensity: item.avgSectorIntensity
+                                    });
+                                    setMunicipalityPlanOpen(true);
+                                  }}
+                                  className={cn(
+                                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                                    config.bgColor, config.color, config.borderColor,
+                                    "border hover:opacity-80 transition-opacity cursor-pointer"
+                                  )}
+                                >
+                                  <StatusIcon className="h-3 w-3" />
+                                  <span>{config.label}</span>
+                                  {showTarget && (
+                                    <span className={targetReached ? 'text-green-600' : 'text-amber-600'}>
+                                      {targetReached ? '✓' : '✗'}
+                                    </span>
+                                  )}
+                                </button>
+                              </TableCell>
+                              
+                              {/* Coluna Medidas/Fundos */}
+                              <TableCell>
+                                {measuresCount === 0 && fundingCount === 0 ? (
+                                  <span className="text-muted-foreground">—</span>
+                                ) : (
+                                  <div className="flex items-center gap-1 text-sm">
+                                    {measuresCount > 0 ? (
+                                      <span className="text-foreground">{measuresCount} medida{measuresCount !== 1 ? 's' : ''}</span>
+                                    ) : (
+                                      <span className="text-muted-foreground">—</span>
+                                    )}
+                                    <span className="text-muted-foreground">·</span>
+                                    {fundingCount > 0 ? (
+                                      <span className="text-foreground">{fundingCount} fundo{fundingCount !== 1 ? 's' : ''}</span>
+                                    ) : (
+                                      <span className="text-muted-foreground">—</span>
+                                    )}
+                                  </div>
+                                )}
+                              </TableCell>
+                              
+                              {/* Coluna Ação */}
+                              <TableCell className="text-center">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setSelectedMunicipalitySupplier({
+                                          supplier: item.supplier,
+                                          riskLevel: item.riskLevel,
+                                          riskMultiplier: item.riskMultiplier,
+                                          avgSectorIntensity: item.avgSectorIntensity
+                                        });
+                                        setMunicipalityPlanOpen(true);
+                                      }}
+                                    >
+                                      <Target className="h-4 w-4 mr-2" />
+                                      Ver plano
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        // TODO: Enviar email
+                                      }}
+                                      disabled={status === 'sem_plano'}
+                                    >
+                                      <Mail className="h-4 w-4 mr-2" />
+                                      Enviar email
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
                   
-                  {/* Nota explicativa */}
+                  {/* Legenda dos estados */}
                   <div className="bg-muted/30 rounded-lg p-3 border border-border">
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium">💡 Nota:</span> Empresas com risco alto ({">"}1.5x média do setor)
-                      enfrentam custos regulatórios aumentados e restrições de financiamento. 
-                      São prioritárias para programas de apoio municipal.
-                    </p>
+                    <div className="flex flex-wrap items-center gap-4 text-xs">
+                      <span className="font-medium text-muted-foreground">Legenda:</span>
+                      <div className="flex items-center gap-1.5">
+                        <XCircle className="h-3 w-3 text-red-600" />
+                        <span className="text-muted-foreground">Sem plano</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-3 w-3 text-amber-600" />
+                        <span className="text-muted-foreground">Em preparação</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle className="h-3 w-3 text-green-600" />
+                        <span className="text-muted-foreground">Plano pronto</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Mail className="h-3 w-3 text-blue-600" />
+                        <span className="text-muted-foreground">Enviado</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
