@@ -55,7 +55,6 @@ export const MunicipalityActionPlanModal = ({
   const [municipalityNotes, setMunicipalityNotes] = useState<string>('');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     proximosPassos: true,
-    empresa: true,
     diagnosticoImpacto: true,
     medidas: true,
     financiamento: true,
@@ -91,7 +90,6 @@ export const MunicipalityActionPlanModal = ({
     const newState = !allExpanded;
     setExpandedSections({
       proximosPassos: newState,
-      empresa: newState,
       diagnosticoImpacto: newState,
       medidas: newState,
       financiamento: newState,
@@ -1326,6 +1324,9 @@ export const MunicipalityActionPlanModal = ({
               <h3 className="font-semibold text-2xl mb-1">Resumo do Plano de Ação</h3>
               <p className="text-sm text-muted-foreground">
                 Reveja o plano antes de exportar ou enviar à empresa.
+                <span className="text-muted-foreground/70 ml-1">
+                  • Gerado em {new Date().toLocaleDateString('pt-PT')}
+                </span>
               </p>
             </div>
             
@@ -1333,7 +1334,7 @@ export const MunicipalityActionPlanModal = ({
             <button
               type="button"
               onClick={toggleAllSections}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium border rounded-lg hover:bg-muted transition-colors"
             >
               {allExpanded ? (
                 <>
@@ -1433,39 +1434,83 @@ export const MunicipalityActionPlanModal = ({
             </div>
           </CollapsibleSection>
 
-          {/* SECÇÃO: Empresa */}
-          <CollapsibleSection id="empresa" title="Empresa" icon={Building2}>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Nome</p>
-                <p className="font-medium">{supplier.name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Setor</p>
-                <p className="font-medium">{sectorLabels[supplier.sector] || supplier.sector}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Dimensão</p>
-                <p className="font-medium">{getDimensionLabel(supplier.companySize)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Freguesia</p>
-                <p className="font-medium">{supplier.parish || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Emissões Totais</p>
-                <p className="font-medium">{supplier.totalEmissions.toLocaleString('pt-PT')} t CO₂e</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Receita</p>
-                <p className="font-medium">{supplier.revenue.toLocaleString('pt-PT')}€</p>
-              </div>
-            </div>
-          </CollapsibleSection>
-
           {/* SECÇÃO: Diagnóstico e Impacto (UNIFICADA) */}
           <CollapsibleSection id="diagnosticoImpacto" title="Diagnóstico e Impacto" icon={BarChart3}>
             <div className="space-y-6">
+              {/* Dados Base */}
+              <div>
+                <h5 className="text-sm font-medium text-muted-foreground mb-3">Dados Base</h5>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Faturação</p>
+                    <p className="font-semibold text-lg">{supplier.revenue.toLocaleString('pt-PT')}€</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Emissões Totais</p>
+                    <p className="font-semibold text-lg">{supplier.totalEmissions.toLocaleString('pt-PT')} t CO₂e</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Emissões por Âmbito */}
+              <div>
+                <h5 className="text-sm font-medium text-muted-foreground mb-3">Emissões por Âmbito</h5>
+                <div className="grid grid-cols-3 gap-4">
+                  {/* Âmbito 1 - Violet */}
+                  <div className="p-3 bg-violet-50 dark:bg-violet-950/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 rounded-full bg-violet-500" />
+                      <p className="text-xs text-violet-600 dark:text-violet-400">Âmbito 1 - Diretas</p>
+                    </div>
+                    <p className="font-semibold text-lg text-violet-700 dark:text-violet-300">
+                      {(supplier.scope1 || 0).toLocaleString('pt-PT')} t CO₂e
+                    </p>
+                    <p className="text-xs text-violet-600 dark:text-violet-400">
+                      {supplier.totalEmissions > 0 
+                        ? `${((supplier.scope1 || 0) / supplier.totalEmissions * 100).toFixed(0)}%`
+                        : '0%'
+                      }
+                    </p>
+                  </div>
+                  
+                  {/* Âmbito 2 - Blue */}
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      <p className="text-xs text-blue-600 dark:text-blue-400">Âmbito 2 - Energia</p>
+                    </div>
+                    <p className="font-semibold text-lg text-blue-700 dark:text-blue-300">
+                      {(supplier.scope2 || 0).toLocaleString('pt-PT')} t CO₂e
+                    </p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                      {supplier.totalEmissions > 0 
+                        ? `${((supplier.scope2 || 0) / supplier.totalEmissions * 100).toFixed(0)}%`
+                        : '0%'
+                      }
+                    </p>
+                  </div>
+                  
+                  {/* Âmbito 3 - Orange */}
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 rounded-full bg-orange-500" />
+                      <p className="text-xs text-orange-600 dark:text-orange-400">Âmbito 3 - Indiretas</p>
+                    </div>
+                    <p className="font-semibold text-lg text-orange-700 dark:text-orange-300">
+                      {(supplier.scope3 || 0).toLocaleString('pt-PT')} t CO₂e
+                    </p>
+                    <p className="text-xs text-orange-600 dark:text-orange-400">
+                      {supplier.totalEmissions > 0 
+                        ? `${((supplier.scope3 || 0) / supplier.totalEmissions * 100).toFixed(0)}%`
+                        : '0%'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
               {/* Intensidades */}
               <div>
                 <h5 className="text-sm font-medium text-muted-foreground mb-3">Intensidade de Carbono</h5>
@@ -1640,29 +1685,47 @@ export const MunicipalityActionPlanModal = ({
 
         </div>
         
-        {/* Footer com acções - Fixo */}
-        <div className="shrink-0 p-6 pt-4 border-t border-border/50 bg-muted/10 rounded-b-lg overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Plano gerado em {new Date().toLocaleDateString('pt-PT')}
-            </p>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {/* TODO: Implementar envio email */}}
-                className="gap-2"
-              >
-                <Mail className="h-4 w-4" />
-                Enviar Email
-              </Button>
-              <Button
-                onClick={() => {/* TODO: Implementar exportação PDF */}}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Exportar PDF
-              </Button>
-            </div>
+        {/* Footer - Fixo (IGUAL AOS OUTROS STEPS) */}
+        <div className="shrink-0 flex items-center justify-between p-4 border-t bg-background">
+          {/* Esquerda - Botão Anterior */}
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep(3)}
+            className="gap-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Anterior
+          </Button>
+          
+          {/* Centro - Indicador de passo */}
+          <span className="text-sm text-muted-foreground">
+            Passo 4 de 4
+          </span>
+          
+          {/* Direita - Acções */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Fechar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {/* TODO: Implementar envio email */}}
+              className="gap-2"
+            >
+              <Mail className="h-4 w-4" />
+              Enviar Email
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {/* TODO: Implementar exportação PDF */}}
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Exportar PDF
+            </Button>
           </div>
         </div>
       </div>
