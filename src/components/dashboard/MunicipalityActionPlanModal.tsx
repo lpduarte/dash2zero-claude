@@ -56,10 +56,9 @@ export const MunicipalityActionPlanModal = ({
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     proximosPassos: true,
     empresa: true,
-    diagnostico: true,
+    diagnosticoImpacto: true, // Secção unificada
     medidas: true,
     financiamento: true,
-    impacto: true,
     contexto: false,
     notas: true,
   });
@@ -1252,10 +1251,10 @@ export const MunicipalityActionPlanModal = ({
     const coveragePercent = totalInvestment > 0 ? (totalCoverage / totalInvestment) * 100 : 0;
     const remaining = Math.max(0, totalInvestment - totalCoverage);
     
-    // Nova intensidade
+    // Nova intensidade - usar redução proporcional (consistente com Step 2)
     const currentIntensity = supplier.emissionsPerRevenue || 0;
-    const newEmissions = supplier.totalEmissions - totalReduction;
-    const newIntensity = supplier.revenue > 0 ? (newEmissions / supplier.revenue) * 1000 : 0;
+    const reductionRatio = supplier.totalEmissions > 0 ? totalReduction / supplier.totalEmissions : 0;
+    const newIntensity = currentIntensity * (1 - reductionRatio);
     const reachedTarget = newIntensity <= avgSectorIntensity;
     
     // Próximos prazos de fundos (ordenados por data)
@@ -1388,27 +1387,32 @@ export const MunicipalityActionPlanModal = ({
             </div>
           </CollapsibleSection>
 
-          {/* SECÇÃO: Diagnóstico */}
-          <CollapsibleSection id="diagnostico" title="Diagnóstico" icon={BarChart3}>
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg text-center">
-                  <p className="text-xs text-red-600 dark:text-red-400 mb-1">Intensidade Actual</p>
-                  <p className="font-semibold text-red-700 dark:text-red-300">{currentIntensity.toFixed(2)}</p>
-                  <p className="text-xs text-red-600 dark:text-red-400">kg CO₂e/€</p>
-                </div>
-                <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg text-center">
-                  <p className="text-xs text-green-600 dark:text-green-400 mb-1">Nova Intensidade</p>
-                  <p className="font-semibold text-green-700 dark:text-green-300">{newIntensity.toFixed(2)}</p>
-                  <p className="text-xs text-green-600 dark:text-green-400">kg CO₂e/€</p>
-                </div>
-                <div className="p-3 bg-muted rounded-lg text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Média do Setor</p>
-                  <p className="font-semibold">{avgSectorIntensity.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">kg CO₂e/€</p>
+          {/* SECÇÃO: Diagnóstico e Impacto (UNIFICADA) */}
+          <CollapsibleSection id="diagnosticoImpacto" title="Diagnóstico e Impacto" icon={BarChart3}>
+            <div className="space-y-6">
+              {/* Intensidades */}
+              <div>
+                <h5 className="text-sm font-medium text-muted-foreground mb-3">Intensidade de Carbono</h5>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-lg text-center">
+                    <p className="text-xs text-red-600 dark:text-red-400 mb-1">Intensidade Actual</p>
+                    <p className="font-semibold text-xl text-red-700 dark:text-red-300">{currentIntensity.toFixed(2)}</p>
+                    <p className="text-xs text-red-600 dark:text-red-400">kg CO₂e/€</p>
+                  </div>
+                  <div className={`p-4 rounded-lg text-center ${reachedTarget ? 'bg-green-50 dark:bg-green-950/30' : 'bg-amber-50 dark:bg-amber-950/30'}`}>
+                    <p className={`text-xs mb-1 ${reachedTarget ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>Nova Intensidade</p>
+                    <p className={`font-semibold text-xl ${reachedTarget ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>{newIntensity.toFixed(2)}</p>
+                    <p className={`text-xs ${reachedTarget ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>kg CO₂e/€</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground mb-1">Média do Setor</p>
+                    <p className="font-semibold text-xl">{avgSectorIntensity.toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground">kg CO₂e/€</p>
+                  </div>
                 </div>
               </div>
               
+              {/* Estado da Meta */}
               <div className={`flex items-center gap-2 p-3 rounded-lg ${reachedTarget ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300' : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300'}`}>
                 {reachedTarget ? (
                   <>
@@ -1421,6 +1425,35 @@ export const MunicipalityActionPlanModal = ({
                     <span className="font-medium">Meta não atingida. Considere adicionar mais medidas.</span>
                   </>
                 )}
+              </div>
+              
+              <Separator />
+              
+              {/* Impacto Total */}
+              <div>
+                <h5 className="text-sm font-medium text-muted-foreground mb-3">Impacto das Medidas</h5>
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg text-center">
+                    <p className="text-xs text-green-600 dark:text-green-400 mb-1">Redução</p>
+                    <p className="font-semibold text-xl text-green-700 dark:text-green-300">-{totalReduction.toLocaleString('pt-PT')}t</p>
+                    <p className="text-xs text-green-600 dark:text-green-400">CO₂e ({reductionPercent.toFixed(0)}%)</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground mb-1">Investimento</p>
+                    <p className="font-semibold text-xl">{totalInvestment.toLocaleString('pt-PT')}€</p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-center">
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">Comparticipação</p>
+                    <p className="font-semibold text-xl text-blue-700 dark:text-blue-300">{totalCoverage.toLocaleString('pt-PT')}€</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400">Até {coveragePercent.toFixed(0)}%</p>
+                  </div>
+                  <div className={`p-4 rounded-lg text-center ${remaining === 0 ? 'bg-green-50 dark:bg-green-950/30' : 'bg-amber-50 dark:bg-amber-950/30'}`}>
+                    <p className={`text-xs mb-1 ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>A cargo da empresa</p>
+                    <p className={`font-semibold text-xl ${remaining === 0 ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>{remaining.toLocaleString('pt-PT')}€</p>
+                    <p className={`text-xs ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{(100 - coveragePercent).toFixed(0)}%</p>
+                  </div>
+                </div>
               </div>
             </div>
           </CollapsibleSection>
@@ -1480,32 +1513,6 @@ export const MunicipalityActionPlanModal = ({
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">Nenhum fundo selecionado</p>
             )}
-          </CollapsibleSection>
-
-          {/* SECÇÃO: Impacto Total */}
-          <CollapsibleSection id="impacto" title="Impacto Total" icon={TrendingDown}>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg text-center">
-                <p className="text-xs text-green-600 dark:text-green-400 mb-1">Redução</p>
-                <p className="font-semibold text-xl text-green-700 dark:text-green-300">-{totalReduction.toLocaleString('pt-PT')}t</p>
-                <p className="text-xs text-green-600 dark:text-green-400">CO₂e ({reductionPercent.toFixed(0)}%)</p>
-              </div>
-              <div className="p-4 bg-muted rounded-lg text-center">
-                <p className="text-xs text-muted-foreground mb-1">Investimento</p>
-                <p className="font-semibold text-xl">{totalInvestment.toLocaleString('pt-PT')}€</p>
-                <p className="text-xs text-muted-foreground">Total</p>
-              </div>
-              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-center">
-                <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">Comparticipação</p>
-                <p className="font-semibold text-xl text-blue-700 dark:text-blue-300">{totalCoverage.toLocaleString('pt-PT')}€</p>
-                <p className="text-xs text-blue-600 dark:text-blue-400">Até {coveragePercent.toFixed(0)}%</p>
-              </div>
-              <div className={`p-4 rounded-lg text-center ${remaining === 0 ? 'bg-green-50 dark:bg-green-950/30' : 'bg-amber-50 dark:bg-amber-950/30'}`}>
-                <p className={`text-xs mb-1 ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>A cargo da empresa</p>
-                <p className={`font-semibold text-xl ${remaining === 0 ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>{remaining.toLocaleString('pt-PT')}€</p>
-                <p className={`text-xs ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{(100 - coveragePercent).toFixed(0)}%</p>
-              </div>
-            </div>
           </CollapsibleSection>
 
           {/* SECÇÃO: Contexto do Município */}
