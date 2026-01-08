@@ -34,23 +34,17 @@ import { mockClusters, emailTemplates } from "@/data/mockClusters";
 import { mockSuppliers } from "@/data/mockSuppliers";
 import { Cluster, ClusterProvider } from "@/types/cluster";
 import { UniversalFilterState } from "@/types/supplier";
-import { Mail, Upload, Download, Search, X, Building2, Users, Handshake, LayoutGrid, Plus } from "lucide-react";
+import { Mail, Upload, Download, Search, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
+import { getClusterConfig, ClusterType } from "@/config/clusters";
 
 const ITEMS_PER_PAGE = 10;
 
-type ClusterType = 'all' | 'fornecedor' | 'cliente' | 'parceiro';
-
-const clusterOptions = [
-  { value: 'all' as ClusterType, label: 'Todas', icon: LayoutGrid },
-  { value: 'fornecedor' as ClusterType, label: 'Fornecedores', icon: Building2 },
-  { value: 'cliente' as ClusterType, label: 'Clientes', icon: Users },
-  { value: 'parceiro' as ClusterType, label: 'Parceiros', icon: Handshake },
-];
-
 export default function ClusterManagement() {
-  const { user, isMunicipio } = useUser();
+  const { user, isMunicipio, userType } = useUser();
+  const clusterOptions = getClusterConfig(userType);
+  
   const [clusters, setClusters] = useState<Cluster[]>(mockClusters);
   const [selectedClusterType, setSelectedClusterType] = useState<ClusterType>('all');
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -267,7 +261,7 @@ export default function ClusterManagement() {
                       )}
                     >
                       <Icon className="h-4 w-4" />
-                      <span className="font-medium">{option.label}</span>
+                      <span className="font-medium">{option.labelPlural}</span>
                       <span
                         className={cn(
                           "ml-1 px-2 py-0.5 rounded-full text-xs font-semibold",

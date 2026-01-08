@@ -1,26 +1,16 @@
-import { Building2, Users, Handshake } from "lucide-react";
 import { sectorLabels } from "@/data/sectors";
+import { useUser } from "@/contexts/UserContext";
+import { getClusterInfo } from "@/config/clusters";
+import type { ClusterType } from "@/config/clusters";
 
 // Re-export for backward compatibility
 export { sectorLabels };
 
+// Legacy export for backward compatibility
 export const clusterLabels: Record<string, string> = {
   fornecedor: "Fornecedores",
   cliente: "Clientes",
   parceiro: "Parceiros"
-};
-
-const ClusterIcon = ({ cluster }: { cluster: string }) => {
-  switch (cluster) {
-    case 'fornecedor':
-      return <Building2 className="h-3 w-3" />;
-    case 'cliente':
-      return <Users className="h-3 w-3" />;
-    case 'parceiro':
-      return <Handshake className="h-3 w-3" />;
-    default:
-      return null;
-  }
 };
 
 interface SupplierLabelProps {
@@ -29,9 +19,16 @@ interface SupplierLabelProps {
 }
 
 export const SupplierLabel = ({ sector, cluster }: SupplierLabelProps) => {
+  const { userType } = useUser();
+  const clusterInfo = getClusterInfo(userType, cluster as ClusterType);
+  const ClusterIcon = clusterInfo?.icon;
+  
   return (
     <p className="text-xs text-muted-foreground flex items-center gap-1">
-      {sectorLabels[sector] || sector} • <ClusterIcon cluster={cluster} /> {clusterLabels[cluster] || cluster}
+      {sectorLabels[sector] || sector} • 
+      {ClusterIcon && <ClusterIcon className="h-3 w-3" />}
+      {clusterInfo?.label || cluster}
     </p>
   );
 };
+

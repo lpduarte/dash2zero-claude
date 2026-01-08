@@ -4,13 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Supplier } from "@/types/supplier";
 import { getSectorName } from "@/data/sectors";
-import { Building2, Users, Handshake } from "lucide-react";
-
-const clusterConfig: Record<string, { label: string; icon: React.ReactNode }> = {
-  fornecedor: { label: "Fornecedor", icon: <Building2 className="h-3 w-3" /> },
-  cliente: { label: "Cliente", icon: <Users className="h-3 w-3" /> },
-  parceiro: { label: "Parceiro", icon: <Handshake className="h-3 w-3" /> },
-};
+import { useUser } from "@/contexts/UserContext";
+import { getClusterInfo, ClusterType } from "@/config/clusters";
 
 type MetricType = 'total' | 'perRevenue' | 'perEmployee' | 'perArea';
 
@@ -48,8 +43,18 @@ interface SupplierEmissionsChartProps {
 export const SupplierEmissionsChart = ({
   suppliers
 }: SupplierEmissionsChartProps) => {
+  const { userType } = useUser();
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('total');
   
+  const getClusterDisplay = (cluster: string) => {
+    const info = getClusterInfo(userType, cluster as ClusterType);
+    const Icon = info?.icon;
+    return {
+      label: info?.label || cluster,
+      icon: Icon ? <Icon className="h-3 w-3" /> : null
+    };
+  };
+
   const getMetricValue = (supplier: Supplier): number => {
     switch (selectedMetric) {
       case 'total': return supplier.totalEmissions;
@@ -141,7 +146,7 @@ export const SupplierEmissionsChart = ({
             }) => {
               if (!active || !payload || !payload[0]) return null;
               const data = payload[0].payload;
-              const cluster = clusterConfig[data.cluster] || { label: data.cluster, icon: null };
+              const cluster = getClusterDisplay(data.cluster);
               return (
                 <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
                   <p className="font-semibold mb-2">{data.fullName}</p>

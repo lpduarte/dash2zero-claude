@@ -27,11 +27,13 @@ import {
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Send, Loader2, ChevronDown, ChevronRight, History, LayoutGrid, Users, Handshake, ShoppingCart, Search, X } from "lucide-react";
+import { Mail, Send, Loader2, ChevronDown, ChevronRight, History, Search, X } from "lucide-react";
 import { mockMissingCompanies, emailTemplates, MissingCompany } from "@/data/mockMissingCompanies";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
+import { useUser } from "@/contexts/UserContext";
+import { getClusterConfig, getClusterInfo, ClusterType } from "@/config/clusters";
 
 interface IncentiveEmailDialogProps {
   open: boolean;
@@ -39,19 +41,15 @@ interface IncentiveEmailDialogProps {
   companiesMissing: number;
 }
 
-const clusterLabels: Record<string, { label: string; icon: React.ReactNode }> = {
-  all: { label: "Todos", icon: <LayoutGrid className="h-4 w-4" /> },
-  fornecedor: { label: "Fornecedores", icon: <ShoppingCart className="h-4 w-4" /> },
-  cliente: { label: "Clientes", icon: <Users className="h-4 w-4" /> },
-  parceiro: { label: "Parceiros", icon: <Handshake className="h-4 w-4" /> },
-};
-
 export const IncentiveEmailDialog = ({
   open,
   onOpenChange,
   companiesMissing,
 }: IncentiveEmailDialogProps) => {
   const { toast } = useToast();
+  const { userType } = useUser();
+  const clusterOptions = getClusterConfig(userType);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState("t1");
@@ -154,43 +152,22 @@ export const IncentiveEmailDialog = ({
   };
 
   const getClusterIcon = (cluster: string) => {
-    switch (cluster) {
-      case "fornecedor":
-        return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <ShoppingCart className="h-3.5 w-3.5 text-primary" />
-              </TooltipTrigger>
-              <TooltipContent><p>Fornecedor</p></TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        );
-      case "cliente":
-        return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Users className="h-3.5 w-3.5 text-blue-600" />
-              </TooltipTrigger>
-              <TooltipContent><p>Cliente</p></TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        );
-      case "parceiro":
-        return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Handshake className="h-3.5 w-3.5 text-purple-600" />
-              </TooltipTrigger>
-              <TooltipContent><p>Parceiro</p></TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        );
-      default:
-        return null;
-    }
+    const info = getClusterInfo(userType, cluster as ClusterType);
+    const Icon = info?.icon;
+    const label = info?.label || cluster;
+    
+    if (!Icon) return null;
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Icon className="h-3.5 w-3.5 text-primary" />
+          </TooltipTrigger>
+          <TooltipContent><p>{label}</p></TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
   };
 
   const handleSend = async () => {
@@ -270,18 +247,21 @@ export const IncentiveEmailDialog = ({
               )}
               {/* Cluster Filter */}
               <div className="flex gap-1">
-                {Object.entries(clusterLabels).map(([key, { label, icon }]) => (
-                  <Button
-                    key={key}
-                    variant={clusterFilter === key ? "default" : "outline"}
-                    size="sm"
-                    className={`h-7 text-xs gap-1 ${clusterFilter !== key ? "hover:bg-primary hover:text-primary-foreground hover:border-primary" : ""}`}
-                    onClick={() => setClusterFilter(key)}
-                  >
-                    {icon}
-                    {label}
-                  </Button>
-                ))}
+                {clusterOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <Button
+                      key={option.value}
+                      variant={clusterFilter === option.value ? "default" : "outline"}
+                      size="sm"
+                      className={`h-7 text-xs gap-1 ${clusterFilter !== option.value ? "hover:bg-primary hover:text-primary-foreground hover:border-primary" : ""}`}
+                      onClick={() => setClusterFilter(option.value)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {option.labelPlural}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
             <ScrollArea className="flex-1">

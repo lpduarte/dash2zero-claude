@@ -1,19 +1,14 @@
-import { Building2, Users, Handshake, LayoutGrid, TrendingDown } from "lucide-react";
+import { TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
 import { FilterButton } from "./FilterButton";
 import { FilterModal } from "./FilterModal";
 import { ActiveFiltersDisplay } from "./ActiveFiltersDisplay";
+import { useUser } from "@/contexts/UserContext";
+import { getClusterConfig, ClusterType } from "@/config/clusters";
 
-type ClusterType = 'all' | 'fornecedor' | 'cliente' | 'parceiro';
 type ImprovementPotential = 'high' | 'medium' | 'low';
-
-interface ClusterOption {
-  value: ClusterType;
-  label: string;
-  icon: React.ReactNode;
-}
 
 interface ClusterSelectorProps {
   selectedCluster: ClusterType;
@@ -24,13 +19,6 @@ interface ClusterSelectorProps {
   universalFilters: UniversalFilterState;
   onUniversalFiltersChange: (filters: UniversalFilterState) => void;
 }
-
-const clusterOptions: ClusterOption[] = [
-  { value: 'all', label: 'Todos', icon: <LayoutGrid className="h-4 w-4" /> },
-  { value: 'fornecedor', label: 'Fornecedores', icon: <Building2 className="h-4 w-4" /> },
-  { value: 'cliente', label: 'Clientes', icon: <Users className="h-4 w-4" /> },
-  { value: 'parceiro', label: 'Parceiros', icon: <Handshake className="h-4 w-4" /> },
-];
 
 const getPotentialConfig = (potential: ImprovementPotential, isSelected: boolean) => {
   const configs = {
@@ -62,6 +50,9 @@ export function ClusterSelector({
   universalFilters,
   onUniversalFiltersChange,
 }: ClusterSelectorProps) {
+  const { userType } = useUser();
+  const clusterOptions = getClusterConfig(userType);
+  
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [isStuck, setIsStuck] = useState(false);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -145,7 +136,9 @@ export function ClusterSelector({
         <div className="flex justify-between items-center gap-4">
           {/* Left side - Cluster buttons */}
           <div className="flex flex-wrap gap-2">
-            {clusterOptions.map((option) => (
+            {clusterOptions.map((option) => {
+              const Icon = option.icon;
+              return (
               <button
                 key={option.value}
                 onClick={() => onClusterChange(option.value)}
@@ -157,8 +150,8 @@ export function ClusterSelector({
                     : "bg-card text-card-foreground border-border hover:border-primary/50 hover:bg-primary hover:text-primary-foreground hover:shadow-md"
                 )}
               >
-                {option.icon}
-                <span className="font-medium">{option.label}</span>
+                <Icon className="h-4 w-4" />
+                <span className="font-medium">{option.labelPlural}</span>
                 <span
                   className={cn(
                     "ml-1 px-2 py-0.5 rounded-full text-xs font-semibold",
@@ -180,7 +173,7 @@ export function ClusterSelector({
                   );
                 })()}
               </button>
-            ))}
+            );})}
           </div>
 
           {/* Right side - Filter button */}
@@ -210,4 +203,5 @@ export function ClusterSelector({
   );
 }
 
-export type { ClusterType, ImprovementPotential };
+export type { ImprovementPotential };
+export type { ClusterType } from "@/config/clusters";

@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
-import { Building2, Users, Handshake, Briefcase, TrendingDown, Factory, Award, Zap } from "lucide-react";
+import { TrendingDown, Factory, Zap, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUser } from "@/contexts/UserContext";
+import { getClusterInfo, clusterIcons, clusterLabels, ClusterType } from "@/config/clusters";
 
 interface ClusterKPIsProps {
   suppliers: Supplier[];
@@ -10,18 +12,16 @@ interface ClusterKPIsProps {
 }
 
 export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: ClusterKPIsProps) => {
-  const clusterIcons = {
-    fornecedor: Factory,
-    cliente: Users,
-    parceiro: Handshake,
-    subcontratado: Briefcase,
+  const { userType } = useUser();
+  
+  const getClusterLabel = (cluster: string) => {
+    const info = getClusterInfo(userType, cluster as ClusterType);
+    return info?.labelPlural || clusterLabels[cluster] || cluster;
   };
-
-  const clusterLabels = {
-    fornecedor: 'Fornecedores',
-    cliente: 'Clientes',
-    parceiro: 'Parceiros',
-    subcontratado: 'Subcontratados',
+  
+  const getClusterIconComponent = (cluster: string) => {
+    const info = getClusterInfo(userType, cluster as ClusterType);
+    return info?.icon || clusterIcons[cluster as keyof typeof clusterIcons] || Factory;
   };
 
   const clusterColors = {
@@ -105,7 +105,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {allClustersData.map(({ cluster, count, totalEmissions, avgEmissions }) => {
-              const Icon = clusterIcons[cluster];
+              const Icon = getClusterIconComponent(cluster);
               const colors = clusterColors[cluster];
               
               return (
@@ -118,7 +118,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
                       <Badge className={colors.badge}>{count}</Badge>
                     </div>
                     
-                    <h3 className="font-bold text-lg mb-3">{clusterLabels[cluster]}</h3>
+                    <h3 className="font-bold text-lg mb-3">{getClusterLabel(cluster)}</h3>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
@@ -149,14 +149,14 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
         <TabsList className="grid w-full grid-cols-4">
           {clusters.map(cluster => (
             <TabsTrigger key={cluster} value={cluster}>
-              {clusterLabels[cluster]}
+              {getClusterLabel(cluster)}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {clusters.map(cluster => {
           const data = getClusterData(cluster);
-          const Icon = clusterIcons[cluster];
+          const Icon = getClusterIconComponent(cluster);
           
           return (
             <TabsContent key={cluster} value={cluster}>
@@ -164,7 +164,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon className="h-5 w-5" />
-                    Análise Detalhada - {clusterLabels[cluster]}
+                    Análise Detalhada - {getClusterLabel(cluster)}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
