@@ -1,10 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw, Calendar, Wallet, FileCheck, ListChecks, Building2, MapPin, Bike, Sun, Recycle, Mail, Download, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw, Calendar, Wallet, FileCheck, ListChecks, Building2, MapPin, Bike, Sun, Recycle, Mail, Download, ChevronDown, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -56,12 +56,49 @@ export const MunicipalityActionPlanModal = ({
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     proximosPassos: true,
     empresa: true,
-    diagnosticoImpacto: true, // Secção unificada
+    diagnosticoImpacto: true,
     medidas: true,
     financiamento: true,
     contexto: false,
     notas: true,
   });
+  
+  // Ref para o container scrollável do Step 4
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Toggle de secção mantendo posição de scroll
+  const toggleSection = (section: string, event?: React.MouseEvent) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    
+    const scrollTop = scrollContainerRef.current?.scrollTop || 0;
+    
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+    
+    // Restaurar posição após re-render
+    requestAnimationFrame(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollTop;
+      }
+    });
+  };
+  
+  // Verificar se todas as secções estão expandidas
+  const allExpanded = Object.values(expandedSections).every(v => v);
+  
+  // Alternar todas as secções
+  const toggleAllSections = () => {
+    const newState = !allExpanded;
+    setExpandedSections({
+      proximosPassos: newState,
+      empresa: newState,
+      diagnosticoImpacto: newState,
+      medidas: newState,
+      financiamento: newState,
+      contexto: newState,
+      notas: newState,
+    });
+  };
   
   // Chave única para esta empresa (com fallback para evitar erro se supplier é null)
   const storageKey = supplier ? `actionPlan_${supplier.id}` : '';
@@ -171,9 +208,6 @@ export const MunicipalityActionPlanModal = ({
     onOpenChange(false);
   };
   
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
 
   // Função para selecionar melhores medidas automaticamente (toggle)
   const selectBestMeasures = () => {
@@ -1178,7 +1212,7 @@ export const MunicipalityActionPlanModal = ({
     );
   };
 
-  // Componente de secção colapsável
+  // Componente de secção colapsável com animação suave
   const CollapsibleSection = ({ 
     id, 
     title, 
@@ -1193,40 +1227,56 @@ export const MunicipalityActionPlanModal = ({
     badge?: string | number;
     children: React.ReactNode;
     highlighted?: boolean;
-  }) => (
-    <div className={`border rounded-lg overflow-hidden ${highlighted ? 'border-2 border-primary/30 bg-primary/5' : ''}`}>
-      <button
-        onClick={() => toggleSection(id)}
-        className={`w-full flex items-center justify-between p-4 transition-colors ${
-          highlighted 
-            ? 'bg-primary/10 hover:bg-primary/20' 
-            : 'bg-muted/30 hover:bg-muted/50'
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          {highlighted ? (
-            <div className="p-2 rounded-lg bg-primary/20">
-              <Icon className="h-5 w-5 text-primary" />
-            </div>
-          ) : (
-            <Icon className="h-5 w-5 text-muted-foreground" />
-          )}
-          <span className={`font-medium ${highlighted ? 'font-semibold text-primary' : ''}`}>{title}</span>
-          {badge !== undefined && (
-            <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-medium">
-              {badge}
-            </span>
-          )}
+  }) => {
+    const isExpanded = expandedSections[id];
+    
+    return (
+      <div className={`border rounded-lg overflow-hidden ${highlighted ? 'border-2 border-primary/30 bg-primary/5' : ''}`}>
+        <button
+          type="button"
+          onClick={(e) => toggleSection(id, e)}
+          className={`w-full flex items-center justify-between p-4 transition-colors ${
+            highlighted 
+              ? 'bg-primary/10 hover:bg-primary/20' 
+              : 'bg-muted/30 hover:bg-muted/50'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            {highlighted ? (
+              <div className="p-2 rounded-lg bg-primary/20">
+                <Icon className="h-5 w-5 text-primary" />
+              </div>
+            ) : (
+              <Icon className="h-5 w-5 text-muted-foreground" />
+            )}
+            <span className={`font-medium ${highlighted ? 'font-semibold text-primary' : ''}`}>{title}</span>
+            {badge !== undefined && (
+              <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-medium">
+                {badge}
+              </span>
+            )}
+          </div>
+          <ChevronDown 
+            className={`h-5 w-5 transition-transform duration-200 ${
+              highlighted ? 'text-primary' : 'text-muted-foreground'
+            } ${isExpanded ? 'rotate-180' : ''}`} 
+          />
+        </button>
+        
+        {/* Conteúdo com transição suave */}
+        <div 
+          className={`
+            overflow-hidden transition-all duration-200 ease-in-out
+            ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
+          `}
+        >
+          <div className={`p-4 border-t ${highlighted ? 'border-primary/20' : ''}`}>
+            {children}
+          </div>
         </div>
-        <ChevronDown className={`h-5 w-5 transition-transform ${highlighted ? 'text-primary' : 'text-muted-foreground'} ${expandedSections[id] ? 'rotate-180' : ''}`} />
-      </button>
-      {expandedSections[id] && (
-        <div className={`p-4 border-t ${highlighted ? 'border-primary/20' : ''}`}>
-          {children}
-        </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  };
 
   const renderResumoContent = () => {
     // Dados calculados dos steps anteriores
@@ -1271,14 +1321,40 @@ export const MunicipalityActionPlanModal = ({
       <div className="flex flex-col h-full">
         {/* Header do step - Fixo */}
         <div className="shrink-0 p-6 pb-4 border-b border-border/50">
-          <h3 className="font-semibold text-2xl mb-1">Resumo do Plano de Ação</h3>
-          <p className="text-sm text-muted-foreground">
-            Reveja o plano antes de exportar ou enviar à empresa.
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-semibold text-2xl mb-1">Resumo do Plano de Ação</h3>
+              <p className="text-sm text-muted-foreground">
+                Reveja o plano antes de exportar ou enviar à empresa.
+              </p>
+            </div>
+            
+            {/* Botão Expandir/Colapsar Todas */}
+            <button
+              type="button"
+              onClick={toggleAllSections}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            >
+              {allExpanded ? (
+                <>
+                  <ChevronsDownUp className="h-4 w-4" />
+                  Colapsar todas
+                </>
+              ) : (
+                <>
+                  <ChevronsUpDown className="h-4 w-4" />
+                  Expandir todas
+                </>
+              )}
+            </button>
+          </div>
         </div>
         
         {/* Conteúdo - Scrollável */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto p-6 space-y-4"
+        >
           
           {/* SECÇÃO: Próximos Passos - DESTAQUE NO TOPO */}
           <CollapsibleSection id="proximosPassos" title="Próximos Passos" icon={ListChecks} highlighted>
