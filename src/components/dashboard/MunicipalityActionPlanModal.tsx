@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw, Calendar, Wallet, FileCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BarChart3, Zap, Euro, FileText, AlertTriangle, Target, CheckCircle, Minus, Search, Check, Leaf, Clock, TrendingDown, Info, Sparkles, RotateCcw, Calendar, Wallet, FileCheck, ListChecks, Building2, MapPin, Bike, Sun, Recycle, Mail, Download, ChevronDown } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Supplier } from '@/types/supplier';
@@ -51,6 +52,54 @@ export const MunicipalityActionPlanModal = ({
   const [selectedMeasures, setSelectedMeasures] = useState<string[]>([]);
   const [recommendedApplied, setRecommendedApplied] = useState(false);
   const [selectedFunding, setSelectedFunding] = useState<string[]>([]);
+  const [municipalityNotes, setMunicipalityNotes] = useState<string>('');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    proximosPassos: true,
+    empresa: true,
+    diagnostico: true,
+    medidas: true,
+    financiamento: true,
+    impacto: true,
+    contexto: false,
+    notas: true,
+  });
+  
+  // Chave única para esta empresa
+  const storageKey = `actionPlan_${supplier.id}`;
+  
+  // Carregar estado ao abrir modal
+  useEffect(() => {
+    if (open) {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.selectedMeasures) setSelectedMeasures(parsed.selectedMeasures);
+          if (parsed.selectedFunding) setSelectedFunding(parsed.selectedFunding);
+          if (parsed.municipalityNotes) setMunicipalityNotes(parsed.municipalityNotes);
+          if (parsed.currentStep) setCurrentStep(parsed.currentStep);
+          if (parsed.expandedSections) setExpandedSections(parsed.expandedSections);
+        } catch (e) {
+          console.error('Error loading saved action plan:', e);
+        }
+      }
+    }
+  }, [open, storageKey]);
+  
+  // Guardar estado automaticamente
+  useEffect(() => {
+    if (open) {
+      const dataToSave = {
+        selectedMeasures,
+        selectedFunding,
+        municipalityNotes,
+        currentStep,
+        expandedSections,
+        lastUpdated: new Date().toISOString(),
+      };
+      localStorage.setItem(storageKey, JSON.stringify(dataToSave));
+    }
+  }, [selectedMeasures, selectedFunding, municipalityNotes, currentStep, expandedSections, storageKey, open]);
   if (!supplier) return null;
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1 as Step);
@@ -117,11 +166,12 @@ export const MunicipalityActionPlanModal = ({
   };
 
   const handleClose = () => {
-    setCurrentStep(1);
-    setSelectedMeasures([]);
-    setRecommendedApplied(false);
-    setSelectedFunding([]);
+    // Não resetar estado - mantido em localStorage
     onOpenChange(false);
+  };
+  
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
   // Função para selecionar melhores medidas automaticamente (toggle)
@@ -1127,6 +1177,413 @@ export const MunicipalityActionPlanModal = ({
     );
   };
 
+  // Componente de secção colapsável
+  const CollapsibleSection = ({ 
+    id, 
+    title, 
+    icon: Icon, 
+    badge,
+    children,
+    highlighted = false
+  }: { 
+    id: string;
+    title: string; 
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: string | number;
+    children: React.ReactNode;
+    highlighted?: boolean;
+  }) => (
+    <div className={`border rounded-lg overflow-hidden ${highlighted ? 'border-2 border-primary/30 bg-primary/5' : ''}`}>
+      <button
+        onClick={() => toggleSection(id)}
+        className={`w-full flex items-center justify-between p-4 transition-colors ${
+          highlighted 
+            ? 'bg-primary/10 hover:bg-primary/20' 
+            : 'bg-muted/30 hover:bg-muted/50'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          {highlighted ? (
+            <div className="p-2 rounded-lg bg-primary/20">
+              <Icon className="h-5 w-5 text-primary" />
+            </div>
+          ) : (
+            <Icon className="h-5 w-5 text-muted-foreground" />
+          )}
+          <span className={`font-medium ${highlighted ? 'font-semibold text-primary' : ''}`}>{title}</span>
+          {badge !== undefined && (
+            <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-medium">
+              {badge}
+            </span>
+          )}
+        </div>
+        <ChevronDown className={`h-5 w-5 transition-transform ${highlighted ? 'text-primary' : 'text-muted-foreground'} ${expandedSections[id] ? 'rotate-180' : ''}`} />
+      </button>
+      {expandedSections[id] && (
+        <div className={`p-4 border-t ${highlighted ? 'border-primary/20' : ''}`}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderResumoContent = () => {
+    // Dados calculados dos steps anteriores
+    const selectedMeasuresData = mockMeasures.filter(m => selectedMeasures.includes(m.id));
+    const selectedFundingData = mockFunding.filter(f => selectedFunding.includes(f.id));
+    
+    // Cálculos de impacto
+    const totalReduction = selectedMeasuresData.reduce((sum, m) => sum + m.emissionReduction, 0);
+    const totalInvestment = selectedMeasuresData.reduce((sum, m) => sum + m.investment, 0);
+    const reductionPercent = supplier.totalEmissions > 0 
+      ? (totalReduction / supplier.totalEmissions) * 100 
+      : 0;
+    
+    const rawCoverage = selectedFundingData.reduce((sum, fund) => {
+      if (fund.percentage) {
+        const maxFromPercentage = totalInvestment * (fund.percentage / 100);
+        return sum + Math.min(fund.maxAmount, maxFromPercentage);
+      }
+      return sum + fund.maxAmount;
+    }, 0);
+    const totalCoverage = Math.min(rawCoverage, totalInvestment);
+    const coveragePercent = totalInvestment > 0 ? (totalCoverage / totalInvestment) * 100 : 0;
+    const remaining = Math.max(0, totalInvestment - totalCoverage);
+    
+    // Nova intensidade
+    const currentIntensity = supplier.emissionsPerRevenue || 0;
+    const newEmissions = supplier.totalEmissions - totalReduction;
+    const newIntensity = supplier.revenue > 0 ? (newEmissions / supplier.revenue) * 1000 : 0;
+    const reachedTarget = newIntensity <= avgSectorIntensity;
+    
+    // Próximos prazos de fundos (ordenados por data)
+    const upcomingDeadlines = selectedFundingData
+      .filter(f => f.deadline && f.deadline !== 'Contínuo')
+      .map(f => ({
+        name: f.name,
+        deadline: new Date(f.deadline!),
+        daysRemaining: Math.ceil((new Date(f.deadline!).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      }))
+      .sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
+
+    return (
+      <div className="flex flex-col h-full">
+        {/* Header do step - Fixo */}
+        <div className="shrink-0 p-6 pb-4 border-b border-border/50">
+          <h3 className="font-semibold text-2xl mb-1">Resumo do Plano de Ação</h3>
+          <p className="text-sm text-muted-foreground">
+            Reveja o plano antes de exportar ou enviar à empresa.
+          </p>
+        </div>
+        
+        {/* Conteúdo - Scrollável */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          
+          {/* SECÇÃO: Próximos Passos - DESTAQUE NO TOPO */}
+          <CollapsibleSection id="proximosPassos" title="Próximos Passos" icon={ListChecks} highlighted>
+            {/* Prazos Urgentes */}
+            {upcomingDeadlines.length > 0 && (
+              <div className="mb-4">
+                <h5 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Prazos de Candidatura
+                </h5>
+                <div className="space-y-2">
+                  {upcomingDeadlines.map((item, idx) => (
+                    <div 
+                      key={idx}
+                      className={`flex items-center justify-between p-3 rounded-lg ${
+                        item.daysRemaining <= 30 
+                          ? 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800' 
+                          : item.daysRemaining <= 60 
+                            ? 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800'
+                            : 'bg-muted/50'
+                      }`}
+                    >
+                      <span className="text-sm">{item.name}</span>
+                      <span className={`text-sm font-medium ${
+                        item.daysRemaining <= 30 
+                          ? 'text-red-600 dark:text-red-400' 
+                          : item.daysRemaining <= 60 
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-muted-foreground'
+                      }`}>
+                        {item.daysRemaining <= 30 && <AlertTriangle className="h-4 w-4 inline mr-1" />}
+                        {item.daysRemaining} dias ({item.deadline.toLocaleDateString('pt-PT')})
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Acções Sugeridas */}
+            <div>
+              <h5 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Acções Recomendadas
+              </h5>
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium shrink-0">1</div>
+                  <div>
+                    <p className="text-sm font-medium">Contactar a empresa</p>
+                    <p className="text-xs text-muted-foreground">Apresentar o plano de ação e discutir prioridades de implementação</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium shrink-0">2</div>
+                  <div>
+                    <p className="text-sm font-medium">Preparar candidaturas aos fundos</p>
+                    <p className="text-xs text-muted-foreground">Reunir documentação necessária para os fundos selecionados</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium shrink-0">3</div>
+                  <div>
+                    <p className="text-sm font-medium">Implementar medidas Soft primeiro</p>
+                    <p className="text-xs text-muted-foreground">Menor investimento, resultados mais rápidos, prepara terreno para intervenções maiores</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium shrink-0">4</div>
+                  <div>
+                    <p className="text-sm font-medium">Agendar acompanhamento</p>
+                    <p className="text-xs text-muted-foreground">Definir data para revisão de progresso (sugestão: 30 dias)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Empresa */}
+          <CollapsibleSection id="empresa" title="Empresa" icon={Building2}>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground">Nome</p>
+                <p className="font-medium">{supplier.name}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Setor</p>
+                <p className="font-medium">{sectorLabels[supplier.sector] || supplier.sector}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Dimensão</p>
+                <p className="font-medium">{getDimensionLabel(supplier.companySize)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Freguesia</p>
+                <p className="font-medium">{supplier.parish || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Emissões Totais</p>
+                <p className="font-medium">{supplier.totalEmissions.toLocaleString('pt-PT')} t CO₂e</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Receita</p>
+                <p className="font-medium">{supplier.revenue.toLocaleString('pt-PT')}€</p>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Diagnóstico */}
+          <CollapsibleSection id="diagnostico" title="Diagnóstico" icon={BarChart3}>
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg text-center">
+                  <p className="text-xs text-red-600 dark:text-red-400 mb-1">Intensidade Actual</p>
+                  <p className="font-semibold text-red-700 dark:text-red-300">{currentIntensity.toFixed(2)}</p>
+                  <p className="text-xs text-red-600 dark:text-red-400">kg CO₂e/€</p>
+                </div>
+                <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg text-center">
+                  <p className="text-xs text-green-600 dark:text-green-400 mb-1">Nova Intensidade</p>
+                  <p className="font-semibold text-green-700 dark:text-green-300">{newIntensity.toFixed(2)}</p>
+                  <p className="text-xs text-green-600 dark:text-green-400">kg CO₂e/€</p>
+                </div>
+                <div className="p-3 bg-muted rounded-lg text-center">
+                  <p className="text-xs text-muted-foreground mb-1">Média do Setor</p>
+                  <p className="font-semibold">{avgSectorIntensity.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">kg CO₂e/€</p>
+                </div>
+              </div>
+              
+              <div className={`flex items-center gap-2 p-3 rounded-lg ${reachedTarget ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300' : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300'}`}>
+                {reachedTarget ? (
+                  <>
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-medium">Meta atingida! A empresa passará a estar abaixo da média do setor.</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="h-5 w-5" />
+                    <span className="font-medium">Meta não atingida. Considere adicionar mais medidas.</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Medidas Selecionadas */}
+          <CollapsibleSection id="medidas" title="Medidas Selecionadas" icon={Zap} badge={selectedMeasuresData.length}>
+            {selectedMeasuresData.length > 0 ? (
+              <div className="space-y-2">
+                {selectedMeasuresData.map(measure => (
+                  <div key={measure.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${
+                        measure.scope === 1 ? 'bg-violet-500' : 
+                        measure.scope === 2 ? 'bg-blue-500' : 'bg-orange-500'
+                      }`} />
+                      <div>
+                        <p className="text-sm font-medium">{measure.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Âmbito {measure.scope} • {measure.interventionLevel === 'soft' ? 'Soft' : 'Interventiva'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-green-600 dark:text-green-400">-{measure.emissionReduction}t CO₂e</p>
+                      <p className="text-xs text-muted-foreground">{measure.investment.toLocaleString('pt-PT')}€</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhuma medida selecionada</p>
+            )}
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Financiamento */}
+          <CollapsibleSection id="financiamento" title="Financiamento" icon={Euro} badge={selectedFundingData.length}>
+            {selectedFundingData.length > 0 ? (
+              <div className="space-y-2">
+                {selectedFundingData.map(fund => (
+                  <div key={fund.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium">{fund.name}</p>
+                      <p className="text-xs text-muted-foreground">{fund.provider}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">
+                        Até {fund.maxAmount.toLocaleString('pt-PT')}€
+                        {fund.percentage && ` (${fund.percentage}%)`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {fund.deadline === 'Contínuo' ? 'Candidatura contínua' : `Prazo: ${new Date(fund.deadline!).toLocaleDateString('pt-PT')}`}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhum fundo selecionado</p>
+            )}
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Impacto Total */}
+          <CollapsibleSection id="impacto" title="Impacto Total" icon={TrendingDown}>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg text-center">
+                <p className="text-xs text-green-600 dark:text-green-400 mb-1">Redução</p>
+                <p className="font-semibold text-xl text-green-700 dark:text-green-300">-{totalReduction.toLocaleString('pt-PT')}t</p>
+                <p className="text-xs text-green-600 dark:text-green-400">CO₂e ({reductionPercent.toFixed(0)}%)</p>
+              </div>
+              <div className="p-4 bg-muted rounded-lg text-center">
+                <p className="text-xs text-muted-foreground mb-1">Investimento</p>
+                <p className="font-semibold text-xl">{totalInvestment.toLocaleString('pt-PT')}€</p>
+                <p className="text-xs text-muted-foreground">Total</p>
+              </div>
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-center">
+                <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">Comparticipação</p>
+                <p className="font-semibold text-xl text-blue-700 dark:text-blue-300">{totalCoverage.toLocaleString('pt-PT')}€</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">Até {coveragePercent.toFixed(0)}%</p>
+              </div>
+              <div className={`p-4 rounded-lg text-center ${remaining === 0 ? 'bg-green-50 dark:bg-green-950/30' : 'bg-amber-50 dark:bg-amber-950/30'}`}>
+                <p className={`text-xs mb-1 ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>A cargo da empresa</p>
+                <p className={`font-semibold text-xl ${remaining === 0 ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>{remaining.toLocaleString('pt-PT')}€</p>
+                <p className={`text-xs ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{(100 - coveragePercent).toFixed(0)}%</p>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Contexto do Município */}
+          <CollapsibleSection id="contexto" title="Infraestrutura Municipal de Suporte" icon={MapPin}>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Zap className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{cascaisInfrastructure.chargingStations} postos de carregamento</p>
+                  <p className="text-xs text-muted-foreground">Mobilidade elétrica</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Bike className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{cascaisInfrastructure.cyclingNetworkKm} km de ciclovias</p>
+                  <p className="text-xs text-muted-foreground">Rede ciclável</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Sun className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{cascaisInfrastructure.solarPotentialZones} zonas de potencial solar</p>
+                  <p className="text-xs text-muted-foreground">Energia renovável</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Recycle className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{cascaisInfrastructure.recyclingCenters} centros de reciclagem</p>
+                  <p className="text-xs text-muted-foreground">Gestão de resíduos</p>
+                </div>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* SECÇÃO: Notas do Município */}
+          <CollapsibleSection id="notas" title="Notas do Município" icon={FileText}>
+            <Textarea
+              value={municipalityNotes}
+              onChange={(e) => setMunicipalityNotes(e.target.value)}
+              placeholder="Adicione observações, recomendações adicionais, informações sobre outros fundos disponíveis, ou notas para seguimento interno..."
+              className="w-full h-32 resize-none"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              Estas notas serão incluídas no documento exportado e no email enviado à empresa.
+            </p>
+          </CollapsibleSection>
+
+        </div>
+        
+        {/* Footer com acções - Fixo */}
+        <div className="shrink-0 p-6 pt-4 border-t border-border/50 bg-muted/10 rounded-b-lg overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Plano gerado em {new Date().toLocaleDateString('pt-PT')}
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {/* TODO: Implementar envio email */}}
+                className="gap-2"
+              >
+                <Mail className="h-4 w-4" />
+                Enviar Email
+              </Button>
+              <Button
+                onClick={() => {/* TODO: Implementar exportação PDF */}}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Exportar PDF
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderStepContent = () => {
     // Step 1: Análise - Conteúdo direto (sem Card exterior)
     if (currentStep === 1) {
@@ -1145,36 +1602,12 @@ export const MunicipalityActionPlanModal = ({
       return renderFinanciamentoContent();
     }
 
-    // Step 4: Placeholder
-    const StepIcon = stepConfig[currentStep - 1].icon;
-    return <div className="flex-1 flex flex-col items-center justify-center p-8">
-        <Card className="w-full max-w-2xl p-8 text-center border-dashed border-2">
-          <div className="mb-6">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <StepIcon className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Step {currentStep}: {stepTitles[currentStep - 1]}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Conteúdo em construção - Será implementado em breve
-            </p>
-          </div>
-          
-          <Separator className="my-6" />
-          
-          <div className="grid grid-cols-2 gap-4 text-left">
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Empresa</p>
-              <p className="text-sm font-medium">{supplier.name}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Emissões</p>
-              <p className="text-sm font-medium">{supplier.totalEmissions.toLocaleString('pt-PT')} t CO₂e</p>
-            </div>
-          </div>
-        </Card>
-      </div>;
+    // Step 4: Resumo - layout flex com scroll interno
+    if (currentStep === 4) {
+      return renderResumoContent();
+    }
+
+    return null;
   };
   return <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
@@ -1292,38 +1725,40 @@ export const MunicipalityActionPlanModal = ({
           {renderStepContent()}
         </div>
         
-        {/* Footer Navigation */}
-        <div className="p-4 border-t flex items-center justify-between shrink-0 bg-background rounded-b-lg">
-          <Button variant="outline" onClick={handlePrevious} disabled={currentStep === 1} className="gap-2">
-            <ChevronLeft className="h-4 w-4" />
-            Anterior
-          </Button>
-          
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Passo {currentStep} de 4
-            </span>
-          </div>
-          
-          <div className="relative group">
-            <Button 
-              onClick={handleNext} 
-              disabled={currentStep === 4 || (currentStep === 2 && selectedMeasures.length === 0)} 
-              className="gap-2"
-            >
-              Próximo
-              <ChevronRight className="h-4 w-4" />
+        {/* Footer Navigation - Escondido no Step 4 (tem footer próprio) */}
+        {currentStep !== 4 && (
+          <div className="p-4 border-t flex items-center justify-between shrink-0 bg-background rounded-b-lg">
+            <Button variant="outline" onClick={handlePrevious} disabled={currentStep === 1} className="gap-2">
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
             </Button>
             
-            {/* Tooltip quando disabled no Step 2 - posicionado à direita para evitar clipping */}
-            {currentStep === 2 && selectedMeasures.length === 0 && (
-              <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                Selecione pelo menos uma medida
-                <div className="absolute top-full right-4 border-4 border-transparent border-t-gray-900" />
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Passo {currentStep} de 4
+              </span>
+            </div>
+            
+            <div className="relative group">
+              <Button 
+                onClick={handleNext} 
+                disabled={currentStep === 2 && selectedMeasures.length === 0} 
+                className="gap-2"
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              {/* Tooltip quando disabled no Step 2 - posicionado à direita para evitar clipping */}
+              {currentStep === 2 && selectedMeasures.length === 0 && (
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  Selecione pelo menos uma medida
+                  <div className="absolute top-full right-4 border-4 border-transparent border-t-gray-900" />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>;
 };
