@@ -470,8 +470,7 @@ export const MunicipalityActionPlanModal = ({
     const scope2Pct = supplier.totalEmissions > 0 ? supplier.scope2 / supplier.totalEmissions * 100 : 0;
     const scope3Pct = supplier.totalEmissions > 0 ? supplier.scope3 / supplier.totalEmissions * 100 : 0;
 
-    // Identificar âmbito dominante
-    const dominantScope: Scope = scope1Pct >= scope2Pct && scope1Pct >= scope3Pct ? 1 : scope2Pct >= scope3Pct ? 2 : 3;
+    // Nota: Removido identificação de âmbito dominante - todas as colunas têm mesmo estilo
 
     // Agrupar medidas por âmbito
     const measuresByScope = {
@@ -589,32 +588,37 @@ export const MunicipalityActionPlanModal = ({
       };
       const scopeColors = {
         1: {
-          bg: 'bg-violet-500',
-          border: 'border-violet-400'
+          headerBg: 'bg-violet-50 dark:bg-violet-950/30',
+          text: 'text-violet-700 dark:text-violet-300',
+          textSecondary: 'text-violet-600 dark:text-violet-400',
+          badge: 'bg-violet-700 dark:bg-violet-600'
         },
         2: {
-          bg: 'bg-blue-500',
-          border: 'border-blue-400'
+          headerBg: 'bg-blue-50 dark:bg-blue-950/30',
+          text: 'text-blue-700 dark:text-blue-300',
+          textSecondary: 'text-blue-600 dark:text-blue-400',
+          badge: 'bg-blue-700 dark:bg-blue-600'
         },
         3: {
-          bg: 'bg-orange-500',
-          border: 'border-orange-400'
+          headerBg: 'bg-orange-50 dark:bg-orange-950/30',
+          text: 'text-orange-700 dark:text-orange-300',
+          textSecondary: 'text-orange-600 dark:text-orange-400',
+          badge: 'bg-orange-700 dark:bg-orange-600'
         }
       };
-      const isDominant = scope === dominantScope;
+      const colors = scopeColors[scope];
       const measures = measuresByScope[scope];
+      
       return <div className="flex flex-col">
-          {/* Header da coluna */}
-          <div className={`
-            flex items-center gap-2 mb-3 pb-2 border-b-2
-            ${isDominant ? 'border-green-500' : 'border-border'}
-          `}>
-            <div className={`w-3 h-3 rounded-full ${scopeColors[scope].bg}`} />
-            <h4 className="font-medium text-sm">{scopeNames[scope]}</h4>
-            <span className="text-xs text-muted-foreground">({scopePcts[scope].toFixed(0)}%)</span>
-            {isDominant && <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
-                Prioridade
-              </span>}
+          {/* Header da coluna - estilo igual ao financiamento */}
+          <div className={`flex items-center justify-between p-3 rounded-lg mb-3 ${colors.headerBg}`}>
+            <div className="flex items-center gap-2">
+              <span className={`font-medium text-sm ${colors.text}`}>{scopeNames[scope]}</span>
+              <span className={`text-sm ${colors.textSecondary}`}>({scopePcts[scope].toFixed(0)}%)</span>
+            </div>
+            <span className={`px-2 py-0.5 rounded-full text-white text-xs font-medium ${colors.badge}`}>
+              {measures.length}
+            </span>
           </div>
           
           {/* Lista de medidas */}
@@ -631,7 +635,7 @@ export const MunicipalityActionPlanModal = ({
     const currentBarWidth = maxIntensity > 0 ? currentIntensity / maxIntensity * 100 : 0;
     const newBarWidth = maxIntensity > 0 ? newIntensity / maxIntensity * 100 : 0;
     const avgBarWidth = maxIntensity > 0 ? avgSectorIntensity / maxIntensity * 100 : 0;
-    return <div className="space-y-6">
+    return <div className="flex flex-col h-full">
         {/* Estilo da animação shadow-pulse */}
         <style>{`
           @keyframes shadow-pulse {
@@ -643,47 +647,52 @@ export const MunicipalityActionPlanModal = ({
           }
         `}</style>
         
-        {/* Header com botão Melhores Medidas (toggle) */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="font-semibold text-2xl mb-1">Seleção de Medidas</h3>
-            <p className="text-sm text-muted-foreground">
-              Selecione medidas até a intensidade ficar abaixo da média do setor.
-            </p>
+        {/* Header do step - Fixo */}
+        <div className="shrink-0 p-6 pb-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-semibold text-2xl mb-1">Seleção de Medidas</h3>
+              <p className="text-sm text-muted-foreground">
+                Selecione medidas até a intensidade ficar abaixo da média do setor.
+              </p>
+            </div>
+            <button 
+              onClick={selectBestMeasures} 
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shrink-0
+                ${recommendedApplied 
+                  ? 'bg-white border border-border text-muted-foreground hover:bg-muted/50' 
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90 animate-shadow-pulse'
+                }
+              `}
+            >
+              {recommendedApplied ? (
+                <>
+                  <RotateCcw className="h-4 w-4" />
+                  Repor seleção
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Aplicar medidas recomendadas
+                </>
+              )}
+            </button>
           </div>
-          <button 
-            onClick={selectBestMeasures} 
-            className={`
-              flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-              ${recommendedApplied 
-                ? 'bg-white border border-border text-muted-foreground hover:bg-muted/50' 
-                : 'bg-primary text-primary-foreground hover:bg-primary/90 animate-shadow-pulse'
-              }
-            `}
-          >
-            {recommendedApplied ? (
-              <>
-                <RotateCcw className="h-4 w-4" />
-                Repor seleção
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" />
-                Aplicar medidas recomendadas
-              </>
-            )}
-          </button>
         </div>
         
-        {/* Grid 3 colunas - Âmbitos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {renderScopeColumn(1)}
-          {renderScopeColumn(2)}
-          {renderScopeColumn(3)}
+        {/* Colunas dos âmbitos - Scrollável */}
+        <div className="flex-1 overflow-y-auto px-6 min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4">
+            {renderScopeColumn(1)}
+            {renderScopeColumn(2)}
+            {renderScopeColumn(3)}
+          </div>
         </div>
         
-        {/* Secção de Impacto - Layout conforme mockup com 3 áreas */}
-        <div className="rounded-lg overflow-hidden border border-border mt-6">
+        {/* Impacto/Totais - Fixo no fundo */}
+        <div className="shrink-0 p-6 pt-4 border-t bg-muted/10">
+          <div className="rounded-lg overflow-hidden border border-border">
           
           {/* ÁREA 1: Header (Título | Medidas) */}
           <div className="flex border-b border-border">
@@ -793,6 +802,7 @@ export const MunicipalityActionPlanModal = ({
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>;
   };
@@ -992,69 +1002,73 @@ export const MunicipalityActionPlanModal = ({
     };
 
     return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="font-semibold text-2xl mb-1">Financiamento Disponível</h3>
-            <p className="text-muted-foreground">
-              Fundos sugeridos de acordo com as medidas selecionadas. Selecione os que pretende incluir no plano.
-            </p>
+      <div className="flex flex-col h-full">
+        {/* Header do step - Fixo */}
+        <div className="shrink-0 p-6 pb-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-semibold text-2xl mb-1">Financiamento Disponível</h3>
+              <p className="text-sm text-muted-foreground">
+                Fundos sugeridos de acordo com as medidas selecionadas. Selecione os que pretende incluir no plano.
+              </p>
+            </div>
+            
+            {/* Badge de cobertura */}
+            <div className="text-right shrink-0">
+              <p className="text-xs text-muted-foreground mb-1">Cobertura possível</p>
+              <p className="font-semibold text-lg">
+                {totalCoverage.toLocaleString('pt-PT')}€
+                <span className="text-sm font-normal text-muted-foreground ml-1">
+                  de {totalInvestment.toLocaleString('pt-PT')}€ ({coveragePercentage.toFixed(0)}%)
+                </span>
+              </p>
+            </div>
           </div>
           
-          {/* Badge de cobertura */}
-          <div className="text-right shrink-0">
-            <p className="text-xs text-muted-foreground mb-1">Cobertura possível</p>
-            <p className="font-semibold text-lg">
-              {totalCoverage.toLocaleString('pt-PT')}€
-              <span className="text-sm font-normal text-muted-foreground ml-1">
-                de {totalInvestment.toLocaleString('pt-PT')}€ ({coveragePercentage.toFixed(0)}%)
-              </span>
-            </p>
-          </div>
+          {/* Aviso se não há medidas selecionadas */}
+          {selectedMeasures.length === 0 && (
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 mt-4">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Selecione medidas no passo anterior para ver os fundos aplicáveis.
+              </p>
+            </div>
+          )}
         </div>
         
-        {/* Aviso se não há medidas selecionadas */}
-        {selectedMeasures.length === 0 && (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <p className="text-sm text-amber-700 dark:text-amber-300">
-              Selecione medidas no passo anterior para ver os fundos aplicáveis.
-            </p>
-          </div>
-        )}
+        {/* Colunas dos tipos de financiamento - Scrollável */}
+        <div className="flex-1 overflow-y-auto px-6 min-h-0">
+          {selectedMeasures.length > 0 && (
+            <div className="grid grid-cols-3 gap-4 pb-4">
+              {renderTypeColumn('subsidio')}
+              {renderTypeColumn('incentivo')}
+              {renderTypeColumn('financiamento')}
+            </div>
+          )}
+        </div>
         
-        {/* Grid 3 colunas por tipo */}
-        {selectedMeasures.length > 0 && (
-          <div className="grid grid-cols-3 gap-4">
-            {renderTypeColumn('subsidio')}
-            {renderTypeColumn('incentivo')}
-            {renderTypeColumn('financiamento')}
-          </div>
-        )}
-        
-        <Separator />
-        
-        {/* Resumo */}
-        <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">Fundos Selecionados</p>
-            <p className="font-semibold text-xl">{selectedFunding.length}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">Comparticipação Possível</p>
-            <p className="font-semibold text-lg">
-              Até {totalCoverage.toLocaleString('pt-PT')}€
-              <span className="text-sm font-normal text-muted-foreground ml-1">
-                ({coveragePercentage.toFixed(0)}% do investimento)
-              </span>
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">Valor a Financiar</p>
-            <p className="font-semibold text-lg">
-              {Math.max(0, totalInvestment - totalCoverage).toLocaleString('pt-PT')}€
-            </p>
+        {/* Resumo/Totais - Fixo no fundo */}
+        <div className="shrink-0 p-6 pt-4 border-t bg-muted/10">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border">
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground mb-1">Fundos Selecionados</p>
+              <p className="font-semibold text-xl">{selectedFunding.length}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground mb-1">Comparticipação Possível</p>
+              <p className="font-semibold text-lg text-green-600 dark:text-green-400">
+                Até {totalCoverage.toLocaleString('pt-PT')}€
+                <span className="text-sm font-normal text-muted-foreground ml-1">
+                  ({coveragePercentage.toFixed(0)}% do investimento)
+                </span>
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground mb-1">Valor a Financiar</p>
+              <p className="font-semibold text-lg">
+                {Math.max(0, totalInvestment - totalCoverage).toLocaleString('pt-PT')}€
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -1069,18 +1083,14 @@ export const MunicipalityActionPlanModal = ({
         </div>;
     }
 
-    // Step 2: Medidas
+    // Step 2: Medidas - layout flex com scroll interno
     if (currentStep === 2) {
-      return <div className="p-6">
-          {renderMedidasContent()}
-        </div>;
+      return renderMedidasContent();
     }
 
-    // Step 3: Financiamento
+    // Step 3: Financiamento - layout flex com scroll interno
     if (currentStep === 3) {
-      return <div className="p-6">
-          {renderFinanciamentoContent()}
-        </div>;
+      return renderFinanciamentoContent();
     }
 
     // Step 4: Placeholder
@@ -1219,11 +1229,11 @@ export const MunicipalityActionPlanModal = ({
               <ChevronRight className="h-4 w-4" />
             </Button>
             
-            {/* Tooltip quando disabled no Step 2 */}
+            {/* Tooltip quando disabled no Step 2 - posicionado à direita para evitar clipping */}
             {currentStep === 2 && selectedMeasures.length === 0 && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 Selecione pelo menos uma medida
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                <div className="absolute top-full right-4 border-4 border-transparent border-t-gray-900" />
               </div>
             )}
           </div>
