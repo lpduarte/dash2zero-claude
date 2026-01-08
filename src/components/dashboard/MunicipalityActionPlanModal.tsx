@@ -84,8 +84,29 @@ export const MunicipalityActionPlanModal = ({
 
   // Verificar se step é clicável
   const isStepClickable = (step: number): boolean => {
-    const state = getStepState(step);
-    return state === 'current' || state === 'completed';
+    // Step actual - sempre clicável
+    if (step === currentStep) return true;
+    
+    // Step anterior ao actual - sempre clicável
+    if (step < currentStep) return true;
+    
+    // Próximo step imediato - sempre clicável (posso avançar)
+    if (step === currentStep + 1) return true;
+    
+    // Steps mais à frente (2+ passos) - clicável se todos os intermédios têm escolhas
+    if (step > currentStep + 1) {
+      for (let s = currentStep + 1; s < step; s++) {
+        // Step 1 (Análise) não precisa de escolhas
+        if (s === 1) continue;
+        // Step 2 (Medidas) precisa de escolhas
+        if (s === 2 && selectedMeasures.length === 0) return false;
+        // Step 3 (Financiamento) precisa de escolhas
+        if (s === 3 && selectedFunding.length === 0) return false;
+      }
+      return true;
+    }
+    
+    return false;
   };
 
   // Navegar para step
