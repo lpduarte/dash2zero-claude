@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye, Rocket, RotateCcw } from "lucide-react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye, Rocket, RotateCcw, AlertCircle } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
@@ -661,6 +661,15 @@ export const CriticalSuppliersHighlight = ({
                     </Table>
                   </div>
                   
+                  {/* Nota no fundo da tabela */}
+                  <div className="p-4 bg-amber-50/50 border-t border-amber-100 rounded-b-lg">
+                    <p className="text-sm text-amber-800 flex items-start gap-2">
+                      <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span>
+                        <strong>Nota:</strong> Empresas acima da média do setor têm maior impacto nas emissões municipais e representam maior potencial de redução. Priorizá-las acelera o cumprimento das metas de descarbonização.
+                      </span>
+                    </p>
+                  </div>
                 </div>
               )}
 
