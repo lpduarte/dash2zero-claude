@@ -177,7 +177,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
             <button
               type="button"
               onClick={() => setShowMethodologyModal(true)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="p-1.5 bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
               title="Guia metodológico"
             >
               <Info className="h-4 w-4" />

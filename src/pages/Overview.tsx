@@ -161,18 +161,7 @@ const Overview = () => {
 
           <TabsContent value="home" className="space-y-6">
             {/* GRUPO 1: KPIs de Emissões */}
-            <Card className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold text-card-foreground">
-                  {isMunicipio 
-                    ? 'Emissões das empresas do município' 
-                    : 'Visão Geral das Emissões'
-                  }
-                </h3>
-              </div>
-              <MetricsOverview suppliers={filteredSuppliers} totalCompanies={clusterTotals[selectedCluster]} />
-            </Card>
+            <MetricsOverview suppliers={filteredSuppliers} totalCompanies={clusterTotals[selectedCluster]} />
             
             {/* GRUPO 2: KPIs de Infraestruturas (APENAS municípios) */}
             {isMunicipio && (
