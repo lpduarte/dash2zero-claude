@@ -662,13 +662,12 @@ export const CriticalSuppliersHighlight = ({
                   </div>
                   
                   {/* Nota no fundo da tabela */}
-                  <div className="px-4 py-3 border-t border-border">
-                    <p className="text-sm text-muted-foreground flex items-start gap-2">
-                      <span className="text-success mt-1">•</span>
-                      <span>
+                  <div className="p-4">
+                    <div className="px-4 py-3 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
                         <strong className="text-foreground/80">Nota:</strong> Empresas acima da média do setor têm maior impacto nas emissões municipais e representam maior potencial de redução. Priorizá-las acelera o cumprimento das metas de descarbonização.
-                      </span>
-                    </p>
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
