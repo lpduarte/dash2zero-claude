@@ -1,6 +1,7 @@
 import type { Measure, MeasureCategory } from '@/types/actionPlan';
 import type { Supplier } from '@/types/supplier';
 import { cascaisInfrastructure } from './mockInfrastructure';
+import { getSectorName } from './sectors';
 
 export const mockMeasures: Measure[] = [
   // === ÂMBITO 1 - DIRETAS ===
@@ -310,12 +311,19 @@ export function getApplicableMeasures(
   supplier: { sector: string; companySize: string; totalEmissions: number },
   allMeasures: Measure[] = mockMeasures
 ): Measure[] {
+  // Traduzir o setor do supplier para português para comparação
+  const supplierSectorPT = getSectorName(supplier.sector);
+  
   return allMeasures.filter(measure => {
-    // Filtro por setor
+    // Filtro por setor - comparar com nome traduzido
     if (measure.applicableTo.sectors && 
-        measure.applicableTo.sectors.length > 0 &&
-        !measure.applicableTo.sectors.includes(supplier.sector)) {
-      return false;
+        measure.applicableTo.sectors.length > 0) {
+      // Verificar se o setor do supplier (traduzido) está na lista
+      const sectorMatch = measure.applicableTo.sectors.some(s => 
+        s.toLowerCase() === supplierSectorPT.toLowerCase() ||
+        s.toLowerCase() === supplier.sector.toLowerCase()
+      );
+      if (!sectorMatch) return false;
     }
     
     // Filtro por dimensão
