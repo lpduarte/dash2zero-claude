@@ -71,7 +71,7 @@ export const SectorBenchmarking = ({
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>

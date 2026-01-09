@@ -54,7 +54,7 @@ export const EmissionsParetoChart = ({ suppliers }: EmissionsParetoChartProps) =
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Gráfico de Pareto: Fator de Emissões vs Investimento</CardTitle>
           <p className="text-sm text-muted-foreground">
