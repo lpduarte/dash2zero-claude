@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye } from "lucide-react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye, Rocket } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { SupplierSwitchModal } from "./SupplierSwitchModal";
 import { ActionPlanModal } from "./ActionPlanModal";
 import { MunicipalityActionPlanModal } from "./MunicipalityActionPlanModal";
+import { BulkPlanWizard } from "./BulkPlanWizard";
 import { useUser } from "@/contexts/UserContext";
 import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -221,6 +222,15 @@ export const CriticalSuppliersHighlight = ({
     avgSectorIntensity: number;
   } | null>(null);
   
+  // Estado para wizard de planos em massa
+  const [bulkWizardOpen, setBulkWizardOpen] = useState(false);
+  
+  // Calcular média do setor para passar ao wizard
+  const avgSectorIntensity = useMemo(() => {
+    const total = suppliers.reduce((sum, s) => sum + s.emissionsPerRevenue, 0);
+    return suppliers.length > 0 ? total / suppliers.length : 0;
+  }, [suppliers]);
+  
   const filteredSuppliers = selectedSector === "all" ? suppliers : suppliers.filter(s => s.sector === selectedSector);
   const avgEmissions = filteredSuppliers.reduce((sum, s) => sum + s.totalEmissions, 0) / filteredSuppliers.length;
 
@@ -399,6 +409,16 @@ export const CriticalSuppliersHighlight = ({
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {isMunicipio && (
+                  <Button 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => setBulkWizardOpen(true)}
+                  >
+                    <Rocket className="h-4 w-4" />
+                    Gerar planos em massa
+                  </Button>
+                )}
                 {!isMunicipio && (
                   <Button 
                     variant="outline" 
@@ -786,6 +806,14 @@ export const CriticalSuppliersHighlight = ({
         avgSectorIntensity={selectedMunicipalitySupplier?.avgSectorIntensity || 0}
         open={municipalityPlanOpen}
         onOpenChange={setMunicipalityPlanOpen}
+      />
+
+      {/* Wizard de planos em massa para municípios */}
+      <BulkPlanWizard
+        open={bulkWizardOpen}
+        onOpenChange={setBulkWizardOpen}
+        suppliers={suppliers}
+        avgSectorIntensity={avgSectorIntensity}
       />
     </>
   );
