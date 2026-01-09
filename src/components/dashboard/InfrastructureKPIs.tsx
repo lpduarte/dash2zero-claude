@@ -119,7 +119,7 @@ export const InfrastructureKPIs = () => {
 
   return (
     <>
-      <Card className="p-6">
+      <Card className="p-6 shadow-sm">
         {/* Header do card */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -148,8 +148,8 @@ export const InfrastructureKPIs = () => {
             >
               <ChevronDown 
                 className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                  isInfrastructureExpanded ? '' : 'rotate-180'
-                }`} 
+                  isInfrastructureExpanded ? '' : '-rotate-90'
+                }`}
               />
             </button>
           </div>
@@ -166,7 +166,9 @@ export const InfrastructureKPIs = () => {
                   <div key={kpi.label} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-muted-foreground">{kpi.label}</span>
-                      <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
+                      <div className="p-1.5 bg-muted rounded-md">
+                        <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
+                      </div>
                     </div>
                     <p className="text-2xl font-bold">{kpi.value.toLocaleString('pt-PT')}</p>
                   </div>
@@ -182,7 +184,9 @@ export const InfrastructureKPIs = () => {
                   <div key={kpi.label} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-muted-foreground">{kpi.label}</span>
-                      <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
+                      <div className="p-1.5 bg-muted rounded-md">
+                        <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
+                      </div>
                     </div>
                     <p className={`text-2xl font-bold ${kpi.valueColor || ''}`}>
                       {typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
