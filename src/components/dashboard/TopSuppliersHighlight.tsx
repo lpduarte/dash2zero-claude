@@ -82,7 +82,7 @@ export const TopSuppliersHighlight = ({
     return acc;
   }, {} as Record<string, number>);
   return <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-    <Card className="border-success/50 bg-gradient-to-br from-success/10 via-primary/5 to-accent/10">
+    <Card className="border-success/50 bg-gradient-to-br from-success/10 via-primary/5 to-accent/10 shadow-sm">
       <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
