@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye, Rocket } from "lucide-react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye, Rocket, RotateCcw } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
@@ -410,14 +410,40 @@ export const CriticalSuppliersHighlight = ({
               </div>
               <div className="flex items-center gap-2">
                 {isMunicipio && (
-                  <Button 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => setBulkWizardOpen(true)}
-                  >
-                    <Rocket className="h-4 w-4" />
-                    Gerar planos em massa
-                  </Button>
+                  <>
+                    {/* Botão Reset (temporário para demos) */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        // Encontrar todas as keys de planos no localStorage
+                        const keysToRemove: string[] = [];
+                        for (let i = 0; i < localStorage.length; i++) {
+                          const key = localStorage.key(i);
+                          if (key && key.startsWith('actionPlan_')) {
+                            keysToRemove.push(key);
+                          }
+                        }
+                        // Remover todas
+                        keysToRemove.forEach(key => localStorage.removeItem(key));
+                        // Forçar refresh
+                        window.location.reload();
+                      }}
+                      title="Limpar todos os planos"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={() => setBulkWizardOpen(true)}
+                    >
+                      <Rocket className="h-4 w-4" />
+                      Gerar planos em massa
+                    </Button>
+                  </>
                 )}
                 {!isMunicipio && (
                   <Button 
