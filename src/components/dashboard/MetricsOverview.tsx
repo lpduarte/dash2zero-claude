@@ -172,25 +172,24 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
             <h3 className="font-semibold text-lg">Emissões das empresas do município</h3>
           </div>
           
-          <div className="flex items-center gap-1">
-            {/* Botão Info */}
+          <div className="flex items-center gap-2">
+            {/* Botão Info - estilo igual ao (i) do KPI Potencial de melhoria */}
             <button
+              type="button"
               onClick={() => setShowMethodologyModal(true)}
-              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
               title="Guia metodológico"
             >
               <Info className="h-4 w-4" />
             </button>
             
-            {/* Botão Colapsar */}
+            {/* Chevron - estilo igual ao bloco Empresas a monitorizar */}
             <button
+              type="button"
               onClick={() => setIsEmissionsExpanded(!isEmissionsExpanded)}
-              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0"
             >
-              <ChevronDown className={cn(
-                "h-4 w-4 transition-transform duration-200",
-                !isEmissionsExpanded && "-rotate-90"
-              )} />
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isEmissionsExpanded ? '' : 'rotate-180'}`} />
             </button>
           </div>
         </div>
