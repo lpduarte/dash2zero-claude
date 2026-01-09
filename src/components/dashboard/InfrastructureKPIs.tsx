@@ -95,9 +95,8 @@ export const InfrastructureKPIs = () => {
 
   const kpisLine2 = [
     {
-      label: 'Ciclovias',
+      label: 'Ciclovias (km)',
       value: 47.3,
-      unit: 'km',
       icon: Route,
       iconColor: 'text-teal-500'
     },
@@ -110,7 +109,7 @@ export const InfrastructureKPIs = () => {
     {
       label: 'Qualidade do Ar',
       value: 'Bom',
-      subtitle: '3 estações',
+      inlineSubtitle: '3 estações',
       icon: Wind,
       iconColor: 'text-teal-500',
       valueColor: 'text-green-600'
@@ -163,10 +162,10 @@ export const InfrastructureKPIs = () => {
               {kpisLine1.map((kpi) => {
                 const Icon = kpi.icon;
                 return (
-                  <div key={kpi.label} className="p-4 border rounded-lg">
+                  <div key={kpi.label} className="p-4 border rounded-lg shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{kpi.label}</span>
-                      <div className="p-1.5 bg-muted rounded-md">
+                      <span className="text-xs font-medium text-muted-foreground">{kpi.label}</span>
+                      <div className="p-1.5 bg-muted rounded">
                         <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
                       </div>
                     </div>
@@ -181,21 +180,22 @@ export const InfrastructureKPIs = () => {
               {kpisLine2.map((kpi) => {
                 const Icon = kpi.icon;
                 return (
-                  <div key={kpi.label} className="p-4 border rounded-lg">
+                  <div key={kpi.label} className="p-4 border rounded-lg shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">{kpi.label}</span>
-                      <div className="p-1.5 bg-muted rounded-md">
+                      <span className="text-xs font-medium text-muted-foreground">{kpi.label}</span>
+                      <div className="p-1.5 bg-muted rounded">
                         <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
                       </div>
                     </div>
-                    <p className={`text-2xl font-bold ${kpi.valueColor || ''}`}>
-                      {typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
-                    </p>
-                    {kpi.unit && (
-                      <p className="text-xs text-muted-foreground">{kpi.unit}</p>
-                    )}
-                    {kpi.subtitle && (
-                      <p className="text-xs text-muted-foreground">{kpi.subtitle}</p>
+                    {kpi.inlineSubtitle ? (
+                      <div className="flex items-baseline gap-2">
+                        <p className={`text-2xl font-bold ${kpi.valueColor || ''}`}>{kpi.value}</p>
+                        <span className="text-sm text-muted-foreground">· {kpi.inlineSubtitle}</span>
+                      </div>
+                    ) : (
+                      <p className={`text-2xl font-bold ${kpi.valueColor || ''}`}>
+                        {typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
+                      </p>
                     )}
                   </div>
                 );

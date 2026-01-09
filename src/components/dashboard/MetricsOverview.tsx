@@ -203,7 +203,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
             {/* Linha 1: 5 KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {metrics.map((metric) => (
-                <div key={metric.title} className="p-4 border rounded-lg relative">
+                <div key={metric.title} className="p-4 border rounded-lg shadow-sm relative">
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <p className="text-xs font-medium text-muted-foreground">{metric.title}</p>
@@ -269,7 +269,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
             {/* Linha 2: Pegadas calculadas + Origem dos dados */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Pegadas calculadas */}
-              <div className={`p-4 border-2 rounded-lg ${percentageColors.bgLight} ${percentageColors.border}`}>
+              <div className={`p-4 border-2 rounded-lg shadow-sm ${percentageColors.bgLight} ${percentageColors.border}`}>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <p className={`text-xs font-medium ${percentageColors.text}`}>Pegadas calculadas</p>
@@ -305,7 +305,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
               </div>
 
               {/* Origem dos dados */}
-              <div className="p-4 border rounded-lg">
+              <div className="p-4 border rounded-lg shadow-sm">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-medium text-muted-foreground">Origem dos dados</p>
