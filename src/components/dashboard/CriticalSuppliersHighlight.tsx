@@ -96,39 +96,56 @@ const statusConfig = {
   },
 };
 
-// Helper para nível de risco baseado em intensidade
-const getRiskLevel = (intensity: number, avgSector: number): string => {
-  const ratio = intensity / avgSector;
-  if (ratio >= 2) return 'Crítico';
-  if (ratio >= 1.5) return 'Alto';
-  if (ratio >= 1) return 'Médio';
-  return 'Baixo';
-};
-
-const getRiskColor = (level: string): string => {
-  switch (level) {
-    case 'Crítico': return 'text-red-600';
-    case 'Alto': return 'text-orange-600';
-    case 'Médio': return 'text-amber-600';
-    case 'Baixo': return 'text-green-600';
-    default: return 'text-muted-foreground';
-  }
-};
-
-// Helper para comparação com média do sector
-const getComparisonText = (intensity: number, avgSector: number): { text: string; isAbove: boolean } => {
-  if (avgSector === 0) return { text: '', isAbove: false };
-  
-  const diff = ((intensity - avgSector) / avgSector) * 100;
-  const isAbove = diff > 0;
-  
-  if (Math.abs(diff) < 1) {
-    return { text: 'na média', isAbove: false };
+// Helper unificado para risco e comparação
+const getRiskInfo = (intensity: number, avgSector: number): { 
+  level: string; 
+  color: string; 
+  percentAbove: number;
+  comparisonText: string;
+  isAbove: boolean;
+} => {
+  if (avgSector === 0) {
+    return { level: 'N/A', color: 'text-muted-foreground', percentAbove: 0, comparisonText: '', isAbove: false };
   }
   
-  return {
-    text: `${Math.abs(diff).toFixed(0)}% ${isAbove ? 'acima' : 'abaixo'} da média`,
-    isAbove,
+  const percentAbove = ((intensity - avgSector) / avgSector) * 100;
+  
+  if (percentAbove >= 100) {
+    return { 
+      level: 'Crítico', 
+      color: 'text-red-600', 
+      percentAbove,
+      comparisonText: `${Math.round(percentAbove)}% acima da média`,
+      isAbove: true,
+    };
+  }
+  if (percentAbove >= 50) {
+    return { 
+      level: 'Alto', 
+      color: 'text-red-600', 
+      percentAbove,
+      comparisonText: `${Math.round(percentAbove)}% acima da média`,
+      isAbove: true,
+    };
+  }
+  if (percentAbove > 0) {
+    return { 
+      level: 'Médio', 
+      color: 'text-amber-600', 
+      percentAbove,
+      comparisonText: `${Math.round(percentAbove)}% acima da média`,
+      isAbove: true,
+    };
+  }
+  
+  // Abaixo da média
+  const percentBelow = Math.abs(percentAbove);
+  return { 
+    level: 'Baixo', 
+    color: 'text-green-600', 
+    percentAbove,
+    comparisonText: percentBelow < 1 ? 'na média' : `${Math.round(percentBelow)}% abaixo da média`,
+    isAbove: false,
   };
 };
 
@@ -457,10 +474,10 @@ export const CriticalSuppliersHighlight = ({
                                   <div className="space-y-2 text-xs">
                                     <p className="font-medium">Intensidade de carbono vs média do setor.</p>
                                     <div className="space-y-1">
-                                      <p><span className="text-red-600 font-medium">Crítico:</span> ≥2x média do setor</p>
-                                      <p><span className="text-orange-600 font-medium">Alto:</span> 1.5-2x média</p>
-                                      <p><span className="text-amber-600 font-medium">Médio:</span> 1-1.5x média</p>
-                                      <p><span className="text-green-600 font-medium">Baixo:</span> {"<"}1x média</p>
+                                      <p><span className="text-red-600 font-medium">Crítico:</span> ≥100% acima da média</p>
+                                      <p><span className="text-red-600 font-medium">Alto:</span> 50-100% acima da média</p>
+                                      <p><span className="text-amber-600 font-medium">Médio:</span> 1-50% acima da média</p>
+                                      <p><span className="text-green-600 font-medium">Baixo:</span> abaixo da média</p>
                                     </div>
                                   </div>
                                 </TooltipContent>
@@ -480,8 +497,7 @@ export const CriticalSuppliersHighlight = ({
                           const StatusIcon = config.icon;
                           const measuresCount = planData?.selectedMeasures?.length || 0;
                           const fundingCount = planData?.selectedFunding?.length || 0;
-                          const riskLevelLabel = getRiskLevel(item.supplier.emissionsPerRevenue, item.avgSectorIntensity);
-                          const isAboveAverage = item.supplier.emissionsPerRevenue > item.avgSectorIntensity;
+                          const riskInfo = getRiskInfo(item.supplier.emissionsPerRevenue, item.avgSectorIntensity);
                           const showTarget = status === 'plano_pronto' || status === 'enviado';
                           const targetReached = planData?.reachedTarget;
                           
@@ -494,33 +510,26 @@ export const CriticalSuppliersHighlight = ({
                               
                               {/* Coluna Intensidade + Risco */}
                               <TableCell>
-                                {(() => {
-                                  const comparison = getComparisonText(item.supplier.emissionsPerRevenue, item.avgSectorIntensity);
-                                  return (
-                                    <div className="flex flex-col">
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-medium">{item.supplier.emissionsPerRevenue.toFixed(2)}</span>
-                                        <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
-                                        {comparison.isAbove ? (
-                                          <TrendingUp className="h-3 w-3 text-red-500" />
-                                        ) : (
-                                          <TrendingDown className="h-3 w-3 text-green-500" />
-                                        )}
-                                      </div>
-                                      <div className="flex items-center gap-1.5 text-xs">
-                                        <span className={getRiskColor(riskLevelLabel)}>Risco {riskLevelLabel}</span>
-                                        {comparison.text && (
-                                          <>
-                                            <span className="text-muted-foreground">·</span>
-                                            <span className={comparison.isAbove ? 'text-red-600' : 'text-green-600'}>
-                                              {comparison.text}
-                                            </span>
-                                          </>
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
+                                <div className="flex flex-col">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{item.supplier.emissionsPerRevenue.toFixed(2)}</span>
+                                    <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
+                                    {riskInfo.isAbove ? (
+                                      <TrendingUp className="h-3 w-3 text-red-500" />
+                                    ) : (
+                                      <TrendingDown className="h-3 w-3 text-green-500" />
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1.5 text-xs">
+                                    <span className={riskInfo.color}>Risco {riskInfo.level}</span>
+                                    {riskInfo.comparisonText && (
+                                      <>
+                                        <span className="text-muted-foreground">·</span>
+                                        <span className={riskInfo.color}>{riskInfo.comparisonText}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
                               </TableCell>
                               
                               {/* Coluna Estado */}
