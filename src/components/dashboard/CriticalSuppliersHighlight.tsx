@@ -368,7 +368,7 @@ export const CriticalSuppliersHighlight = ({
                 </div>
                 <div>
                   <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    {isMunicipio ? 'Empresas a Monitorizar' : 'Empresas críticas e alternativas'}
+                    {isMunicipio ? 'Empresas do município a monitorizar' : 'Empresas críticas e alternativas'}
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
                     {isMunicipio ? 'Acompanhamento de planos de descarbonização' : 'Parceiros com maior impacto ambiental na supply chain'}
