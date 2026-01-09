@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, MoreHorizontal } from "lucide-react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
@@ -15,7 +15,7 @@ import { useUser } from "@/contexts/UserContext";
 import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { calculateSuppliersRisk, SupplierRisk } from "@/lib/riskAnalysis";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 
 // Tipos para estado do plano
 type PlanStatus = 'sem_plano' | 'em_preparacao' | 'plano_pronto' | 'enviado';
@@ -112,6 +112,57 @@ const getRiskColor = (level: string): string => {
     case 'Médio': return 'text-amber-600';
     case 'Baixo': return 'text-green-600';
     default: return 'text-muted-foreground';
+  }
+};
+
+// Helper para comparação com média do sector
+const getComparisonText = (intensity: number, avgSector: number): { text: string; isAbove: boolean } => {
+  if (avgSector === 0) return { text: '', isAbove: false };
+  
+  const diff = ((intensity - avgSector) / avgSector) * 100;
+  const isAbove = diff > 0;
+  
+  if (Math.abs(diff) < 1) {
+    return { text: 'na média', isAbove: false };
+  }
+  
+  return {
+    text: `${Math.abs(diff).toFixed(0)}% ${isAbove ? 'acima' : 'abaixo'} da média`,
+    isAbove,
+  };
+};
+
+// Helper para botão de ação por estado
+const getActionButton = (status: PlanStatus, planData: PlanData | null) => {
+  switch (status) {
+    case 'sem_plano':
+      return {
+        label: 'Criar plano',
+        icon: Plus,
+        variant: 'default' as const,
+        targetStep: 1,
+      };
+    case 'em_preparacao':
+      return {
+        label: 'Continuar',
+        icon: ArrowRight,
+        variant: 'outline' as const,
+        targetStep: planData?.lastStep || 2,
+      };
+    case 'plano_pronto':
+      return {
+        label: 'Ver plano',
+        icon: Eye,
+        variant: 'outline' as const,
+        targetStep: 4,
+      };
+    case 'enviado':
+      return {
+        label: 'Ver plano',
+        icon: Eye,
+        variant: 'outline' as const,
+        targetStep: 4,
+      };
   }
 };
 
@@ -443,20 +494,33 @@ export const CriticalSuppliersHighlight = ({
                               
                               {/* Coluna Intensidade + Risco */}
                               <TableCell>
-                                <div className="flex flex-col">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium">{item.supplier.emissionsPerRevenue.toFixed(2)}</span>
-                                    <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
-                                    {isAboveAverage ? (
-                                      <TrendingUp className="h-3 w-3 text-red-500" />
-                                    ) : (
-                                      <TrendingDown className="h-3 w-3 text-green-500" />
-                                    )}
-                                  </div>
-                                  <span className={`text-xs font-medium ${getRiskColor(riskLevelLabel)}`}>
-                                    Risco {riskLevelLabel}
-                                  </span>
-                                </div>
+                                {(() => {
+                                  const comparison = getComparisonText(item.supplier.emissionsPerRevenue, item.avgSectorIntensity);
+                                  return (
+                                    <div className="flex flex-col">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium">{item.supplier.emissionsPerRevenue.toFixed(2)}</span>
+                                        <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
+                                        {comparison.isAbove ? (
+                                          <TrendingUp className="h-3 w-3 text-red-500" />
+                                        ) : (
+                                          <TrendingDown className="h-3 w-3 text-green-500" />
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-1.5 text-xs">
+                                        <span className={getRiskColor(riskLevelLabel)}>Risco {riskLevelLabel}</span>
+                                        {comparison.text && (
+                                          <>
+                                            <span className="text-muted-foreground">·</span>
+                                            <span className={comparison.isAbove ? 'text-red-600' : 'text-green-600'}>
+                                              {comparison.text}
+                                            </span>
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
                               </TableCell>
                               
                               {/* Coluna Estado */}
@@ -510,18 +574,14 @@ export const CriticalSuppliersHighlight = ({
                               
                               {/* Coluna Ação */}
                               <TableCell className="text-center">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button 
-                                      size="sm" 
-                                      variant="ghost" 
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
+                                {(() => {
+                                  const action = getActionButton(status, planData);
+                                  const ActionIcon = action.icon;
+                                  
+                                  return (
+                                    <Button
+                                      size="sm"
+                                      variant={action.variant}
                                       onClick={() => {
                                         setSelectedMunicipalitySupplier({
                                           supplier: item.supplier,
@@ -531,21 +591,13 @@ export const CriticalSuppliersHighlight = ({
                                         });
                                         setMunicipalityPlanOpen(true);
                                       }}
+                                      className="gap-1.5"
                                     >
-                                      <Target className="h-4 w-4 mr-2" />
-                                      Ver plano
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => {
-                                        // TODO: Enviar email
-                                      }}
-                                      disabled={status === 'sem_plano'}
-                                    >
-                                      <Mail className="h-4 w-4 mr-2" />
-                                      Enviar email
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                      <ActionIcon className="h-4 w-4" />
+                                      {action.label}
+                                    </Button>
+                                  );
+                                })()}
                               </TableCell>
                             </TableRow>
                           );
@@ -554,28 +606,6 @@ export const CriticalSuppliersHighlight = ({
                     </Table>
                   </div>
                   
-                  {/* Legenda dos estados */}
-                  <div className="bg-muted/30 rounded-lg p-3 border border-border">
-                    <div className="flex flex-wrap items-center gap-4 text-xs">
-                      <span className="font-medium text-muted-foreground">Legenda:</span>
-                      <div className="flex items-center gap-1.5">
-                        <XCircle className="h-3 w-3 text-red-600" />
-                        <span className="text-muted-foreground">Sem plano</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3 w-3 text-amber-600" />
-                        <span className="text-muted-foreground">Em preparação</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle className="h-3 w-3 text-green-600" />
-                        <span className="text-muted-foreground">Plano pronto</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Mail className="h-3 w-3 text-blue-600" />
-                        <span className="text-muted-foreground">Enviado</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
 

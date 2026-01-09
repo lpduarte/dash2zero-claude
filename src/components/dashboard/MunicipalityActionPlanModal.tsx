@@ -133,6 +133,9 @@ export const MunicipalityActionPlanModal = ({
       const newIntensity = currentIntensity * (1 - reductionRatio);
       const reachedTarget = newIntensity <= avgSectorIntensity;
       
+      // Plano está pronto ao ENTRAR no Step 4 (não só ao completar)
+      const completedStep4 = currentStep === 4;
+      
       const dataToSave = {
         selectedMeasures,
         selectedFunding,
@@ -140,13 +143,15 @@ export const MunicipalityActionPlanModal = ({
         currentStep,
         expandedSections,
         lastUpdated: new Date().toISOString(),
+        lastStep: currentStep,
         // Flags para estado do plano
-        completedStep4: currentStep === 4,
-        reachedTarget: reachedTarget,
+        completedStep4,
+        reachedTarget,
+        emailSent,
       };
       localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     }
-  }, [selectedMeasures, selectedFunding, municipalityNotes, currentStep, expandedSections, storageKey, open, supplier, avgSectorIntensity]);
+  }, [selectedMeasures, selectedFunding, municipalityNotes, currentStep, expandedSections, storageKey, open, supplier, avgSectorIntensity, emailSent]);
   
   if (!supplier) return null;
   
