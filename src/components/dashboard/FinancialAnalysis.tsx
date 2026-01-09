@@ -96,7 +96,7 @@ export const FinancialAnalysis = ({ suppliers }: FinancialAnalysisProps) => {
         </Card>
       </div>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Intensidade de Emissões vs Volume de Negócios</CardTitle>
           <p className="text-sm text-muted-foreground">

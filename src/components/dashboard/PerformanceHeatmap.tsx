@@ -40,7 +40,7 @@ export const PerformanceHeatmap = ({
     if (normalized < 0.8) return 'bg-danger/70';
     return 'bg-danger';
   };
-  return <Card>
+  return <Card className="shadow-sm">
       <CardHeader>
         <h2 className="text-xl font-semibold">Desempenho por região</h2>
       </CardHeader>

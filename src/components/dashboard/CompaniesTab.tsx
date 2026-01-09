@@ -275,7 +275,7 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
 
       {/* Table View */}
       {viewMode === 'table' && (
-        <div className="rounded-md border overflow-x-auto">
+        <div className="rounded-md border overflow-x-auto shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
