@@ -30,8 +30,14 @@ export const SectionHeader = ({
   onToggle,
   className,
 }: SectionHeaderProps) => {
+  // Se é colapsável, a margem inferior depende do estado expanded
+  // Se não é colapsável, tem sempre margem (mb-4)
+  const marginClass = collapsible 
+    ? (expanded ? "mb-4" : "mb-0")
+    : "mb-4";
+
   return (
-    <div className={cn("flex items-center justify-between", className)}>
+    <div className={cn("flex items-center justify-between", marginClass, className)}>
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-muted">
           <Icon className={cn("h-5 w-5 text-muted-foreground", iconClassName)} />

@@ -101,7 +101,6 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
           <SectionHeader
             icon={Building2}
             title="KPIs por Cluster do Banco Montepio/Município"
-            className="mb-0"
           />
         </CardHeader>
         <CardContent>

@@ -90,7 +90,6 @@ export const TopSuppliersHighlight = ({
           collapsible
           expanded={isOpen}
           onToggle={() => setIsOpen(!isOpen)}
-          className="mb-0"
           actions={
             <Select value={selectedSector} onValueChange={setSelectedSector}>
               <SelectTrigger className="w-[280px]">

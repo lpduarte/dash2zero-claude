@@ -239,7 +239,6 @@ export const CriticalSuppliersHighlight = ({
               collapsible
               expanded={isOpen}
               onToggle={() => setIsOpen(!isOpen)}
-              className="mb-0"
               actions={
                 <>
                   {isMunicipio && <>
