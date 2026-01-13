@@ -324,7 +324,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
       <IncentiveEmailDialog
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
-        companiesMissing={companiesMissing}
+        suppliers={suppliers}
       />
     </TooltipProvider>
   );

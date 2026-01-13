@@ -28,23 +28,30 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Send, Loader2, ChevronDown, ChevronRight, History, Search, X } from "lucide-react";
-import { mockMissingCompanies, emailTemplates, MissingCompany } from "@/data/mockMissingCompanies";
+import { emailTemplates, getCompanyEmailTracking, EmailRecord } from "@/data/emailTracking";
+import { Supplier } from "@/types/supplier";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 import { useUser } from "@/contexts/UserContext";
 import { getClusterConfig, getClusterInfo, ClusterType } from "@/config/clusters";
 
+// Tipo que combina Supplier com dados de email tracking
+interface CompanyWithTracking extends Supplier {
+  emailsSent: number;
+  emailHistory: EmailRecord[];
+}
+
 interface IncentiveEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  companiesMissing: number;
+  suppliers: Supplier[]; // Todos os suppliers do contexto actual
 }
 
 export const IncentiveEmailDialog = ({
   open,
   onOpenChange,
-  companiesMissing,
+  suppliers,
 }: IncentiveEmailDialogProps) => {
   const { toast } = useToast();
   const { userType } = useUser();
@@ -60,32 +67,51 @@ export const IncentiveEmailDialog = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [collapsedSectors, setCollapsedSectors] = useState<Set<string>>(new Set());
 
-  const companies = useMemo(() => {
-    return mockMissingCompanies.slice(0, companiesMissing);
-  }, [companiesMissing]);
+  // Empresas sem pegada calculada (dataSource !== "get2zero")
+  const companies = useMemo((): CompanyWithTracking[] => {
+    return suppliers
+      .filter(s => s.dataSource !== "get2zero")
+      .map(supplier => {
+        const tracking = getCompanyEmailTracking(supplier.id);
+        return {
+          ...supplier,
+          emailsSent: tracking.emailsSent,
+          emailHistory: tracking.emailHistory
+        };
+      });
+  }, [suppliers]);
 
   const filteredCompanies = useMemo(() => {
     let result = companies;
+    
+    // Filtro por cluster
     if (clusterFilter !== "all") {
       result = result.filter(c => c.cluster === clusterFilter);
     }
+    
+    // Filtro por pesquisa (nome, email ou NIF)
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(c => c.name.toLowerCase().includes(query));
+      result = result.filter(c => 
+        c.name.toLowerCase().includes(query) ||
+        c.contact.email.toLowerCase().includes(query) ||
+        c.contact.nif.includes(query)
+      );
     }
+    
     return result;
   }, [companies, clusterFilter, searchQuery]);
 
-  // Group companies by sector
+  // Agrupar empresas por sector
   const companiesBySector = useMemo(() => {
-    const grouped: Record<string, MissingCompany[]> = {};
+    const grouped: Record<string, CompanyWithTracking[]> = {};
     filteredCompanies.forEach(company => {
       if (!grouped[company.sector]) {
         grouped[company.sector] = [];
       }
       grouped[company.sector].push(company);
     });
-    // Sort sectors alphabetically
+    // Ordenar sectores alfabeticamente
     return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
   }, [filteredCompanies]);
 
@@ -117,7 +143,7 @@ export const IncentiveEmailDialog = ({
     );
   };
 
-  const handleSelectSector = (sectorCompanies: MissingCompany[]) => {
+  const handleSelectSector = (sectorCompanies: CompanyWithTracking[]) => {
     const sectorIds = sectorCompanies.map(c => c.id);
     const allSelected = sectorIds.every(id => selectedCompanies.includes(id));
     
@@ -226,7 +252,7 @@ export const IncentiveEmailDialog = ({
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
-                  placeholder="Pesquisar empresa..."
+                  placeholder="Pesquisar empresa, email ou NIF..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-8 pl-8 pr-8 text-sm"
@@ -394,15 +420,16 @@ export const IncentiveEmailDialog = ({
                 <SelectContent>
                   {emailTemplates.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
-                      <div className="flex flex-col items-start text-left">
-                        <span>{template.name}</span>
-                        <span className="text-xs opacity-60 group-data-[highlighted]:opacity-80">{template.description}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{template.name}</span>
+                        <span className="text-xs text-muted-foreground">{template.description}</span>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+            
             <div className="grid gap-2">
               <Label htmlFor="subject" className="text-xs font-medium">Assunto</Label>
               <Input
@@ -412,40 +439,37 @@ export const IncentiveEmailDialog = ({
                 placeholder="Assunto do email"
               />
             </div>
-            <div className="flex flex-col gap-2 flex-1">
+
+            <div className="grid gap-2 flex-1">
               <Label htmlFor="message" className="text-xs font-medium">Mensagem</Label>
               <Textarea
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Corpo do email"
-                className="min-h-[280px] flex-1 resize-none text-sm"
+                placeholder="Escreva a sua mensagem..."
+                className="flex-1 min-h-[200px] resize-none"
               />
-              <p className="text-[10px] text-muted-foreground">
-                Variáveis disponíveis: {"{companyName}"}
+              <p className="text-xs text-muted-foreground">
+                Variáveis disponíveis: {"{companyName}"}, {"{contactName}"}
               </p>
             </div>
           </div>
         </div>
 
-        <DialogFooter className="mt-4">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-          >
+        <DialogFooter className="mt-4 gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
           <Button onClick={handleSend} disabled={isLoading || selectedCompanies.length === 0}>
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 A enviar...
               </>
             ) : (
               <>
-                <Send className="h-4 w-4 mr-2" />
-                Enviar para {selectedCompanies.length} empresa{selectedCompanies.length !== 1 ? "s" : ""}
+                <Send className="mr-2 h-4 w-4" />
+                Enviar ({selectedCompanies.length})
               </>
             )}
           </Button>
