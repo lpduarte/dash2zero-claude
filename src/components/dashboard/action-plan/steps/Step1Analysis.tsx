@@ -1,6 +1,7 @@
 import { Separator } from '@/components/ui/separator';
 import { AlertTriangle, Minus, CheckCircle, Target, Search } from 'lucide-react';
 import type { Step1Props } from '../types';
+import { riskColors } from '@/lib/styles';
 
 export const Step1Analysis = ({
   supplier,
@@ -13,28 +14,28 @@ export const Step1Analysis = ({
   const scope2Pct = supplier.totalEmissions > 0 ? supplier.scope2 / supplier.totalEmissions * 100 : 0;
   const scope3Pct = supplier.totalEmissions > 0 ? supplier.scope3 / supplier.totalEmissions * 100 : 0;
 
-  // Configuração por nível de risco
+  // Configuração por nível de risco usando cores centralizadas
   const riskConfig = {
     alto: {
       label: 'Alto',
       icon: AlertTriangle,
-      iconColor: 'text-red-500',
-      iconBg: 'bg-red-100 dark:bg-red-900/30',
-      tagColor: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
+      iconColor: riskColors.alto.text.replace('text-', 'text-').replace('-600', '-500').replace('-700', '-500'),
+      iconBg: `${riskColors.alto.bg} dark:bg-red-900/30`,
+      tagColor: `${riskColors.alto.badge} dark:bg-red-900/30 dark:text-red-300 dark:border-red-800`
     },
     medio: {
       label: 'Médio',
       icon: Minus,
-      iconColor: 'text-amber-500',
-      iconBg: 'bg-amber-100 dark:bg-amber-900/30',
-      tagColor: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800'
+      iconColor: riskColors.medio.text.replace('-600', '-500'),
+      iconBg: `${riskColors.medio.bg} dark:bg-amber-900/30`,
+      tagColor: `${riskColors.medio.badge} dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800`
     },
     normal: {
       label: 'Baixo',
       icon: CheckCircle,
-      iconColor: 'text-green-500',
-      iconBg: 'bg-green-100 dark:bg-green-900/30',
-      tagColor: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
+      iconColor: riskColors.baixo.text.replace('-600', '-500'),
+      iconBg: `${riskColors.baixo.bg} dark:bg-green-900/30`,
+      tagColor: `${riskColors.baixo.badge} dark:bg-green-900/30 dark:text-green-300 dark:border-green-800`
     }
   };
   const config = riskConfig[riskLevel];

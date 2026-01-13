@@ -3,6 +3,8 @@
  * Centraliza funções usadas em múltiplos componentes
  */
 
+import { riskColors } from './styles';
+
 // Tipos
 export interface PlanData {
   selectedMeasures: string[];
@@ -121,7 +123,7 @@ export const getRiskInfo = (intensity: number, avgSector: number): {
   if (percentAbove >= 100) {
     return {
       level: 'Crítico',
-      color: 'text-red-600',
+      color: riskColors.critico.text,
       percentAbove,
       comparisonText: `${Math.round(percentAbove)}% acima da média`,
       isAbove: true
@@ -130,7 +132,7 @@ export const getRiskInfo = (intensity: number, avgSector: number): {
   if (percentAbove >= 50) {
     return {
       level: 'Alto',
-      color: 'text-red-600',
+      color: riskColors.alto.text,
       percentAbove,
       comparisonText: `${Math.round(percentAbove)}% acima da média`,
       isAbove: true
@@ -139,7 +141,7 @@ export const getRiskInfo = (intensity: number, avgSector: number): {
   if (percentAbove > 0) {
     return {
       level: 'Médio',
-      color: 'text-amber-600',
+      color: riskColors.medio.text,
       percentAbove,
       comparisonText: `${Math.round(percentAbove)}% acima da média`,
       isAbove: true
@@ -150,7 +152,7 @@ export const getRiskInfo = (intensity: number, avgSector: number): {
   const percentBelow = Math.abs(percentAbove);
   return {
     level: 'Baixo',
-    color: 'text-green-600',
+    color: riskColors.baixo.text,
     percentAbove,
     comparisonText: percentBelow < 1 ? 'na média' : `${Math.round(percentBelow)}% abaixo da média`,
     isAbove: false
