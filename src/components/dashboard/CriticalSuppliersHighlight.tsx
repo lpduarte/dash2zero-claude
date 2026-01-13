@@ -422,12 +422,14 @@ export const CriticalSuppliersHighlight = ({
                   
                 </div>}
               
-              {/* Nota abaixo da tabela - mesmo estilo do card da tabela */}
-              <div className="p-4 border rounded-lg mt-4">
-                <p className="text-sm text-muted-foreground">
-                   Empresas acima da média do setor têm maior impacto nas emissões municipais e representam maior potencial de redução. Priorizá-las acelera o cumprimento das metas de descarbonização.
-                </p>
-              </div>
+              {/* Nota abaixo da tabela - apenas para municípios */}
+              {isMunicipio && (
+                <div className="p-4 border rounded-lg mt-4">
+                  <p className="text-sm text-muted-foreground">
+                     Empresas acima da média do setor têm maior impacto nas emissões municipais e representam maior potencial de redução. Priorizá-las acelera o cumprimento das metas de descarbonização.
+                  </p>
+                </div>
+              )}
 
               {/* Vista original para empresas */}
               {!isMunicipio && <div className="space-y-3">

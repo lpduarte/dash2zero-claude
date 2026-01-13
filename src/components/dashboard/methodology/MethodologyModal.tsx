@@ -97,7 +97,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
           <div className="space-y-2">
             {/* Secção: Origem dos dados */}
             <Collapsible open={expandedSections.origem} onOpenChange={() => toggleSection('origem')}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+              <CollapsibleTrigger className={cn("flex items-center justify-between w-full p-3 border hover:bg-muted/50 transition-colors", expandedSections.origem ? "rounded-t-lg" : "rounded-lg")}>
                 <div className="flex items-center gap-2">
                   <Database className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">De onde vêm os dados?</span>
@@ -137,7 +137,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             
             {/* Secção: Âmbitos de emissões */}
             <Collapsible open={expandedSections.ambitos} onOpenChange={() => toggleSection('ambitos')}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+              <CollapsibleTrigger className={cn("flex items-center justify-between w-full p-3 border hover:bg-muted/50 transition-colors", expandedSections.ambitos ? "rounded-t-lg" : "rounded-lg")}>
                 <div className="flex items-center gap-2">
                   <Layers className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">Como são calculadas as emissões?</span>
@@ -194,7 +194,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             
             {/* Secção: Métricas */}
             <Collapsible open={expandedSections.metricas} onOpenChange={() => toggleSection('metricas')}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+              <CollapsibleTrigger className={cn("flex items-center justify-between w-full p-3 border hover:bg-muted/50 transition-colors", expandedSections.metricas ? "rounded-t-lg" : "rounded-lg")}>
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">O que significa cada métrica?</span>
@@ -257,7 +257,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             
             {/* Secção: Análise de risco */}
             <Collapsible open={expandedSections.risco} onOpenChange={() => toggleSection('risco')}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+              <CollapsibleTrigger className={cn("flex items-center justify-between w-full p-3 border hover:bg-muted/50 transition-colors", expandedSections.risco ? "rounded-t-lg" : "rounded-lg")}>
                 <div className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">Como funciona a análise de risco?</span>

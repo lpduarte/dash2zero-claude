@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { 
   Zap, 
   Recycle, 
@@ -82,58 +83,59 @@ export const InfrastructureKPIs = () => {
 
   return (
     <>
-      <Card className="p-6 shadow-sm">
-        <SectionHeader
-          icon={Building}
-          title="Infraestruturas Sustentáveis do Município"
-          collapsible
-          expanded={isInfrastructureExpanded}
-          onToggle={() => setIsInfrastructureExpanded(!isInfrastructureExpanded)}
-          actions={
-            <button
-              type="button"
-              onClick={() => setShowInfrastructureModal(true)}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
-              <Settings className="h-4 w-4" />
-              Gerir infraestruturas
-            </button>
-          }
-        />
+      <Collapsible open={isInfrastructureExpanded} onOpenChange={setIsInfrastructureExpanded}>
+        <Card className="p-6 shadow-sm">
+          <SectionHeader
+            icon={Building}
+            title="Infraestruturas Sustentáveis do Município"
+            collapsible
+            expanded={isInfrastructureExpanded}
+            onToggle={() => setIsInfrastructureExpanded(!isInfrastructureExpanded)}
+            actions={
+              <button
+                type="button"
+                onClick={() => setShowInfrastructureModal(true)}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                Gerir infraestruturas
+              </button>
+            }
+          />
 
-        {/* Conteúdo colapsável */}
-        {isInfrastructureExpanded && (
-          <div className="space-y-4">
-            {/* Linha 1: 4 infraestruturas actuais */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {kpisLine1.map((kpi) => (
-                <KPICard
-                  key={kpi.label}
-                  title={kpi.label}
-                  value={kpi.value.toLocaleString('pt-PT')}
-                  icon={kpi.icon}
-                  iconColor={kpi.iconColor}
-                />
-              ))}
+          <CollapsibleContent>
+            <div className="space-y-4">
+              {/* Linha 1: 4 infraestruturas actuais */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {kpisLine1.map((kpi) => (
+                  <KPICard
+                    key={kpi.label}
+                    title={kpi.label}
+                    value={kpi.value.toLocaleString('pt-PT')}
+                    icon={kpi.icon}
+                    iconColor={kpi.iconColor}
+                  />
+                ))}
+              </div>
+              
+              {/* Linha 2: 3 novos KPIs */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {kpisLine2.map((kpi) => (
+                  <KPICard
+                    key={kpi.label}
+                    title={kpi.label}
+                    value={typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
+                    icon={kpi.icon}
+                    iconColor={kpi.iconColor}
+                    valueColor={kpi.valueColor}
+                    inlineSubtitle={kpi.inlineSubtitle}
+                  />
+                ))}
+              </div>
             </div>
-            
-            {/* Linha 2: 3 novos KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {kpisLine2.map((kpi) => (
-                <KPICard
-                  key={kpi.label}
-                  title={kpi.label}
-                  value={typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
-                  icon={kpi.icon}
-                  iconColor={kpi.iconColor}
-                  valueColor={kpi.valueColor}
-                  inlineSubtitle={kpi.inlineSubtitle}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </Card>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
       
       <ManageInfrastructureModal
         open={showInfrastructureModal}

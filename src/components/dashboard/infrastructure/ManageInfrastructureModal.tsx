@@ -46,6 +46,7 @@ export const ManageInfrastructureModal = ({
   const [organicosCount, setOrganicosCount] = useState('178');
   const [cicloviasKm, setCicloviasKm] = useState('47.3');
   const [transportesCount, setTransportesCount] = useState('312');
+  const [bicicletasCount, setBicicletasCount] = useState('52');
   
   // Fonte seleccionada para bicicletas
   const [bicicletasSource, setBicicletasSource] = useState('gira');
@@ -191,17 +192,36 @@ export const ManageInfrastructureModal = ({
                       </SelectContent>
                     </Select>
                   </div>
-                  <button
-                    onClick={() => handleRefreshData('bicicletas')}
-                    className={elements.outlineButtonSm}
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Actualizar
-                  </button>
+                  {bicicletasSource === 'gira' ? (
+                    <button
+                      onClick={() => handleRefreshData('bicicletas')}
+                      className={elements.outlineButtonSm}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Actualizar
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={bicicletasCount}
+                        onChange={(e) => setBicicletasCount(e.target.value)}
+                        className={elements.inputSmall}
+                      />
+                      <button
+                        onClick={() => handleSaveData('Estações de bicicletas')}
+                        className={elements.primaryButtonSm}
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Última actualização: 06/01/2026 · Actualização automática semanal
-                </p>
+                {bicicletasSource === 'gira' && (
+                  <p className="text-xs text-muted-foreground">
+                    Última actualização: 06/01/2026 · Actualização automática semanal
+                  </p>
+                )}
                 <div className="p-3 bg-muted/30 rounded-lg">
                   <p className="text-sm text-muted-foreground">
                     <Info className="h-4 w-4 inline mr-1" />
