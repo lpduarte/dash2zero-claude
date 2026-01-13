@@ -231,7 +231,7 @@ export const CriticalSuppliersHighlight = ({
   return <>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className={cn("bg-gradient-to-br shadow-sm", isMunicipio ? "border-primary/50 from-primary/10 via-primary/5 to-accent/10" : "border-danger/50 from-danger/10 via-warning/5 to-accent/10")}>
-          <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
+          <CardHeader className={cn("transition-all duration-[400ms]", isOpen ? "pb-3" : "pb-6")}>
             <SectionHeader
               icon={isMunicipio ? Target : AlertTriangle}
               iconClassName={isMunicipio ? undefined : "text-danger"}

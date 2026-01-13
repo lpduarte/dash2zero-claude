@@ -37,7 +37,7 @@ export const SectionHeader = ({
     : "mb-4";
 
   return (
-    <div className={cn("flex items-center justify-between", marginClass, className)}>
+    <div className={cn("flex items-center justify-between transition-all duration-[400ms]", marginClass, className)}>
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-muted">
           <Icon className={cn("h-5 w-5 text-muted-foreground", iconClassName)} />

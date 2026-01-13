@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SectionHeader } from "@/components/ui/section-header";
+import { cn } from "@/lib/utils";
 interface TopSuppliersHighlightProps {
   suppliers: Supplier[];
 }
@@ -83,7 +84,7 @@ export const TopSuppliersHighlight = ({
   }, {} as Record<string, number>);
   return <Collapsible open={isOpen} onOpenChange={setIsOpen}>
     <Card className="border-success/50 bg-gradient-to-br from-success/10 via-primary/5 to-accent/10 shadow-sm">
-      <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
+      <CardHeader className={cn("transition-all duration-[400ms]", isOpen ? "pb-3" : "pb-6")}>
         <SectionHeader
           icon={Trophy}
           title="As melhores empresas"

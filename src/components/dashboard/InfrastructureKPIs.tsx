@@ -17,6 +17,7 @@ import { mockInfrastructure } from '@/data/mockInfrastructure';
 import { KPICard } from '@/components/ui/kpi-card';
 import { SectionHeader } from '@/components/ui/section-header';
 import { ManageInfrastructureModal } from './infrastructure';
+import { cn } from '@/lib/utils';
 
 export const InfrastructureKPIs = () => {
   const { user, isMunicipio } = useUser();
@@ -85,7 +86,7 @@ export const InfrastructureKPIs = () => {
     <>
       <Collapsible open={isInfrastructureExpanded} onOpenChange={setIsInfrastructureExpanded}>
         <Card className="shadow-sm">
-          <CardHeader className={isInfrastructureExpanded ? "pb-3" : "pb-6"}>
+          <CardHeader className={cn("transition-all duration-[400ms]", isInfrastructureExpanded ? "pb-3" : "pb-6")}>
             <SectionHeader
               icon={Building}
               title="Infraestruturas Sustentáveis do Município"

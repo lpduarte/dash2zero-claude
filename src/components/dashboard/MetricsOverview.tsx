@@ -146,7 +146,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
     <TooltipProvider delayDuration={100}>
       <Collapsible open={isEmissionsExpanded} onOpenChange={setIsEmissionsExpanded}>
         <Card className="shadow-sm">
-          <CardHeader>
+          <CardHeader className={cn("transition-all duration-[400ms]", isEmissionsExpanded ? "pb-3" : "pb-6")}>
             <SectionHeader
               icon={BarChart3}
               title={isMunicipio ? "Emissões das empresas do município" : "Emissões das empresas"}
