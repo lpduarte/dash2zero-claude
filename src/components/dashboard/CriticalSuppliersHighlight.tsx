@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Clock, CheckCircle, XCircle, Mail, Plus, Eye, Rocket, RotateCcw, AlertCircle } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Plus, Eye, Rocket, RotateCcw, AlertCircle } from "lucide-react";
+import { useState, useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -15,44 +15,9 @@ import { BulkPlanWizard } from "./BulkPlanWizard";
 import { useUser } from "@/contexts/UserContext";
 import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { calculateSuppliersRisk, SupplierRisk } from "@/lib/riskAnalysis";
+import { calculateSuppliersRisk } from "@/lib/riskAnalysis";
 import { getPlanData, getPlanStatus, getRiskInfo, PlanData, PlanStatus } from "@/lib/planUtils";
-
-// Configuração visual dos estados
-const statusConfig = {
-  sem_plano: {
-    label: 'Sem plano',
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    icon: XCircle,
-    targetStep: 1
-  },
-  em_preparacao: {
-    label: 'Em preparação',
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
-    borderColor: 'border-amber-200',
-    icon: Clock,
-    targetStep: 2
-  },
-  plano_pronto: {
-    label: 'Plano pronto',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
-    icon: CheckCircle,
-    targetStep: 4
-  },
-  enviado: {
-    label: 'Enviado',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    icon: Mail,
-    targetStep: 4
-  }
-};
+import { planStatusConfig } from "@/lib/styles";
 
 // Helper para botão de ação por estado
 const getActionButton = (status: PlanStatus, planData: PlanData | null) => {
@@ -381,7 +346,7 @@ export const CriticalSuppliersHighlight = ({
                         {sortedMunicipioSuppliers.map(item => {
                       const planData = getPlanData(item.supplier.id);
                       const status = getPlanStatus(planData);
-                      const config = statusConfig[status];
+                      const config = planStatusConfig[status];
                       const StatusIcon = config.icon;
                       const measuresCount = planData?.selectedMeasures?.length || 0;
                       const fundingCount = planData?.selectedFunding?.length || 0;
