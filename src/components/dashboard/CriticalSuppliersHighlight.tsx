@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SupplierSwitchModal } from "./SupplierSwitchModal";
 import { ActionPlanModal } from "./ActionPlanModal";
-import { MunicipalityActionPlanModal } from "./MunicipalityActionPlanModal";
+import { MunicipalityActionPlanModal } from "./action-plan";
 import { BulkPlanWizard } from "./BulkPlanWizard";
 import { useUser } from "@/contexts/UserContext";
 import { cn } from "@/lib/utils";
