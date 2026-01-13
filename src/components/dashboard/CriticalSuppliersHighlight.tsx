@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { calculateSuppliersRisk } from "@/lib/riskAnalysis";
 import { getPlanData, getPlanStatus, getRiskInfo, PlanData, PlanStatus } from "@/lib/planUtils";
-import { planStatusConfig } from "@/lib/styles";
+import { planStatusConfig, riskColors } from "@/lib/styles";
 import { SectionHeader } from "@/components/ui/section-header";
 
 // Helper para botão de ação por estado
@@ -317,10 +317,10 @@ export const CriticalSuppliersHighlight = ({
                                   <div className="space-y-2 text-xs">
                                     <p className="font-medium">Intensidade de carbono vs média do setor.</p>
                                     <div className="space-y-1">
-                                      <p><span className="text-red-600 font-medium">Crítico:</span> ≥100% acima da média</p>
-                                      <p><span className="text-red-600 font-medium">Alto:</span> 50-100% acima da média</p>
-                                      <p><span className="text-amber-600 font-medium">Médio:</span> 1-50% acima da média</p>
-                                      <p><span className="text-green-600 font-medium">Baixo:</span> abaixo da média</p>
+                                      <p><span className={`${riskColors.critico.text} font-medium`}>Crítico:</span> ≥100% acima da média</p>
+                                      <p><span className={`${riskColors.alto.text} font-medium`}>Alto:</span> 50-100% acima da média</p>
+                                      <p><span className={`${riskColors.medio.text} font-medium`}>Médio:</span> 1-50% acima da média</p>
+                                      <p><span className={`${riskColors.baixo.text} font-medium`}>Baixo:</span> abaixo da média</p>
                                     </div>
                                   </div>
                                 </TooltipContent>
@@ -357,7 +357,7 @@ export const CriticalSuppliersHighlight = ({
                                     <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
                                     {riskInfo.isAbove ? <TrendingUp className="h-3 w-3 text-red-500" /> : <TrendingDown className="h-3 w-3 text-green-500" />}
                                   </div>
-                                  <div className="flex items-center gap-1.5 text-xs">
+                                  <div className="flex items-center gap-2 text-xs">
                                     <span className={riskInfo.color}>Risco {riskInfo.level}</span>
                                     {riskInfo.comparisonText && <>
                                         <span className="text-muted-foreground">·</span>
@@ -377,7 +377,7 @@ export const CriticalSuppliersHighlight = ({
                               avgSectorIntensity: item.avgSectorIntensity
                             });
                             setMunicipalityPlanOpen(true);
-                          }} className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium", config.bgColor, config.color, config.borderColor, "border hover:opacity-80 transition-opacity cursor-pointer")}>
+                          }} className={cn("inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium", config.bgColor, config.color, config.borderColor, "border hover:opacity-80 transition-opacity cursor-pointer")}>
                                   <StatusIcon className="h-3 w-3" />
                                   <span>{config.label}</span>
                                   {showTarget && <span className={targetReached ? 'text-green-600' : 'text-amber-600'}>
@@ -388,7 +388,7 @@ export const CriticalSuppliersHighlight = ({
                               
                               {/* Coluna Medidas/Fundos */}
                               <TableCell>
-                                {measuresCount === 0 && fundingCount === 0 ? <span className="text-muted-foreground">—</span> : <div className="flex items-center gap-1 text-sm">
+                                {measuresCount === 0 && fundingCount === 0 ? <span className="text-muted-foreground">—</span> : <div className="flex items-center gap-2 text-sm">
                                     {measuresCount > 0 ? <span className="text-foreground">{measuresCount} medida{measuresCount !== 1 ? 's' : ''}</span> : <span className="text-muted-foreground">—</span>}
                                     <span className="text-muted-foreground">·</span>
                                     {fundingCount > 0 ? <span className="text-foreground">{fundingCount} fundo{fundingCount !== 1 ? 's' : ''}</span> : <span className="text-muted-foreground">—</span>}
@@ -408,7 +408,7 @@ export const CriticalSuppliersHighlight = ({
                                 avgSectorIntensity: item.avgSectorIntensity
                               });
                               setMunicipalityPlanOpen(true);
-                            }} className="gap-1.5">
+                            }} className="gap-2">
                                       <ActionIcon className="h-4 w-4" />
                                       {action.label}
                                     </Button>;
