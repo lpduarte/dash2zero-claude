@@ -141,7 +141,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
 
   return (
     <TooltipProvider delayDuration={100}>
-      <Card className="p-6 shadow-md">
+      <Card className="p-6 shadow-sm">
         <SectionHeader
           icon={BarChart3}
           title="Emissões das empresas do município"
@@ -162,7 +162,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
 
         {/* Conteúdo colapsável */}
         <div className={cn(
-          "overflow-hidden transition-all duration-200",
+          "overflow-hidden transition-all duration-[400ms]",
           isEmissionsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
         )}>
           <div className="space-y-4">

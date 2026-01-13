@@ -24,7 +24,7 @@ export const FilterPanel = ({
   onRegionChange,
 }: FilterPanelProps) => {
   return (
-    <Card className="p-6 shadow-md mb-8">
+    <Card className="p-6 shadow-sm mb-8">
       <div className="flex items-center gap-2 mb-4">
         <Filter className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-semibold">Filtros</h2>

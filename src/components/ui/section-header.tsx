@@ -31,7 +31,7 @@ export const SectionHeader = ({
   className,
 }: SectionHeaderProps) => {
   return (
-    <div className={cn("flex items-center justify-between mb-4", className)}>
+    <div className={cn("flex items-center justify-between", className)}>
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-muted">
           <Icon className={cn("h-5 w-5 text-muted-foreground", iconClassName)} />
@@ -50,7 +50,7 @@ export const SectionHeader = ({
           >
             <ChevronDown 
               className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                "h-4 w-4 text-muted-foreground transition-transform duration-[400ms]",
                 !expanded && "-rotate-90"
               )}
             />

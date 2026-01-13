@@ -130,11 +130,11 @@ export default {
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.45s ease-in-out",
+        "accordion-down": "accordion-down 0.4s ease-in-out",
         "accordion-up": "accordion-up 0.4s ease-in-out",
         "fade-in": "fade-in 0.3s ease-out",
         "collapsible-down": "collapsible-down 0.4s ease-in-out",
-        "collapsible-up": "collapsible-up 0.35s ease-in-out",
+        "collapsible-up": "collapsible-up 0.4s ease-in-out",
       },
     },
   },

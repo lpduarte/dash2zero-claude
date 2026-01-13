@@ -266,7 +266,7 @@ export const IncentiveEmailDialog = ({
             </div>
             <ScrollArea className="flex-1">
               <div 
-                className="p-2 space-y-3 transition-all duration-500 ease-in-out" 
+                className="p-2 space-y-3 transition-all duration-[400ms] ease-in-out" 
                 key={`${clusterFilter}-${searchQuery}`}
               >
                 {companiesBySector.length === 0 ? (
@@ -288,7 +288,7 @@ export const IncentiveEmailDialog = ({
                           className="flex items-center justify-between w-full px-2 py-1.5 bg-muted/30 rounded sticky top-0 hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center gap-2">
-                            <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-500 ease-in-out ${isCollapsed ? '-rotate-90' : ''}`} />
+                            <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-[400ms] ease-in-out ${isCollapsed ? '-rotate-90' : ''}`} />
                             <span className="text-xs font-semibold text-muted-foreground">{sector}</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -301,7 +301,7 @@ export const IncentiveEmailDialog = ({
                             />
                           </div>
                         </button>
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[2000px] opacity-100'}`}>
+                        <div className={`overflow-hidden transition-all duration-[400ms] ease-in-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[2000px] opacity-100'}`}>
                           <div className="space-y-1.5 pt-1">
                             {sectorCompanies.map((company, companyIndex) => (
                             <Collapsible key={company.id} open={expandedCompany === company.id}>

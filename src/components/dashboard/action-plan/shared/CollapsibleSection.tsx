@@ -48,7 +48,7 @@ export const CollapsibleSection = ({
           )}
         </div>
         <ChevronDown
-          className={`h-5 w-5 transition-transform duration-200 ${
+          className={`h-5 w-5 transition-transform duration-[400ms] ${
             highlighted ? 'text-primary' : 'text-muted-foreground'
           } ${isExpanded ? 'rotate-180' : ''}`}
         />
@@ -57,7 +57,7 @@ export const CollapsibleSection = ({
       {/* Conteúdo com transição suave */}
       <div
         className={`
-          overflow-hidden transition-all duration-200 ease-in-out
+          overflow-hidden transition-all duration-[400ms] ease-in-out
           ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
         `}
       >
