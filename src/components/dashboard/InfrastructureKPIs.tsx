@@ -9,7 +9,6 @@ import {
   Bus, 
   Wind,
   Settings,
-  ChevronDown,
   Link,
   PenLine,
   RefreshCw,
@@ -35,6 +34,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { KPICard } from '@/components/ui/kpi-card';
+import { SectionHeader } from '@/components/ui/section-header';
 
 export const InfrastructureKPIs = () => {
   const { user, isMunicipio } = useUser();
@@ -119,17 +120,13 @@ export const InfrastructureKPIs = () => {
   return (
     <>
       <Card className="p-6 shadow-sm">
-        {/* Header do card */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-muted">
-              <Building className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <h3 className="font-semibold text-lg">Infraestruturas Sustentáveis do Município</h3>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {/* Botão Gerir - à esquerda do chevron */}
+        <SectionHeader
+          icon={Building}
+          title="Infraestruturas Sustentáveis do Município"
+          collapsible
+          expanded={isInfrastructureExpanded}
+          onToggle={() => setIsInfrastructureExpanded(!isInfrastructureExpanded)}
+          actions={
             <button
               type="button"
               onClick={() => setShowInfrastructureModal(true)}
@@ -138,68 +135,38 @@ export const InfrastructureKPIs = () => {
               <Settings className="h-4 w-4" />
               Gerir infraestruturas
             </button>
-            
-            {/* Chevron - mesmo estilo dos outros cards */}
-            <button
-              type="button"
-              onClick={() => setIsInfrastructureExpanded(!isInfrastructureExpanded)}
-              className="w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0"
-            >
-              <ChevronDown 
-                className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                  isInfrastructureExpanded ? '' : '-rotate-90'
-                }`}
-              />
-            </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Conteúdo colapsável */}
         {isInfrastructureExpanded && (
           <div className="space-y-4">
             {/* Linha 1: 4 infraestruturas actuais */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {kpisLine1.map((kpi) => {
-                const Icon = kpi.icon;
-                return (
-                  <div key={kpi.label} className="p-4 border rounded-lg shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-muted-foreground">{kpi.label}</span>
-                      <div className="p-1.5 bg-muted rounded">
-                        <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
-                      </div>
-                    </div>
-                    <p className="text-2xl font-bold">{kpi.value.toLocaleString('pt-PT')}</p>
-                  </div>
-                );
-              })}
+              {kpisLine1.map((kpi) => (
+                <KPICard
+                  key={kpi.label}
+                  title={kpi.label}
+                  value={kpi.value.toLocaleString('pt-PT')}
+                  icon={kpi.icon}
+                  iconColor={kpi.iconColor}
+                />
+              ))}
             </div>
             
             {/* Linha 2: 3 novos KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {kpisLine2.map((kpi) => {
-                const Icon = kpi.icon;
-                return (
-                  <div key={kpi.label} className="p-4 border rounded-lg shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-muted-foreground">{kpi.label}</span>
-                      <div className="p-1.5 bg-muted rounded">
-                        <Icon className={`h-4 w-4 ${kpi.iconColor}`} />
-                      </div>
-                    </div>
-                    {kpi.inlineSubtitle ? (
-                      <div className="flex items-baseline gap-2">
-                        <p className={`text-2xl font-bold ${kpi.valueColor || ''}`}>{kpi.value}</p>
-                        <span className="text-sm text-muted-foreground">· {kpi.inlineSubtitle}</span>
-                      </div>
-                    ) : (
-                      <p className={`text-2xl font-bold ${kpi.valueColor || ''}`}>
-                        {typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+              {kpisLine2.map((kpi) => (
+                <KPICard
+                  key={kpi.label}
+                  title={kpi.label}
+                  value={typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
+                  icon={kpi.icon}
+                  iconColor={kpi.iconColor}
+                  valueColor={kpi.valueColor}
+                  inlineSubtitle={kpi.inlineSubtitle}
+                />
+              ))}
             </div>
           </div>
         )}

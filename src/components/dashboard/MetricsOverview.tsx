@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/collapsible";
 import { IncentiveEmailDialog } from "./IncentiveEmailDialog";
 import { cn } from "@/lib/utils";
+import { SectionHeader } from "@/components/ui/section-header";
 
 interface MetricsOverviewProps {
   suppliers: Supplier[];
@@ -163,17 +164,13 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
   return (
     <TooltipProvider delayDuration={100}>
       <Card className="p-6 shadow-md">
-        {/* Header do card */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-muted">
-              <BarChart3 className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <h3 className="font-semibold text-lg">Emissões das empresas do município</h3>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {/* Botão Info - estilo igual ao (i) do KPI Potencial de melhoria */}
+        <SectionHeader
+          icon={BarChart3}
+          title="Emissões das empresas do município"
+          collapsible
+          expanded={isEmissionsExpanded}
+          onToggle={() => setIsEmissionsExpanded(!isEmissionsExpanded)}
+          actions={
             <button
               type="button"
               onClick={() => setShowMethodologyModal(true)}
@@ -182,17 +179,8 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
             >
               <Info className="h-4 w-4" />
             </button>
-            
-            {/* Chevron - estilo igual ao bloco Empresas a monitorizar */}
-            <button
-              type="button"
-              onClick={() => setIsEmissionsExpanded(!isEmissionsExpanded)}
-              className="w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0"
-            >
-              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isEmissionsExpanded ? '' : 'rotate-180'}`} />
-            </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Conteúdo colapsável */}
         <div className={cn(
