@@ -1,0 +1,1 @@
+export { MunicipalityActionPlanModal } from './MunicipalityActionPlanModal';
