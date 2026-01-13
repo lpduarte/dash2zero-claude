@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Supplier } from "@/types/supplier";
@@ -18,6 +18,8 @@ import { MethodologyModal } from "./methodology";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/section-header";
 import { KPICard } from "@/components/ui/kpi-card";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { useUser } from "@/contexts/UserContext";
 
 interface MetricsOverviewProps {
   suppliers: Supplier[];
@@ -35,6 +37,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [showMethodologyModal, setShowMethodologyModal] = useState(false);
   const [isEmissionsExpanded, setIsEmissionsExpanded] = useState(true);
+  const { isMunicipio } = useUser();
 
   // Soma total das emissões de todas as empresas
   const totalEmissions = suppliers.reduce((acc, s) => acc + s.totalEmissions, 0);
@@ -141,33 +144,33 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
 
   return (
     <TooltipProvider delayDuration={100}>
-      <Card className="p-6 shadow-sm">
-        <SectionHeader
-          icon={BarChart3}
-          title="Emissões das empresas do município"
-          collapsible
-          expanded={isEmissionsExpanded}
-          onToggle={() => setIsEmissionsExpanded(!isEmissionsExpanded)}
-          actions={
-            <button
-              type="button"
-              onClick={() => setShowMethodologyModal(true)}
-              className="p-1.5 bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
-              title="Guia metodológico"
-            >
-              <Info className="h-4 w-4" />
-            </button>
-          }
-        />
+      <Collapsible open={isEmissionsExpanded} onOpenChange={setIsEmissionsExpanded}>
+        <Card className="shadow-sm">
+          <CardHeader>
+            <SectionHeader
+              icon={BarChart3}
+              title={isMunicipio ? "Emissões das empresas do município" : "Emissões das empresas"}
+              collapsible
+              expanded={isEmissionsExpanded}
+              onToggle={() => setIsEmissionsExpanded(!isEmissionsExpanded)}
+              actions={
+                <button
+                  type="button"
+                  onClick={() => setShowMethodologyModal(true)}
+                  className="p-1.5 bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  title="Guia metodológico"
+                >
+                  <Info className="h-4 w-4" />
+                </button>
+              }
+            />
+          </CardHeader>
 
-        {/* Conteúdo colapsável */}
-        <div className={cn(
-          "overflow-hidden transition-all duration-[400ms]",
-          isEmissionsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
-        )}>
-          <div className="space-y-4">
-            {/* Linha 1: 5 KPIs usando KPICard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <CollapsibleContent>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Linha 1: 5 KPIs usando KPICard */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {metrics.map((metric) => (
                 <KPICard
                   key={metric.title}
@@ -306,9 +309,11 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Card>
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Modal Metodológico - Componente separado */}
       <MethodologyModal 
