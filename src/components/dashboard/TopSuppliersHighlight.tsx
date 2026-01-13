@@ -1,12 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
-import { Award, Trophy, TrendingDown, Euro, BarChart3, ChevronDown } from "lucide-react";
+import { Trophy, TrendingDown, Euro, BarChart3, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
+import { SectionHeader } from "@/components/ui/section-header";
 interface TopSuppliersHighlightProps {
   suppliers: Supplier[];
 }
@@ -84,16 +84,14 @@ export const TopSuppliersHighlight = ({
   return <Collapsible open={isOpen} onOpenChange={setIsOpen}>
     <Card className="border-success/50 bg-gradient-to-br from-success/10 via-primary/5 to-accent/10 shadow-sm">
       <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-muted">
-              <Trophy className="h-5 w-5 text-success" />
-            </div>
-            <CardTitle className="text-lg font-semibold">
-              As melhores empresas
-            </CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
+        <SectionHeader
+          icon={Trophy}
+          title="As melhores empresas"
+          collapsible
+          expanded={isOpen}
+          onToggle={() => setIsOpen(!isOpen)}
+          className="mb-0"
+          actions={
             <Select value={selectedSector} onValueChange={setSelectedSector}>
               <SelectTrigger className="w-[280px]">
                 <SelectValue placeholder="Filtrar por atividade" />
@@ -113,13 +111,8 @@ export const TopSuppliersHighlight = ({
                   </SelectItem>)}
               </SelectContent>
             </Select>
-            <CollapsibleTrigger asChild>
-              <button className="ml-2 w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0">
-                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? '' : 'rotate-180'}`} />
-              </button>
-            </CollapsibleTrigger>
-          </div>
-        </div>
+          }
+        />
       </CardHeader>
       <CollapsibleContent>
         <CardContent>

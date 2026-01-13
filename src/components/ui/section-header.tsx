@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 interface SectionHeaderProps {
   /** Ícone do header */
   icon: LucideIcon;
+  /** Classe adicional para o ícone */
+  iconClassName?: string;
   /** Título da secção */
   title: string;
   /** Conteúdo adicional à direita (botões, badges, etc.) */
@@ -20,6 +22,7 @@ interface SectionHeaderProps {
 
 export const SectionHeader = ({
   icon: Icon,
+  iconClassName,
   title,
   actions,
   collapsible = false,
@@ -31,7 +34,7 @@ export const SectionHeader = ({
     <div className={cn("flex items-center justify-between mb-4", className)}>
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-muted">
-          <Icon className="h-5 w-5 text-muted-foreground" />
+          <Icon className={cn("h-5 w-5 text-muted-foreground", iconClassName)} />
         </div>
         <h3 className="font-semibold text-lg">{title}</h3>
       </div>

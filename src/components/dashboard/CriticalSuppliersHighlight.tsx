@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
-import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, Landmark, ArrowUpDown, Target, Plus, Eye, Rocket, RotateCcw, AlertCircle } from "lucide-react";
+import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, ArrowUpDown, Target, Plus, Eye, Rocket, RotateCcw } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { calculateSuppliersRisk } from "@/lib/riskAnalysis";
 import { getPlanData, getPlanStatus, getRiskInfo, PlanData, PlanStatus } from "@/lib/planUtils";
 import { planStatusConfig } from "@/lib/styles";
+import { SectionHeader } from "@/components/ui/section-header";
 
 // Helper para botão de ação por estado
 const getActionButton = (status: PlanStatus, planData: PlanData | null) => {
@@ -231,35 +232,28 @@ export const CriticalSuppliersHighlight = ({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className={cn("bg-gradient-to-br shadow-sm", isMunicipio ? "border-primary/50 from-primary/10 via-primary/5 to-accent/10" : "border-danger/50 from-danger/10 via-warning/5 to-accent/10")}>
           <CardHeader className={isOpen ? "pb-3" : "pb-6"}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-muted">
-                  {isMunicipio ? <Target className="h-5 w-5 text-muted-foreground" /> : <AlertTriangle className="h-5 w-5 text-danger" />}
-                </div>
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                    {isMunicipio ? 'Empresas do município a monitorizar' : 'Empresas críticas e alternativas'}
-                  </CardTitle>
-                  
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {isMunicipio && <>
-                    {/* Botão Reset (temporário para demos) */}
+            <SectionHeader
+              icon={isMunicipio ? Target : AlertTriangle}
+              iconClassName={isMunicipio ? undefined : "text-danger"}
+              title={isMunicipio ? 'Empresas do município a monitorizar' : 'Empresas críticas e alternativas'}
+              collapsible
+              expanded={isOpen}
+              onToggle={() => setIsOpen(!isOpen)}
+              className="mb-0"
+              actions={
+                <>
+                  {isMunicipio && <>
                     <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground" onClick={() => {
-                  // Encontrar todas as keys de planos no localStorage
-                  const keysToRemove: string[] = [];
-                  for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && key.startsWith('actionPlan_')) {
-                      keysToRemove.push(key);
-                    }
-                  }
-                  // Remover todas
-                  keysToRemove.forEach(key => localStorage.removeItem(key));
-                  // Forçar refresh
-                  window.location.reload();
-                }} title="Limpar todos os planos">
+                      const keysToRemove: string[] = [];
+                      for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('actionPlan_')) {
+                          keysToRemove.push(key);
+                        }
+                      }
+                      keysToRemove.forEach(key => localStorage.removeItem(key));
+                      window.location.reload();
+                    }} title="Limpar todos os planos">
                       <RotateCcw className="h-4 w-4" />
                     </Button>
                     
@@ -268,36 +262,32 @@ export const CriticalSuppliersHighlight = ({
                       Gerar planos em massa
                     </Button>
                   </>}
-                {!isMunicipio && <Button variant="outline" size="sm" className="gap-2" onClick={() => setActionPlanOpen(true)}>
+                  {!isMunicipio && <Button variant="outline" size="sm" className="gap-2" onClick={() => setActionPlanOpen(true)}>
                     <FileText className="h-4 w-4" />
                     Gerar plano de ação
                   </Button>}
-                <Select value={selectedSector} onValueChange={setSelectedSector}>
-                  <SelectTrigger className="w-[280px]">
-                    <SelectValue placeholder="Filtrar por atividade" />
-                  </SelectTrigger>
-                  <SelectContent className="w-[280px]">
-                    <SelectItem value="all">
-                      <div className="flex items-center justify-between w-[230px]">
-                        <span>{sectorLabels.all}</span>
-                        <span className="bg-muted text-muted-foreground text-xs font-semibold px-2 py-0.5 rounded-full min-w-[28px] text-center">{suppliers.length}</span>
-                      </div>
-                    </SelectItem>
-                    {uniqueSectors.map(sector => <SelectItem key={sector} value={sector}>
+                  <Select value={selectedSector} onValueChange={setSelectedSector}>
+                    <SelectTrigger className="w-[280px]">
+                      <SelectValue placeholder="Filtrar por atividade" />
+                    </SelectTrigger>
+                    <SelectContent className="w-[280px]">
+                      <SelectItem value="all">
+                        <div className="flex items-center justify-between w-[230px]">
+                          <span>{sectorLabels.all}</span>
+                          <span className="bg-muted text-muted-foreground text-xs font-semibold px-2 py-0.5 rounded-full min-w-[28px] text-center">{suppliers.length}</span>
+                        </div>
+                      </SelectItem>
+                      {uniqueSectors.map(sector => <SelectItem key={sector} value={sector}>
                         <div className="flex items-center justify-between w-[230px]">
                           <span>{sectorLabels[sector] || sector}</span>
                           <span className="bg-muted text-muted-foreground text-xs font-semibold px-2 py-0.5 rounded-full min-w-[28px] text-center">{sectorCounts[sector]}</span>
                         </div>
                       </SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <CollapsibleTrigger asChild>
-                  <button className="ml-2 w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0">
-                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? '' : 'rotate-180'}`} />
-                  </button>
-                </CollapsibleTrigger>
-              </div>
-            </div>
+                    </SelectContent>
+                  </Select>
+                </>
+              }
+            />
           </CardHeader>
           <CollapsibleContent>
             <CardContent>
