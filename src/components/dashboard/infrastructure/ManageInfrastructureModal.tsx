@@ -30,6 +30,7 @@ import {
   Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { elements } from '@/lib/styles';
 
 interface ManageInfrastructureModalProps {
   open: boolean;
@@ -101,7 +102,7 @@ export const ManageInfrastructureModal = ({
                   </div>
                   <button
                     onClick={() => handleRefreshData('postos')}
-                    className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-lg hover:bg-muted transition-colors"
+                    className={elements.outlineButtonSm}
                   >
                     <RefreshCw className="h-4 w-4" />
                     Actualizar
@@ -143,11 +144,11 @@ export const ManageInfrastructureModal = ({
                       type="number"
                       value={ecopontosCount}
                       onChange={(e) => setEcopontosCount(e.target.value)}
-                      className="w-24 px-3 py-1.5 text-sm border rounded-lg bg-background"
+                      className={elements.inputSmall}
                     />
                     <button
                       onClick={() => handleSaveData('Ecopontos')}
-                      className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                      className={elements.primaryButtonSm}
                     >
                       Guardar
                     </button>
@@ -192,7 +193,7 @@ export const ManageInfrastructureModal = ({
                   </div>
                   <button
                     onClick={() => handleRefreshData('bicicletas')}
-                    className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-lg hover:bg-muted transition-colors"
+                    className={elements.outlineButtonSm}
                   >
                     <RefreshCw className="h-4 w-4" />
                     Actualizar
@@ -238,11 +239,11 @@ export const ManageInfrastructureModal = ({
                       type="number"
                       value={organicosCount}
                       onChange={(e) => setOrganicosCount(e.target.value)}
-                      className="w-24 px-3 py-1.5 text-sm border rounded-lg bg-background"
+                      className={elements.inputSmall}
                     />
                     <button
                       onClick={() => handleSaveData('Contentores orgânicos')}
-                      className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                      className={elements.primaryButtonSm}
                     >
                       Guardar
                     </button>
@@ -283,12 +284,12 @@ export const ManageInfrastructureModal = ({
                       step="0.1"
                       value={cicloviasKm}
                       onChange={(e) => setCicloviasKm(e.target.value)}
-                      className="w-24 px-3 py-1.5 text-sm border rounded-lg bg-background"
+                      className={elements.inputSmall}
                     />
                     <span className="text-sm text-muted-foreground">km</span>
                     <button
                       onClick={() => handleSaveData('Ciclovias')}
-                      className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                      className={elements.primaryButtonSm}
                     >
                       Guardar
                     </button>
@@ -327,11 +328,11 @@ export const ManageInfrastructureModal = ({
                       type="number"
                       value={transportesCount}
                       onChange={(e) => setTransportesCount(e.target.value)}
-                      className="w-24 px-3 py-1.5 text-sm border rounded-lg bg-background"
+                      className={elements.inputSmall}
                     />
                     <button
                       onClick={() => handleSaveData('Paragens de transportes')}
-                      className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                      className={elements.primaryButtonSm}
                     >
                       Guardar
                     </button>
@@ -368,7 +369,7 @@ export const ManageInfrastructureModal = ({
                   </div>
                   <button
                     onClick={() => handleRefreshData('qualidade do ar')}
-                    className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-lg hover:bg-muted transition-colors"
+                    className={elements.outlineButtonSm}
                   >
                     <RefreshCw className="h-4 w-4" />
                     Actualizar

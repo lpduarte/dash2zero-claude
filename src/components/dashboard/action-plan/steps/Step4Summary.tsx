@@ -27,6 +27,7 @@ import { CollapsibleSection } from '../shared';
 import { mockMeasures } from '@/data/mockMeasures';
 import { mockFunding } from '@/data/mockFunding';
 import { cascaisInfrastructure } from '@/data/mockInfrastructure';
+import { elements } from '@/lib/styles';
 
 export const Step4Summary = ({
   supplier,
@@ -118,7 +119,7 @@ export const Step4Summary = ({
           <button
             type="button"
             onClick={onToggleAllSections}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border rounded-lg hover:bg-muted transition-colors"
+            className={elements.outlineButton}
           >
             {allExpanded ? (
               <>
