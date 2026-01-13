@@ -5,6 +5,7 @@ import { TrendingDown, Factory, Zap, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/contexts/UserContext";
 import { getClusterInfo, clusterIcons, clusterLabels, ClusterType } from "@/config/clusters";
+import { SectionHeader } from "@/components/ui/section-header";
 
 interface ClusterKPIsProps {
   suppliers: Supplier[];
@@ -96,11 +97,12 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
   return (
     <div className="space-y-6">
       <Card className="p-6 shadow-sm bg-gradient-to-r from-primary/5 to-accent/5 border-2 border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-6 w-6" />
-            KPIs por Cluster do Banco Montepio/Município
-          </CardTitle>
+        <CardHeader className="pb-3">
+          <SectionHeader
+            icon={Building2}
+            title="KPIs por Cluster do Banco Montepio/Município"
+            className="mb-0"
+          />
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
