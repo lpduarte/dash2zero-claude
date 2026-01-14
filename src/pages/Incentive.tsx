@@ -25,7 +25,9 @@ import {
   ChevronRight,
   Archive,
   CheckCircle2,
-  Calculator
+  Calculator,
+  Clock,
+  Star
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { getClustersByOwnerType } from "@/data/clusters";
@@ -250,21 +252,23 @@ const Incentive = () => {
         </div>
         
         {/* Metrics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <TrendingUp className="h-4 w-4 text-success" />
               <p className="text-xs text-muted-foreground">Taxa de Conversão</p>
             </div>
-            <p className="text-2xl font-bold text-green-600">{metrics.conversionRate}%</p>
+            <p className="text-2xl font-bold text-success">{metrics.conversionRate}%</p>
+            <p className="text-xs text-muted-foreground">contactadas → calcularam</p>
           </Card>
           
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Send className="h-4 w-4 text-blue-600" />
+              <Send className="h-4 w-4 text-primary" />
               <p className="text-xs text-muted-foreground">Emails Enviados</p>
             </div>
             <p className="text-2xl font-bold">{metrics.totalEmailsSent}</p>
+            <p className="text-xs text-muted-foreground">{metrics.emailsThisMonth} este mês</p>
           </Card>
           
           <Card className="p-4">
@@ -273,29 +277,41 @@ const Incentive = () => {
               <p className="text-xs text-muted-foreground">Por Contactar</p>
             </div>
             <p className="text-2xl font-bold text-primary">{metrics.neverContacted}</p>
+            <p className="text-xs text-muted-foreground">nunca contactadas</p>
           </Card>
           
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground">Tempo até Conversão</p>
+            </div>
+            <p className="text-2xl font-bold">{metrics.avgDaysToConversion}</p>
+            <p className="text-xs text-muted-foreground">dias em média</p>
+          </Card>
+          
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Star className="h-4 w-4 text-warning" />
+              <p className="text-xs text-muted-foreground">Melhor Template</p>
+            </div>
+            <p className="text-2xl font-bold">{metrics.bestTemplate}</p>
+            <p className="text-xs text-muted-foreground">{metrics.bestTemplateRate}% conversão</p>
+          </Card>
+          
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertTriangle className="h-4 w-4 text-warning" />
               <p className="text-xs text-muted-foreground">Saturadas (3+)</p>
             </div>
-            <p className="text-2xl font-bold text-amber-500">{metrics.saturatedCount}</p>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Archive className="h-4 w-4 text-emerald-600" />
-              <p className="text-xs text-muted-foreground">No Arquivo</p>
-            </div>
-            <p className="text-2xl font-bold text-emerald-600">{metrics.archivedCount}</p>
+            <p className="text-2xl font-bold text-warning">{metrics.saturatedCount}</p>
+            <p className="text-xs text-muted-foreground">parar de insistir</p>
           </Card>
         </div>
         
         {/* Main Grid: List + Compose */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
           {/* Left Column: Company List */}
-          <div className="lg:col-span-2 flex flex-col border rounded-lg overflow-hidden bg-card">
+          <div className="flex flex-col border rounded-lg overflow-hidden bg-card h-[700px]">
             {/* Tabs: Por Contactar / Arquivo */}
             <div className="border-b p-3">
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "pending" | "archive")}>
@@ -480,13 +496,13 @@ const Incentive = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="font-medium truncate">{company.name}</p>
-                            <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                            <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
                           </div>
                           <p className="text-sm text-muted-foreground truncate">{company.contact.email}</p>
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
+                          <Badge variant="outline" className="text-success border-success/30 bg-success/10">
                             <Calculator className="h-3 w-3 mr-1" />
                             Pegada calculada
                           </Badge>
@@ -513,50 +529,52 @@ const Incentive = () => {
             </div>
           </div>
           
-          {/* Right Column: Email Compose */}
-          <div className="flex flex-col border rounded-lg overflow-hidden bg-card">
-            <Tabs defaultValue="compose" className="flex flex-col h-full">
-              <TabsList className="m-4 mb-0 grid grid-cols-2">
+          {/* Right Column: Email Compose - altura fixa com scroll próprio */}
+          <div className="flex flex-col border rounded-lg overflow-hidden bg-card h-[700px]">
+            <Tabs defaultValue="compose" className="flex flex-col flex-1 min-h-0">
+              <TabsList className="m-4 mb-0 grid grid-cols-2 shrink-0">
                 <TabsTrigger value="compose">Compor</TabsTrigger>
                 <TabsTrigger value="preview">Preview</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="compose" className="flex-1 flex flex-col p-4 pt-2 gap-4">
-                <div>
-                  <Label>Template</Label>
-                  <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {emailTemplates.map(template => (
-                        <SelectItem key={template.id} value={template.id}>
-                          {template.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label>Assunto</Label>
-                  <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
-                </div>
-                
-                <div className="flex-1 flex flex-col">
-                  <Label>Mensagem</Label>
-                  <Textarea 
-                    value={message} 
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="min-h-[250px] resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Use {"{companyName}"} para personalizar
-                  </p>
+              <TabsContent value="compose" className="flex-1 overflow-auto p-4 pt-2">
+                <div className="space-y-4">
+                  <div>
+                    <Label>Template</Label>
+                    <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {emailTemplates.map(template => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label>Assunto</Label>
+                    <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
+                  </div>
+                  
+                  <div>
+                    <Label>Mensagem</Label>
+                    <Textarea 
+                      value={message} 
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="min-h-[280px] resize-none"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Use {"{companyName}"} para personalizar
+                    </p>
+                  </div>
                 </div>
               </TabsContent>
               
-              <TabsContent value="preview" className="flex-1 p-4 pt-2 overflow-auto">
+              <TabsContent value="preview" className="flex-1 overflow-auto p-4 pt-2">
                 {firstSelectedCompany ? (
                   <div className="space-y-3">
                     <div className="p-3 bg-muted/50 rounded-lg">
@@ -567,7 +585,7 @@ const Incentive = () => {
                       <p className="text-xs text-muted-foreground">Assunto</p>
                       <p className="font-medium">{previewSubject}</p>
                     </div>
-                    <div className="p-3 bg-muted/50 rounded-lg max-h-[300px] overflow-auto">
+                    <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-xs text-muted-foreground mb-1">Mensagem</p>
                       <p className="whitespace-pre-wrap text-sm">{previewMessage}</p>
                     </div>
@@ -578,7 +596,7 @@ const Incentive = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="py-12 text-center text-muted-foreground">
+                  <div className="text-center text-muted-foreground">
                     <Mail className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Seleccione empresas para ver o preview</p>
                   </div>
@@ -586,8 +604,8 @@ const Incentive = () => {
               </TabsContent>
             </Tabs>
             
-            {/* Send button */}
-            <div className="p-4 border-t">
+            {/* Send button - sempre visível no fundo */}
+            <div className="p-4 border-t shrink-0">
               <Button 
                 className="w-full" 
                 disabled={selectedCompanies.length === 0 || isLoading}
