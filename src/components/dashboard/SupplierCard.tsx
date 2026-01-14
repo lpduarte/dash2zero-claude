@@ -4,7 +4,7 @@ import { Mail, ExternalLink, FileText, Building2, Users, Handshake, TrendingUp, 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getSectorName } from "@/data/sectors";
-import { mockSuppliers } from "@/data/mockSuppliers";
+import { allEmpresaSuppliers } from "@/data/suppliers";
 interface SupplierCardProps {
   supplier: Supplier;
 }
@@ -43,12 +43,14 @@ const getClusterInfo = (cluster: string) => {
 export const SupplierCard = ({
   supplier
 }: SupplierCardProps) => {
-  const clusterInfo = getClusterInfo(supplier.cluster);
+  const clusterInfo = getClusterInfo((supplier as any).clusterId || supplier.cluster);
   const ClusterIcon = clusterInfo.icon;
 
-  // Calculate sector average
-  const sectorSuppliers = mockSuppliers.filter(s => s.sector === supplier.sector);
-  const sectorAvgEmissions = sectorSuppliers.reduce((sum, s) => sum + s.totalEmissions, 0) / sectorSuppliers.length;
+  // Calculate sector average using suppliers with footprint
+  const sectorSuppliers = allEmpresaSuppliers.filter(s => 'totalEmissions' in s && s.sector === supplier.sector);
+  const sectorAvgEmissions = sectorSuppliers.length > 0 
+    ? sectorSuppliers.reduce((sum, s) => sum + (s as any).totalEmissions, 0) / sectorSuppliers.length 
+    : supplier.totalEmissions;
   const vsAverage = (supplier.totalEmissions - sectorAvgEmissions) / sectorAvgEmissions * 100;
   const isAboveAverage = vsAverage > 0;
   return <Card className="border border-border bg-card hover:shadow-lg transition-all">

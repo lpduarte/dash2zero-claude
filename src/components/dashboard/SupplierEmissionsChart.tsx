@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Supplier } from "@/types/supplier";
 import { getSectorName } from "@/data/sectors";
 import { useUser } from "@/contexts/UserContext";
-import { getClusterInfo, ClusterType } from "@/config/clusters";
+import { getClusterInfo } from "@/config/clusters";
 
 type MetricType = 'total' | 'perRevenue' | 'perEmployee' | 'perArea';
 
@@ -47,7 +47,8 @@ export const SupplierEmissionsChart = ({
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('total');
   
   const getClusterDisplay = (cluster: string) => {
-    const info = getClusterInfo(userType, cluster as ClusterType);
+    const clusterId = cluster;
+    const info = getClusterInfo(userType, clusterId);
     const Icon = info?.icon;
     return {
       label: info?.label || cluster,

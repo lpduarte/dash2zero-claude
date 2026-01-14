@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
 import { UserTypeToggle } from "./UserTypeToggle";
 import { useUser } from "@/contexts/UserContext";
-import { mockSuppliers } from "@/data/mockSuppliers";
+import { allEmpresaSuppliers, allMunicipioSuppliers } from "@/data/suppliers";
 import logoCascais from "@/assets/logo-cascais.svg";
 export const Header = () => {
   const location = useLocation();
@@ -48,7 +48,7 @@ export const Header = () => {
               </Link>
             </nav>
             
-            <NotificationBell suppliers={mockSuppliers} />
+            <NotificationBell suppliers={userType === 'municipio' ? allMunicipioSuppliers as any : allEmpresaSuppliers as any} />
           </div>
         </div>
       </div>
