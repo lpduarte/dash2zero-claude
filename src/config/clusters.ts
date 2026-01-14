@@ -1,56 +1,86 @@
-import { Building2, Users, Handshake, ShieldCheck, Eye, LayoutGrid, Factory, Briefcase, ShoppingCart } from 'lucide-react';
+import { Building2, Users, Handshake, ShieldCheck, Eye, LayoutGrid, Factory, Briefcase, ShoppingCart, Truck, Heart, Leaf, Zap, Home, Coffee, Bed, Store } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { getClustersByOwnerType as getDynamicClusters } from '@/data/clusters';
 
-export type ClusterType = 'all' | 'fornecedor' | 'cliente' | 'parceiro';
+// ClusterType agora aceita qualquer string para suportar IDs dinâmicos
+export type ClusterType = string;
 export type UserViewType = 'empresa' | 'municipio';
 
 export interface ClusterConfig {
-  value: ClusterType;
+  value: string;
   label: string;
   labelPlural: string;
   icon: LucideIcon;
 }
 
-// Cluster configurations per user type
-const empresaClusterConfig: ClusterConfig[] = [
-  { value: 'all', label: 'Todos', labelPlural: 'Todas', icon: LayoutGrid },
-  { value: 'fornecedor', label: 'Fornecedor', labelPlural: 'Fornecedores', icon: Building2 },
-  { value: 'cliente', label: 'Cliente', labelPlural: 'Clientes', icon: Users },
-  { value: 'parceiro', label: 'Parceiro', labelPlural: 'Parceiros', icon: Handshake },
-];
+// Mapeamento de icon name (string) para LucideIcon
+const iconMap: Record<string, LucideIcon> = {
+  Building2,
+  Users,
+  Handshake,
+  ShieldCheck,
+  Eye,
+  LayoutGrid,
+  Factory,
+  Briefcase,
+  ShoppingCart,
+  Truck,
+  Heart,
+  Leaf,
+  Zap,
+  Home,
+  Coffee,
+  Bed,
+  Store,
+};
 
-const municipioClusterConfig: ClusterConfig[] = [
-  { value: 'all', label: 'Todas', labelPlural: 'Todas', icon: LayoutGrid },
-  { value: 'fornecedor', label: 'Apoiada', labelPlural: 'Apoiadas', icon: ShieldCheck },
-  { value: 'cliente', label: 'Monitorizada', labelPlural: 'Monitorizadas', icon: Eye },
-  { value: 'parceiro', label: 'Parceira', labelPlural: 'Parceiras', icon: Handshake },
-];
+const getIconByName = (iconName: string): LucideIcon => {
+  return iconMap[iconName] || LayoutGrid;
+};
 
-// Main export: get clusters based on user type
+// Main export: get clusters based on user type (usando clusters dinâmicos)
 export const getClusterConfig = (userType: UserViewType): ClusterConfig[] => {
-  return userType === 'municipio' ? municipioClusterConfig : empresaClusterConfig;
+  const dynamicClusters = getDynamicClusters(userType === 'municipio' ? 'municipio' : 'empresa');
+  
+  // Adiciona opção "Todas" no início
+  const allOption: ClusterConfig = { 
+    value: 'all', 
+    label: 'Todas', 
+    labelPlural: 'Todas', 
+    icon: LayoutGrid 
+  };
+  
+  // Mapeia clusters dinâmicos para ClusterConfig
+  const clusterConfigs: ClusterConfig[] = dynamicClusters.map(cluster => ({
+    value: cluster.id,
+    label: cluster.name,
+    labelPlural: cluster.name,
+    icon: getIconByName(cluster.icon),
+  }));
+  
+  return [allOption, ...clusterConfigs];
 };
 
 // Get a single cluster's config
-export const getClusterInfo = (userType: UserViewType, clusterValue: ClusterType): ClusterConfig | undefined => {
+export const getClusterInfo = (userType: UserViewType, clusterValue: string): ClusterConfig | undefined => {
   const config = getClusterConfig(userType);
   return config.find(c => c.value === clusterValue);
 };
 
 // Get cluster label (singular)
-export const getClusterLabel = (userType: UserViewType, clusterValue: ClusterType): string => {
+export const getClusterLabel = (userType: UserViewType, clusterValue: string): string => {
   const info = getClusterInfo(userType, clusterValue);
   return info?.label || clusterValue;
 };
 
 // Get cluster label plural
-export const getClusterLabelPlural = (userType: UserViewType, clusterValue: ClusterType): string => {
+export const getClusterLabelPlural = (userType: UserViewType, clusterValue: string): string => {
   const info = getClusterInfo(userType, clusterValue);
   return info?.labelPlural || clusterValue;
 };
 
 // Get cluster icon component
-export const getClusterIcon = (userType: UserViewType, clusterValue: ClusterType): LucideIcon => {
+export const getClusterIcon = (userType: UserViewType, clusterValue: string): LucideIcon => {
   const info = getClusterInfo(userType, clusterValue);
   return info?.icon || LayoutGrid;
 };
@@ -61,6 +91,12 @@ export const clusterLabels: Record<string, string> = {
   cliente: 'Clientes',
   parceiro: 'Parceiros',
   subcontratado: 'Subcontratados',
+  'emp-cluster-fornecedores': 'Fornecedores',
+  'emp-cluster-clientes': 'Clientes',
+  'emp-cluster-parceiros': 'Parceiros',
+  'mun-cluster-apoiadas': 'Apoiadas',
+  'mun-cluster-monitorizadas': 'Monitorizadas',
+  'mun-cluster-parceiras': 'Parceiras',
 };
 
 export const clusterLabelsSingular: Record<string, string> = {
@@ -68,6 +104,12 @@ export const clusterLabelsSingular: Record<string, string> = {
   cliente: 'Cliente',
   parceiro: 'Parceiro',
   subcontratado: 'Subcontratado',
+  'emp-cluster-fornecedores': 'Fornecedor',
+  'emp-cluster-clientes': 'Cliente',
+  'emp-cluster-parceiros': 'Parceiro',
+  'mun-cluster-apoiadas': 'Apoiada',
+  'mun-cluster-monitorizadas': 'Monitorizada',
+  'mun-cluster-parceiras': 'Parceira',
 };
 
 // Icons for charts and tooltips (empresa view - legacy)

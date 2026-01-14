@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
-import { ClusterSelector, ClusterType, ImprovementPotential } from "@/components/dashboard/ClusterSelector";
+import { ClusterSelector, ImprovementPotential } from "@/components/dashboard/ClusterSelector";
 import { MetricsOverview } from "@/components/dashboard/MetricsOverview";
 import { InfrastructureKPIs } from "@/components/dashboard/InfrastructureKPIs";
 import { Card } from "@/components/ui/card";
@@ -18,7 +18,12 @@ import { FinancialAnalysis } from "@/components/dashboard/FinancialAnalysis";
 import { EmissionsParetoChart } from "@/components/dashboard/EmissionsParetoChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { mockSuppliers } from "@/data/mockSuppliers";
+import { 
+  getSuppliersWithFootprintByOwnerType,
+  allEmpresaSuppliers,
+  allMunicipioSuppliers,
+} from "@/data/suppliers";
+import { getClustersByOwnerType } from "@/data/clusters";
 import { getSectorsWithCounts } from "@/data/sectors";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
 import { useUser } from "@/contexts/UserContext";
@@ -46,7 +51,7 @@ const calculateImprovementPotential = (suppliers: Supplier[]): ImprovementPotent
 
 const Overview = () => {
   const { user, isMunicipio } = useUser();
-  const [selectedCluster, setSelectedCluster] = useState<ClusterType>('all');
+  const [selectedCluster, setSelectedCluster] = useState<string>('all');
   const [selectedSector, setSelectedSector] = useState<string>('all');
   const [universalFilters, setUniversalFilters] = useState<UniversalFilterState>({
     companySize: [],
@@ -55,49 +60,57 @@ const Overview = () => {
     parish: [],
   });
 
-  // Base suppliers - filtrados por município se userType === 'municipio'
+  // Base suppliers - usa dados dinâmicos baseado no tipo de utilizador
   const baseSuppliers = useMemo(() => {
-    if (isMunicipio && user.municipality) {
-      return mockSuppliers.filter(s => s.municipality === user.municipality);
-    }
-    return mockSuppliers;
-  }, [isMunicipio, user.municipality]);
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getSuppliersWithFootprintByOwnerType(ownerType) as Supplier[];
+  }, [isMunicipio]);
+
+  // Clusters dinâmicos baseados no tipo de utilizador
+  const clusters = useMemo(() => {
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getClustersByOwnerType(ownerType);
+  }, [isMunicipio]);
 
   // Get unique sectors with counts from centralized config
   const sectorsWithCounts = useMemo(() => getSectorsWithCounts(baseSuppliers), [baseSuppliers]);
 
   const clusterCounts = useMemo(() => {
-    return {
-      all: baseSuppliers.length,
-      fornecedor: baseSuppliers.filter(s => s.cluster === 'fornecedor').length,
-      cliente: baseSuppliers.filter(s => s.cluster === 'cliente').length,
-      parceiro: baseSuppliers.filter(s => s.cluster === 'parceiro').length,
-    };
-  }, [baseSuppliers]);
+    const counts: Record<string, number> = { all: baseSuppliers.length };
+    clusters.forEach(cluster => {
+      counts[cluster.id] = baseSuppliers.filter(s => (s as any).clusterId === cluster.id).length;
+    });
+    return counts;
+  }, [baseSuppliers, clusters]);
 
-  const clusterPotentials = useMemo((): Record<ClusterType, ImprovementPotential> => {
-    return {
+  const clusterPotentials = useMemo(() => {
+    const potentials: Record<string, ImprovementPotential> = {
       all: calculateImprovementPotential(baseSuppliers),
-      fornecedor: calculateImprovementPotential(baseSuppliers.filter(s => s.cluster === 'fornecedor')),
-      cliente: calculateImprovementPotential(baseSuppliers.filter(s => s.cluster === 'cliente')),
-      parceiro: calculateImprovementPotential(baseSuppliers.filter(s => s.cluster === 'parceiro')),
     };
-  }, [baseSuppliers]);
+    clusters.forEach(cluster => {
+      potentials[cluster.id] = calculateImprovementPotential(
+        baseSuppliers.filter(s => (s as any).clusterId === cluster.id)
+      );
+    });
+    return potentials;
+  }, [baseSuppliers, clusters]);
 
   // Total de empresas por cluster (universo total do grupo)
-  const clusterTotals: Record<ClusterType, number> = {
-    all: 150,
-    fornecedor: 20,
-    cliente: 55,
-    parceiro: 75,
-  };
+  const clusterTotals = useMemo(() => {
+    const allSuppliers = isMunicipio ? allMunicipioSuppliers : allEmpresaSuppliers;
+    const totals: Record<string, number> = { all: allSuppliers.length };
+    clusters.forEach(cluster => {
+      totals[cluster.id] = allSuppliers.filter(s => s.clusterId === cluster.id).length;
+    });
+    return totals;
+  }, [isMunicipio, clusters]);
 
   const filteredSuppliers = useMemo(() => {
     let filtered = baseSuppliers;
     
     // Filtro de cluster
     if (selectedCluster !== 'all') {
-      filtered = filtered.filter(supplier => supplier.cluster === selectedCluster);
+      filtered = filtered.filter(supplier => (supplier as any).clusterId === selectedCluster);
     }
     
     // Filtro de dimensão (multiselect)

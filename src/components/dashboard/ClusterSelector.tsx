@@ -6,15 +6,15 @@ import { FilterButton } from "./FilterButton";
 import { FilterModal } from "./FilterModal";
 import { ActiveFiltersDisplay } from "./ActiveFiltersDisplay";
 import { useUser } from "@/contexts/UserContext";
-import { getClusterConfig, ClusterType } from "@/config/clusters";
+import { getClusterConfig } from "@/config/clusters";
 
 type ImprovementPotential = 'high' | 'medium' | 'low';
 
 interface ClusterSelectorProps {
-  selectedCluster: ClusterType;
-  onClusterChange: (cluster: ClusterType) => void;
-  clusterCounts: Record<ClusterType, number>;
-  clusterPotentials: Record<ClusterType, ImprovementPotential>;
+  selectedCluster: string;
+  onClusterChange: (cluster: string) => void;
+  clusterCounts: Record<string, number>;
+  clusterPotentials: Record<string, ImprovementPotential>;
   suppliers: Supplier[];
   universalFilters: UniversalFilterState;
   onUniversalFiltersChange: (filters: UniversalFilterState) => void;
