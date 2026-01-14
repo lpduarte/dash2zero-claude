@@ -38,7 +38,8 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 import { useUser } from "@/contexts/UserContext";
-import { getClusterConfig, getClusterInfo, ClusterType } from "@/config/clusters";
+import { getClusterConfig, getClusterInfo } from "@/config/clusters";
+import { getClustersByOwnerType } from "@/data/clusters";
 
 // Tipo que combina Supplier com dados de email tracking
 interface CompanyWithTracking extends Supplier {
@@ -58,8 +59,13 @@ export const IncentiveEmailDialog = ({
   suppliers,
 }: IncentiveEmailDialogProps) => {
   const { toast } = useToast();
-  const { userType } = useUser();
+  const { userType, isMunicipio } = useUser();
   const clusterOptions = getClusterConfig(userType);
+  
+  const clusters = useMemo(() => {
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getClustersByOwnerType(ownerType);
+  }, [isMunicipio]);
   
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
@@ -97,7 +103,7 @@ export const IncentiveEmailDialog = ({
     
     // Filtro por cluster
     if (clusterFilter !== "all") {
-      result = result.filter(c => c.cluster === clusterFilter);
+      result = result.filter(c => c.clusterId === clusterFilter);
     }
     
     // Filtro por número de emails enviados
@@ -222,10 +228,10 @@ export const IncentiveEmailDialog = ({
     return "bg-red-100 text-red-700";
   };
 
-  const getClusterIcon = (cluster: string) => {
-    const info = getClusterInfo(userType, cluster as ClusterType);
+  const getClusterIcon = (clusterId: string) => {
+    const info = getClusterInfo(userType, clusterId);
     const Icon = info?.icon;
-    const label = info?.label || cluster;
+    const label = info?.label || clusterId;
     
     if (!Icon) return null;
     
@@ -282,7 +288,7 @@ export const IncentiveEmailDialog = ({
       c.contact.nif,
       c.contact.email,
       c.sector,
-      c.cluster,
+      c.clusterId || '',
       c.emailsSent.toString(),
       c.emailHistory[0]?.sentAt ? format(new Date(c.emailHistory[0].sentAt), "dd/MM/yyyy") : "Nunca"
     ]);
@@ -512,7 +518,7 @@ export const IncentiveEmailDialog = ({
                                                 </TooltipProvider>
                                               )}
                                               <p className="text-sm font-medium truncate">{company.name}</p>
-                                              {getClusterIcon(company.cluster)}
+                                              {getClusterIcon(company.clusterId || '')}
                                             </div>
                                             <p className="text-[10px] text-muted-foreground truncate">
                                               NIF: {company.contact.nif}
