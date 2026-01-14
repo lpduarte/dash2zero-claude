@@ -8,6 +8,7 @@ import { SupplierLabel, sectorLabels } from "./SupplierLabel";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SectionHeader } from "@/components/ui/section-header";
 import { cn } from "@/lib/utils";
+import { formatNumber, formatPercentage } from "@/lib/formatters";
 interface TopSuppliersHighlightProps {
   suppliers: Supplier[];
 }
@@ -133,7 +134,7 @@ export const TopSuppliersHighlight = ({
                     <TrendingDown className="h-3 w-3 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Emissões</span>
                   </div>
-                  <p className="text-lg font-bold text-success">{supplier.totalEmissions.toFixed(0)}</p>
+                  <p className="text-lg font-bold text-success">{formatNumber(supplier.totalEmissions, 0)}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e</p>
                 </div>
 
@@ -142,7 +143,7 @@ export const TopSuppliersHighlight = ({
                     <Euro className="h-3 w-3 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">FE</span>
                   </div>
-                  <p className="text-lg font-bold text-warning">{supplier.emissionsPerRevenue.toFixed(1)}</p>
+                  <p className="text-lg font-bold text-warning">{formatNumber(supplier.emissionsPerRevenue, 1)}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e/€</p>
                 </div>
 
@@ -155,7 +156,7 @@ export const TopSuppliersHighlight = ({
                 const comparison = getComparisonToAverage(supplier);
                 return <>
                         <p className={`text-lg font-bold ${comparison.isBelow ? 'text-success' : 'text-destructive'}`}>
-                          {comparison.isBelow ? '-' : '+'}{comparison.percentage.toFixed(0)}%
+                          {comparison.isBelow ? '-' : '+'}{formatPercentage(comparison.percentage, 0)}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {comparison.isBelow ? 'abaixo' : 'acima'}

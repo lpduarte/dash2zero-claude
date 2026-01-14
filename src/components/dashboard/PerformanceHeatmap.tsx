@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Supplier } from "@/types/supplier";
 import { sectorLabels } from "@/data/sectors";
+import { formatNumber } from "@/lib/formatters";
+
 interface PerformanceHeatmapProps {
   suppliers: Supplier[];
 }
@@ -62,7 +64,7 @@ export const PerformanceHeatmap = ({
                 const avgEmissions = getAverageEmissions(region, sector);
                 return <td key={`${sector}-${region}`} className={`border p-4 text-center h-16 ${getColor(avgEmissions)}`}>
                         {avgEmissions ? <div className="text-sm font-medium">
-                            {avgEmissions.toFixed(0)}
+                            {formatNumber(avgEmissions, 0)}
                             <div className="text-xs opacity-80">t CO₂e</div>
                           </div> : <span className="text-xs text-muted-foreground">N/A</span>}
                       </td>;

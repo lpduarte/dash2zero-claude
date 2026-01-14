@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { TrendingUp, AlertCircle, Target } from "lucide-react";
+import { formatNumber, formatPercentage } from "@/lib/formatters";
 
 interface EmissionsParetoChartProps {
   suppliers: Supplier[];
@@ -95,19 +96,19 @@ export const EmissionsParetoChart = ({ suppliers }: EmissionsParetoChartProps) =
                       <div className="space-y-1 text-sm">
                         <p>
                           <span className="text-muted-foreground">Emissões Totais: </span>
-                          <span className="font-bold">{data.totalEmissions.toFixed(0)} t CO₂e</span>
+                          <span className="font-bold">{formatNumber(data.totalEmissions, 0)} t CO₂e</span>
                         </p>
                         <p>
                           <span className="text-muted-foreground">Fator de Emissão: </span>
-                          <span className="font-bold">{data.fe.toFixed(1)} kg/€</span>
+                          <span className="font-bold">{formatNumber(data.fe, 1)} kg/€</span>
                         </p>
                         <p>
                           <span className="text-muted-foreground">Investimento: </span>
-                          <span className="font-bold">{data.revenue.toFixed(1)} M€</span>
+                          <span className="font-bold">{formatNumber(data.revenue, 1)} M€</span>
                         </p>
                         <p className="pt-2 border-t">
                           <span className="text-muted-foreground">% Acumulada: </span>
-                          <span className="font-bold">{data.cumulativePercent.toFixed(1)}%</span>
+                          <span className="font-bold">{formatPercentage(data.cumulativePercent, 1)}</span>
                         </p>
                         <Badge variant="outline" className="mt-2">{data.cluster}</Badge>
                       </div>
@@ -140,10 +141,10 @@ export const EmissionsParetoChart = ({ suppliers }: EmissionsParetoChartProps) =
             </h4>
             <p className="text-sm text-muted-foreground mb-3">
               Identificámos que <strong className="text-danger">{threshold80Index + 1} fornecedores</strong> (
-              <strong>{critical20Percent.toFixed(0)}%</strong> do total) são responsáveis por{" "}
+              <strong>{formatPercentage(critical20Percent, 0)}</strong> do total) são responsáveis por{" "}
               <strong>80% das emissões totais</strong>. Estes fornecedores representam um investimento de{" "}
-              <strong className="text-primary">{totalCriticalRevenue.toFixed(1)}M€</strong> (
-              {((totalCriticalRevenue / totalRevenue) * 100).toFixed(0)}% do volume de negócios total).
+              <strong className="text-primary">{formatNumber(totalCriticalRevenue, 1)}M€</strong> (
+              {formatPercentage((totalCriticalRevenue / totalRevenue) * 100, 0)} do volume de negócios total).
             </p>
             <p className="text-sm">
               <strong>Recomendação:</strong> Priorize ações de redução de emissões nestes fornecedores críticos 
