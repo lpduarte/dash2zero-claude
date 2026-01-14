@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { Header } from "@/components/dashboard/Header";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { KPICard } from "@/components/ui/kpi-card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -252,61 +254,60 @@ const Incentive = () => {
         </div>
         
         {/* Metrics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-success" />
-              <p className="text-xs text-muted-foreground">Taxa de Conversão</p>
+        <Card className="mb-6">
+          <CardHeader className="pb-4">
+            <SectionHeader
+              icon={Target}
+              title="Métricas de Campanha"
+            />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <KPICard
+                title="Taxa de Conversão"
+                value={`${metrics.conversionRate}%`}
+                unit="contactadas → calcularam"
+                icon={TrendingUp}
+                iconColor="text-success"
+                iconBgColor="bg-success/10"
+                valueColor="text-success"
+              />
+              <KPICard
+                title="Emails Enviados"
+                value={metrics.totalEmailsSent}
+                unit={`${metrics.emailsThisMonth} este mês`}
+                icon={Send}
+                iconColor="text-primary"
+                iconBgColor="bg-primary/10"
+              />
+              <KPICard
+                title="Tempo até Conversão"
+                value={metrics.avgDaysToConversion}
+                unit="dias em média"
+                icon={Clock}
+                iconColor="text-muted-foreground"
+                iconBgColor="bg-muted"
+              />
+              <KPICard
+                title="Melhor Template"
+                value={metrics.bestTemplate}
+                unit={`${metrics.bestTemplateRate}% conversão`}
+                icon={Star}
+                iconColor="text-warning"
+                iconBgColor="bg-warning/10"
+              />
+              <KPICard
+                title="Saturadas (3+)"
+                value={metrics.saturatedCount}
+                unit="parar de insistir"
+                icon={AlertTriangle}
+                iconColor="text-warning"
+                iconBgColor="bg-warning/10"
+                valueColor="text-warning"
+              />
             </div>
-            <p className="text-2xl font-bold text-success">{metrics.conversionRate}%</p>
-            <p className="text-xs text-muted-foreground">contactadas → calcularam</p>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Send className="h-4 w-4 text-primary" />
-              <p className="text-xs text-muted-foreground">Emails Enviados</p>
-            </div>
-            <p className="text-2xl font-bold">{metrics.totalEmailsSent}</p>
-            <p className="text-xs text-muted-foreground">{metrics.emailsThisMonth} este mês</p>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-primary" />
-              <p className="text-xs text-muted-foreground">Por Contactar</p>
-            </div>
-            <p className="text-2xl font-bold text-primary">{metrics.neverContacted}</p>
-            <p className="text-xs text-muted-foreground">nunca contactadas</p>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">Tempo até Conversão</p>
-            </div>
-            <p className="text-2xl font-bold">{metrics.avgDaysToConversion}</p>
-            <p className="text-xs text-muted-foreground">dias em média</p>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Star className="h-4 w-4 text-warning" />
-              <p className="text-xs text-muted-foreground">Melhor Template</p>
-            </div>
-            <p className="text-2xl font-bold">{metrics.bestTemplate}</p>
-            <p className="text-xs text-muted-foreground">{metrics.bestTemplateRate}% conversão</p>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-4 w-4 text-warning" />
-              <p className="text-xs text-muted-foreground">Saturadas (3+)</p>
-            </div>
-            <p className="text-2xl font-bold text-warning">{metrics.saturatedCount}</p>
-            <p className="text-xs text-muted-foreground">parar de insistir</p>
-          </Card>
-        </div>
+          </CardContent>
+        </Card>
         
         {/* Main Grid: List + Compose */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
