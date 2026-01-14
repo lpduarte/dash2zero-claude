@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
 import { FileDown, FileSpreadsheet, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
+import { formatNumber } from "@/lib/formatters";
 
 interface ExportOptionsProps {
   suppliers: Supplier[];
@@ -95,7 +96,7 @@ export const ExportOptions = ({ suppliers }: ExportOptionsProps) => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Emissões Totais:</span>
-                  <span className="font-semibold">{totalEmissions.toFixed(0)} t CO₂e</span>
+                  <span className="font-semibold">{formatNumber(totalEmissions, 0)} t CO₂e</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Com SBTi:</span>

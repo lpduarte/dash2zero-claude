@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
 import { Bell, AlertTriangle, TrendingUp, CheckCircle, Info } from "lucide-react";
 import { useState } from "react";
+import { formatNumber, formatPercentage } from "@/lib/formatters";
 
 interface NotificationCenterProps {
   suppliers: Supplier[];
@@ -33,7 +34,7 @@ export const NotificationCenter = ({ suppliers }: NotificationCenterProps) => {
           id: `fe-high-${supplier.id}`,
           type: "warning",
           title: "Fator de Emissão Elevado",
-          description: `${supplier.name} apresenta um FE de ${supplier.emissionsPerRevenue.toFixed(1)} kg/€, 50% acima da média do grupo.`,
+          description: `${supplier.name} apresenta um FE de ${formatNumber(supplier.emissionsPerRevenue, 1)} kg/€, 50% acima da média do grupo.`,
           supplier: supplier.name,
           timestamp: "Há 2 horas",
           read: false,
@@ -70,7 +71,7 @@ export const NotificationCenter = ({ suppliers }: NotificationCenterProps) => {
             id: `improvement-${supplier.id}`,
             type: "success",
             title: "Melhoria Significativa de Performance",
-            description: `${supplier.name} reduziu emissões em ${reduction.toFixed(0)}% no último ano. Excelente progresso!`,
+            description: `${supplier.name} reduziu emissões em ${formatPercentage(reduction, 0)} no último ano. Excelente progresso!`,
             supplier: supplier.name,
             timestamp: "Há 1 dia",
             read: false,

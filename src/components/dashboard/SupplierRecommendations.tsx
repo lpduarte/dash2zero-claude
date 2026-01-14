@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
 import { AlertTriangle, ArrowRight, TrendingDown, DollarSign, Award, CheckCircle, Zap } from "lucide-react";
 import { useState } from "react";
+import { formatNumber, formatPercentage } from "@/lib/formatters";
 
 interface SupplierRecommendationsProps {
   suppliers: Supplier[];
@@ -74,7 +75,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
 
       const benefits: string[] = [];
       if (emissionsSavingsPercent > 30) {
-        benefits.push(`Redução de ${emissionsSavingsPercent.toFixed(0)}% nas emissões`);
+        benefits.push(`Redução de ${formatPercentage(emissionsSavingsPercent, 0)} nas emissões`);
       }
       if (alternative.hasSBTi && !critical.hasSBTi) {
         benefits.push("Fornecedor alternativo com compromisso SBTi validado");
@@ -83,7 +84,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
         benefits.push(`${alternative.certifications.length - critical.certifications.length} certificações adicionais`);
       }
       if (feImprovement > 20) {
-        benefits.push(`Fator de Emissão ${feImprovement.toFixed(0)}% mais baixo`);
+        benefits.push(`Fator de Emissão ${formatPercentage(feImprovement, 0)} mais baixo`);
       }
 
       const risks: string[] = [];
@@ -146,8 +147,8 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                 <TrendingDown className="h-5 w-5 text-success" />
                 <span className="text-sm text-muted-foreground">Poupança Potencial</span>
               </div>
-              <p className="text-3xl font-bold text-success">{totalPotentialSavings.toFixed(0)}</p>
-              <p className="text-xs text-muted-foreground mt-1">t CO₂e (-{totalSavingsPercent.toFixed(0)}%)</p>
+              <p className="text-3xl font-bold text-success">{formatNumber(totalPotentialSavings, 0)}</p>
+              <p className="text-xs text-muted-foreground mt-1">t CO₂e (-{formatPercentage(totalSavingsPercent, 0)})</p>
             </div>
 
             <div className="p-4 bg-card border border-border rounded-lg">
@@ -199,11 +200,11 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                       <div className="mt-2 space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Emissões:</span>
-                          <span className="font-semibold">{rec.critical.totalEmissions.toFixed(0)} ton</span>
+                          <span className="font-semibold">{formatNumber(rec.critical.totalEmissions, 0)} ton</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">FE:</span>
-                          <span className="font-semibold">{rec.feCurrent.toFixed(1)} kg/€</span>
+                          <span className="font-semibold">{formatNumber(rec.feCurrent, 1)} kg/€</span>
                         </div>
                       </div>
                     </div>
@@ -219,11 +220,11 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                       <div className="mt-2 space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Emissões:</span>
-                          <span className="font-semibold">{rec.alternative.totalEmissions.toFixed(0)} ton</span>
+                          <span className="font-semibold">{formatNumber(rec.alternative.totalEmissions, 0)} ton</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">FE:</span>
-                          <span className="font-semibold">{rec.feAlternative.toFixed(1)} kg/€</span>
+                          <span className="font-semibold">{formatNumber(rec.feAlternative, 1)} kg/€</span>
                         </div>
                       </div>
                     </div>
@@ -235,8 +236,8 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                         <TrendingDown className="h-4 w-4 text-success" />
                         <span className="text-sm font-medium">Redução de Emissões</span>
                       </div>
-                      <p className="text-2xl font-bold text-success">{rec.emissionsSavings.toFixed(0)} ton</p>
-                      <p className="text-xs text-muted-foreground">-{rec.emissionsSavingsPercent.toFixed(0)}%</p>
+                      <p className="text-2xl font-bold text-success">{formatNumber(rec.emissionsSavings, 0)} ton</p>
+                      <p className="text-xs text-muted-foreground">-{formatPercentage(rec.emissionsSavingsPercent, 0)}</p>
                     </div>
 
                     <div className="text-center">
@@ -244,7 +245,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                         <Zap className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">Melhoria do FE</span>
                       </div>
-                      <p className="text-2xl font-bold text-primary">{rec.feImprovement.toFixed(0)}%</p>
+                      <p className="text-2xl font-bold text-primary">{formatPercentage(rec.feImprovement, 0)}</p>
                       <p className="text-xs text-muted-foreground">mais eficiente</p>
                     </div>
 
@@ -254,10 +255,10 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                         <span className="text-sm font-medium">Diferença Financeira</span>
                       </div>
                       <p className={`text-2xl font-bold ${rec.costDifference >= 0 ? 'text-success' : 'text-warning'}`}>
-                        {rec.costDifference >= 0 ? '+' : ''}{rec.costDifference.toFixed(1)}M€
+                        {rec.costDifference >= 0 ? '+' : ''}{formatNumber(rec.costDifference, 1)}M€
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {Math.abs(rec.costDifferencePercent).toFixed(0)}% {rec.costDifference >= 0 ? 'maior' : 'menor'}
+                        {formatPercentage(Math.abs(rec.costDifferencePercent), 0)} {rec.costDifference >= 0 ? 'maior' : 'menor'}
                       </p>
                     </div>
                   </div>
@@ -306,11 +307,11 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                         <p className="text-sm">
                           <strong>Recomendamos fortemente</strong> a mudança de <strong>{rec.critical.name}</strong> para{" "}
                           <strong>{rec.alternative.name}</strong>. Esta alteração resultará numa redução de{" "}
-                          <strong className="text-success">{rec.emissionsSavings.toFixed(0)} toneladas de CO₂e</strong>{" "}
-                          ({rec.emissionsSavingsPercent.toFixed(0)}%), com um Fator de Emissão{" "}
-                          <strong className="text-primary">{rec.feImprovement.toFixed(0)}% mais baixo</strong>.
+                          <strong className="text-success">{formatNumber(rec.emissionsSavings, 0)} toneladas de CO₂e</strong>{" "}
+                          ({formatPercentage(rec.emissionsSavingsPercent, 0)}), com um Fator de Emissão{" "}
+                          <strong className="text-primary">{formatPercentage(rec.feImprovement, 0)} mais baixo</strong>.
                           {rec.costDifference > 0 && (
-                            <> Adicionalmente, o fornecedor alternativo tem um volume de negócios {rec.costDifferencePercent.toFixed(0)}% superior, 
+                            <> Adicionalmente, o fornecedor alternativo tem um volume de negócios {formatPercentage(rec.costDifferencePercent, 0)} superior, 
                             indicando maior capacidade e estabilidade.</>
                           )}
                           {rec.alternative.hasSBTi && !rec.critical.hasSBTi && (
