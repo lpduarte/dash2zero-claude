@@ -18,6 +18,7 @@ import {
   Euro, Users, Maximize2, BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { riskColors } from "@/lib/styles";
 
 interface MethodologyModalProps {
   open: boolean;
@@ -280,25 +281,25 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
                       O risco é calculado comparando a intensidade de carbono de cada empresa com a média do seu setor de atividade.
                     </p>
                     <div className="grid grid-cols-4 gap-2">
-                      <div className="text-center p-2 rounded-lg bg-green-100 border border-green-200">
-                        <div className="w-3 h-3 rounded-full bg-green-500 mx-auto mb-1" />
-                        <p className="text-xs font-medium text-green-700">Baixo</p>
-                        <p className="text-[10px] text-green-600">Abaixo da média</p>
+                      <div className={`text-center p-2 rounded-lg ${riskColors.baixo.bg} border ${riskColors.baixo.border}`}>
+                        <div className="w-3 h-3 rounded-full bg-success mx-auto mb-1" />
+                        <p className={`text-xs font-medium ${riskColors.baixo.text}`}>Baixo</p>
+                        <p className={`text-[10px] ${riskColors.baixo.text}`}>Abaixo da média</p>
                       </div>
-                      <div className="text-center p-2 rounded-lg bg-amber-100 border border-amber-200">
-                        <div className="w-3 h-3 rounded-full bg-amber-500 mx-auto mb-1" />
-                        <p className="text-xs font-medium text-amber-700">Médio</p>
-                        <p className="text-[10px] text-amber-600">1-50% acima</p>
+                      <div className={`text-center p-2 rounded-lg ${riskColors.medio.bg} border ${riskColors.medio.border}`}>
+                        <div className="w-3 h-3 rounded-full bg-warning mx-auto mb-1" />
+                        <p className={`text-xs font-medium ${riskColors.medio.text}`}>Médio</p>
+                        <p className={`text-[10px] ${riskColors.medio.text}`}>1-50% acima</p>
                       </div>
-                      <div className="text-center p-2 rounded-lg bg-orange-100 border border-orange-200">
-                        <div className="w-3 h-3 rounded-full bg-orange-500 mx-auto mb-1" />
-                        <p className="text-xs font-medium text-orange-700">Alto</p>
-                        <p className="text-[10px] text-orange-600">50-100% acima</p>
+                      <div className={`text-center p-2 rounded-lg ${riskColors.alto.bg} border ${riskColors.alto.border}`}>
+                        <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-1" />
+                        <p className={`text-xs font-medium ${riskColors.alto.text}`}>Alto</p>
+                        <p className={`text-[10px] ${riskColors.alto.text}`}>50-100% acima</p>
                       </div>
-                      <div className="text-center p-2 rounded-lg bg-red-100 border border-red-200">
-                        <div className="w-3 h-3 rounded-full bg-red-500 mx-auto mb-1" />
-                        <p className="text-xs font-medium text-red-700">Crítico</p>
-                        <p className="text-[10px] text-red-600">+100% acima</p>
+                      <div className={`text-center p-2 rounded-lg ${riskColors.critico.bg} border ${riskColors.critico.border}`}>
+                        <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-1" />
+                        <p className={`text-xs font-medium ${riskColors.critico.text}`}>Crítico</p>
+                        <p className={`text-[10px] ${riskColors.critico.text}`}>+100% acima</p>
                       </div>
                     </div>
                   </div>

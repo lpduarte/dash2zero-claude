@@ -290,7 +290,7 @@ export const BulkPlanWizard = ({
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
                 currentStep === step ? "bg-primary text-primary-foreground" :
-                currentStep > step ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" :
+                currentStep > step ? "bg-success/20 text-success" :
                 "bg-muted text-muted-foreground"
               )}>
                 {currentStep > step ? <CheckCircle className="h-4 w-4" /> : step}
@@ -298,7 +298,7 @@ export const BulkPlanWizard = ({
               {step < 4 && (
                 <div className={cn(
                   "w-12 h-0.5 mx-1",
-                  currentStep > step ? "bg-green-500" : "bg-muted"
+                  currentStep > step ? "bg-success" : "bg-muted"
                 )} />
               )}
             </div>

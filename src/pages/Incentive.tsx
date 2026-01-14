@@ -208,10 +208,10 @@ const Incentive = () => {
   };
   
   const getEmailCountColor = (count: number) => {
-    if (count === 0) return "bg-slate-100 text-slate-600";
-    if (count === 1) return "bg-blue-100 text-blue-700";
-    if (count === 2) return "bg-amber-100 text-amber-700";
-    return "bg-red-100 text-red-700";
+    if (count === 0) return "bg-muted text-muted-foreground";
+    if (count === 1) return "bg-primary/20 text-primary";
+    if (count === 2) return "bg-warning/20 text-warning";
+    return "bg-danger/20 text-danger";
   };
   
   // Preview
@@ -394,7 +394,7 @@ const Incentive = () => {
                     filteredCompanies.map(company => (
                       <Collapsible key={company.id} open={expandedCompany === company.id}>
                         <div className={`rounded-lg border transition-colors ${
-                          company.emailsSent >= 3 ? 'border-amber-200 bg-amber-50/30 dark:bg-amber-950/10' : ''
+                          company.emailsSent >= 3 ? 'border-warning/30 bg-warning/10' : ''
                         } ${selectedCompanies.includes(company.id) ? 'bg-primary/5 border-primary/30' : ''}`}>
                           <div className="flex items-center gap-3 p-3">
                             <Checkbox
@@ -409,7 +409,7 @@ const Incentive = () => {
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger>
-                                        <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                                        <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
                                       </TooltipTrigger>
                                       <TooltipContent>Risco de saturação</TooltipContent>
                                     </Tooltip>

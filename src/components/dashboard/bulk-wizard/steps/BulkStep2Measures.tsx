@@ -22,17 +22,17 @@ export const BulkStep2Measures = ({
         </p>
       </div>
 
-      <div className="p-6 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+      <div className="p-6 bg-success/10 border border-success/30 rounded-lg">
         <div className="flex items-start gap-4">
-          <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900">
-            <Sparkles className="h-6 w-6 text-green-600" />
+          <div className="p-2 rounded-lg bg-success/20">
+            <Sparkles className="h-6 w-6 text-success" />
           </div>
           <div className="space-y-2">
-            <h4 className="font-medium text-green-800 dark:text-green-200">Recomendações automáticas</h4>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <h4 className="font-medium text-success">Recomendações automáticas</h4>
+            <p className="text-sm text-success">
               Para cada empresa, o sistema irá:
             </p>
-            <ul className="text-sm text-green-700 dark:text-green-300 space-y-1 ml-4 list-disc">
+            <ul className="text-sm text-success space-y-1 ml-4 list-disc">
               <li>Analisar a distribuição de emissões por âmbito</li>
               <li>Selecionar medidas com maior impacto potencial</li>
               <li>Priorizar medidas Soft (menor investimento, resultados rápidos)</li>

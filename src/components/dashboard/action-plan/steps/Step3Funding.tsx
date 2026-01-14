@@ -2,6 +2,7 @@ import { AlertTriangle, Check, Euro, Calendar, Wallet, FileCheck } from 'lucide-
 import type { Step3Props } from '../types';
 import { getApplicableMeasures } from '@/data/mockMeasures';
 import { mockFunding, getApplicableFunding } from '@/data/mockFunding';
+import { fundingColors } from '@/lib/styles';
 
 export const Step3Funding = ({
   supplier,
@@ -42,9 +43,9 @@ export const Step3Funding = ({
   };
 
   const typeColors = {
-    subsidio: { headerBg: 'bg-green-50 dark:bg-green-950/30', text: 'text-green-700 dark:text-green-300', badge: 'bg-green-600 dark:bg-green-500' },
-    incentivo: { headerBg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-700 dark:text-blue-300', badge: 'bg-blue-600 dark:bg-blue-500' },
-    financiamento: { headerBg: 'bg-purple-50 dark:bg-purple-950/30', text: 'text-purple-700 dark:text-purple-300', badge: 'bg-purple-600 dark:bg-purple-500' },
+    subsidio: { headerBg: fundingColors.subsidio.bgLight, text: fundingColors.subsidio.text, badge: 'bg-success' },
+    incentivo: { headerBg: fundingColors.incentivo.bgLight, text: fundingColors.incentivo.text, badge: 'bg-primary' },
+    financiamento: { headerBg: fundingColors.financiamento.bgLight, text: fundingColors.financiamento.text, badge: 'bg-purple-600 dark:bg-purple-500' },
   };
 
   const toggleFunding = (fundingId: string) => {
@@ -147,7 +148,7 @@ export const Step3Funding = ({
             </div>
 
             {!eligible && reason && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1">
+              <p className="text-xs text-warning mt-2 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" />
                 {reason}
               </p>
@@ -195,9 +196,9 @@ export const Step3Funding = ({
         </div>
 
         {selectedMeasures.length === 0 && (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 mt-4">
-            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <p className="text-sm text-amber-700 dark:text-amber-300">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-warning/10 border border-warning/30 mt-4">
+            <AlertTriangle className="h-5 w-5 text-warning shrink-0" />
+            <p className="text-sm text-warning">
               Selecione medidas no passo anterior para ver os fundos aplicáveis.
             </p>
           </div>
@@ -224,7 +225,7 @@ export const Step3Funding = ({
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground mb-1">Comparticipação Possível</p>
-            <p className="font-semibold text-lg text-green-600 dark:text-green-400">
+            <p className="font-semibold text-lg text-success">
               Até {totalCoverage.toLocaleString('pt-PT')}€
               <span className="text-sm font-normal text-muted-foreground ml-1">
                 ({coveragePercent.toFixed(0)}%)
@@ -233,7 +234,7 @@ export const Step3Funding = ({
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground mb-1">A cargo da empresa</p>
-            <p className={`font-semibold text-lg ${remaining === 0 ? 'text-green-600 dark:text-green-400' : ''}`}>
+            <p className={`font-semibold text-lg ${remaining === 0 ? 'text-success' : ''}`}>
               {remaining.toLocaleString('pt-PT')}€
               <span className="text-sm font-normal text-muted-foreground ml-1">
                 ({remainingPercent.toFixed(0)}%)

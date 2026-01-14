@@ -8,6 +8,7 @@ import { mockMeasures } from '@/data/mockMeasures';
 import { Step1Analysis, Step2Measures, Step3Funding, Step4Summary } from './steps';
 import type { MunicipalityActionPlanModalProps, Step, StepConfig, ExpandedSections } from './types';
 import { getDimensionLabel } from './types';
+import { riskColors } from '@/lib/styles';
 
 const stepConfig: StepConfig[] = [
   { number: 1, title: 'Análise', icon: BarChart3 },
@@ -256,7 +257,7 @@ export const MunicipalityActionPlanModal = ({
                 <span className="font-medium">{supplier.parish || 'N/A'}</span>
                 <span className="mx-2 text-muted-foreground">•</span>
                 <span className="text-muted-foreground">Risco: </span>
-                <span className={`font-medium ${riskLevel === 'alto' ? 'text-red-600' : riskLevel === 'medio' ? 'text-amber-600' : 'text-green-600'}`}>
+                <span className={`font-medium ${riskColors[riskLevel as keyof typeof riskColors]?.text || 'text-muted-foreground'}`}>
                   {getRiskLabel()}
                 </span>
               </div>
