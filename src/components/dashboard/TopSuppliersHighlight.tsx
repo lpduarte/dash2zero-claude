@@ -124,7 +124,7 @@ export const TopSuppliersHighlight = ({
 
               <div className="flex-1">
                 <h4 className="font-semibold mb-1">{supplier.name}</h4>
-                <SupplierLabel sector={supplier.sector} cluster={supplier.cluster} />
+                <SupplierLabel sector={supplier.sector} cluster={supplier.clusterId || supplier.cluster} />
               </div>
 
               <div className="grid grid-cols-3 gap-4 text-center">

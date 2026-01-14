@@ -447,7 +447,7 @@ export const CriticalSuppliersHighlight = ({
                           {/* Current supplier */}
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-sm truncate">{supplier.name}</h4>
-                            <SupplierLabel sector={supplier.sector} cluster={supplier.cluster} />
+                            <SupplierLabel sector={supplier.sector} cluster={supplier.clusterId || supplier.cluster} />
                           </div>
 
                           <div className="grid grid-cols-3 gap-4 text-center">

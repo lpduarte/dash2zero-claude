@@ -6,6 +6,8 @@ import { Supplier } from "@/types/supplier";
 import { mockFunding } from "@/data/mockFunding";
 import { cn } from "@/lib/utils";
 import { getPlanData, getPlanStatus, getRiskLevel } from "@/lib/planUtils";
+import { useUser } from "@/contexts/UserContext";
+import { getClustersByOwnerType } from "@/data/clusters";
 import { BulkStep1Selection, BulkStep2Measures, BulkStep3Funding, BulkStep4Confirm } from "./steps";
 import { 
   getRecommendedMeasures, 
@@ -51,14 +53,9 @@ const applyCustomFilters = (
       if (status !== customFilters.estado) return false;
     }
     
-    // Filtro por cluster
+    // Filtro por cluster - usa clusterId
     if (customFilters.cluster !== 'todos') {
-      const clusterMap: Record<string, string> = {
-        'apoiadas': 'fornecedor',
-        'monitorizadas': 'cliente',
-        'parceiras': 'parceiro',
-      };
-      if (s.cluster !== clusterMap[customFilters.cluster]) return false;
+      if (s.clusterId !== customFilters.cluster) return false;
     }
     
     // Filtro por setor
@@ -88,6 +85,11 @@ export const BulkPlanWizard = ({
   suppliers,
   avgSectorIntensity
 }: BulkPlanWizardProps) => {
+  const { isMunicipio } = useUser();
+  const clusters = useMemo(() => {
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getClustersByOwnerType(ownerType);
+  }, [isMunicipio]);
   const [currentStep, setCurrentStep] = useState(1);
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('sem_plano');
   const [manualSelection, setManualSelection] = useState<string[]>([]);
@@ -231,6 +233,7 @@ export const BulkPlanWizard = ({
             onManualSelectionChange={setManualSelection}
             customFilters={customFilters}
             onCustomFiltersChange={setCustomFilters}
+            clusters={clusters}
           />
         );
       case 2:
