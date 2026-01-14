@@ -70,7 +70,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
       avgEmissionsPerEmployee,
       hasSBTiCount,
       avgCertifications,
-      responseRate: totalCompaniesInGroup ? (clusterSuppliers.length / totalCompaniesInGroup * 100).toFixed(1) : '0',
+      responseRate: totalCompaniesInGroup ? formatPercentage(clusterSuppliers.length / totalCompaniesInGroup * 100, 1) : '0%',
     };
   };
 
@@ -198,7 +198,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">Taxa de Resposta</span>
-                          <Badge className="bg-primary">{data.responseRate}%</Badge>
+                          <Badge className="bg-primary">{data.responseRate}</Badge>
                         </div>
                       </div>
                     </div>
