@@ -1,10 +1,12 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
 import { TrendingDown, Factory, Zap, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/contexts/UserContext";
-import { getClusterInfo, clusterIcons, clusterLabels, ClusterType } from "@/config/clusters";
+import { getClusterInfo, clusterIcons, clusterLabels } from "@/config/clusters";
+import { getClustersByOwnerType } from "@/data/clusters";
 import { SectionHeader } from "@/components/ui/section-header";
 
 interface ClusterKPIsProps {
@@ -13,61 +15,43 @@ interface ClusterKPIsProps {
 }
 
 export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: ClusterKPIsProps) => {
-  const { userType } = useUser();
+  const { userType, isMunicipio } = useUser();
+
+  const dynamicClusters = useMemo(() => {
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getClustersByOwnerType(ownerType);
+  }, [isMunicipio]);
   
-  const getClusterLabel = (cluster: string) => {
-    const info = getClusterInfo(userType, cluster as ClusterType);
-    return info?.labelPlural || clusterLabels[cluster] || cluster;
+  const getClusterLabel = (clusterId: string) => {
+    const cluster = dynamicClusters.find(c => c.id === clusterId);
+    return cluster?.name || clusterLabels[clusterId] || clusterId;
   };
   
-  const getClusterIconComponent = (cluster: string) => {
-    const info = getClusterInfo(userType, cluster as ClusterType);
-    return info?.icon || clusterIcons[cluster as keyof typeof clusterIcons] || Factory;
+  const getClusterIconComponent = (clusterId: string) => {
+    const info = getClusterInfo(userType, clusterId);
+    return info?.icon || clusterIcons[clusterId as keyof typeof clusterIcons] || Factory;
   };
 
-  const clusterColors = {
-    fornecedor: { 
-      bg: 'bg-primary/5',
-      border: 'border-primary/50',
-      icon: 'bg-primary/10',
-      iconColor: 'text-primary',
-      text: 'text-primary',
-      badge: 'bg-primary',
-      bar: 'bg-primary'
-    },
-    cliente: { 
-      bg: 'bg-success/5',
-      border: 'border-success/50',
-      icon: 'bg-success/10',
-      iconColor: 'text-success',
-      text: 'text-success',
-      badge: 'bg-success',
-      bar: 'bg-success'
-    },
-    parceiro: { 
-      bg: 'bg-warning/5',
-      border: 'border-warning/50',
-      icon: 'bg-warning/10',
-      iconColor: 'text-warning',
-      text: 'text-warning',
-      badge: 'bg-warning',
-      bar: 'bg-warning'
-    },
-    subcontratado: { 
-      bg: 'bg-accent/5',
-      border: 'border-accent/50',
-      icon: 'bg-accent/10',
-      iconColor: 'text-accent',
-      text: 'text-accent',
-      badge: 'bg-accent',
-      bar: 'bg-accent'
-    },
-  };
+  const defaultColors = ['primary', 'success', 'warning', 'accent'];
+  const clusterColors = useMemo(() => {
+    const colors: Record<string, { bg: string; border: string; icon: string; iconColor: string; text: string; badge: string; bar: string }> = {};
+    dynamicClusters.forEach((cluster, index) => {
+      const colorName = defaultColors[index % defaultColors.length];
+      colors[cluster.id] = {
+        bg: `bg-${colorName}/5`,
+        border: `border-${colorName}/50`,
+        icon: `bg-${colorName}/10`,
+        iconColor: `text-${colorName}`,
+        text: `text-${colorName}`,
+        badge: `bg-${colorName}`,
+        bar: `bg-${colorName}`
+      };
+    });
+    return colors;
+  }, [dynamicClusters]);
 
-  const clusters = ['fornecedor', 'cliente', 'parceiro', 'subcontratado'] as const;
-
-  const getClusterData = (clusterType: typeof clusters[number]) => {
-    const clusterSuppliers = suppliers.filter(s => s.cluster === clusterType);
+  const getClusterData = (clusterId: string) => {
+    const clusterSuppliers = suppliers.filter(s => s.clusterId === clusterId);
     const totalEmissions = clusterSuppliers.reduce((sum, s) => sum + s.totalEmissions, 0);
     const avgEmissions = clusterSuppliers.length > 0 ? totalEmissions / clusterSuppliers.length : 0;
     const avgEmissionsPerEmployee = clusterSuppliers.length > 0
@@ -89,10 +73,12 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
     };
   };
 
-  const allClustersData = clusters.map(cluster => ({
-    cluster,
-    ...getClusterData(cluster),
+  const allClustersData = dynamicClusters.map(cluster => ({
+    cluster: cluster.id,
+    clusterName: cluster.name,
+    ...getClusterData(cluster.id),
   }));
+
 
   return (
     <div className="space-y-6">
@@ -146,26 +132,26 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="fornecedor" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          {clusters.map(cluster => (
-            <TabsTrigger key={cluster} value={cluster}>
-              {getClusterLabel(cluster)}
+      <Tabs defaultValue={dynamicClusters[0]?.id || 'all'} className="w-full">
+        <TabsList className={`grid w-full grid-cols-${dynamicClusters.length}`}>
+          {dynamicClusters.map(cluster => (
+            <TabsTrigger key={cluster.id} value={cluster.id}>
+              {cluster.name}
             </TabsTrigger>
           ))}
         </TabsList>
 
-        {clusters.map(cluster => {
-          const data = getClusterData(cluster);
-          const Icon = getClusterIconComponent(cluster);
+        {dynamicClusters.map(cluster => {
+          const data = getClusterData(cluster.id);
+          const Icon = getClusterIconComponent(cluster.id);
           
           return (
-            <TabsContent key={cluster} value={cluster}>
+            <TabsContent key={cluster.id} value={cluster.id}>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon className="h-5 w-5" />
-                    Análise Detalhada - {getClusterLabel(cluster)}
+                    Análise Detalhada - {cluster.name}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
