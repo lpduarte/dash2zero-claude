@@ -33,7 +33,8 @@ export interface Supplier {
   sustainabilityReport?: string;
   rating: 'A' | 'B' | 'C' | 'D' | 'E';
   dataSource: 'formulario' | 'get2zero';
-  cluster: 'fornecedor' | 'cliente' | 'parceiro';
+  cluster?: 'fornecedor' | 'cliente' | 'parceiro'; // Legacy - manter para compatibilidade
+  clusterId?: string; // Novo - ID do cluster dinâmico
 }
 
 export type SectorFilter = 'all' | 'manufacturing' | 'technology' | 'construction' | 'transport' | 'services';
