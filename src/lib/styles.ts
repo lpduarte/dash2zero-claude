@@ -26,28 +26,36 @@ export const shadows = {
 
 export const riskColors = {
   critico: {
-    text: 'text-red-700',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    badge: 'bg-red-100 text-red-700 border-red-200',
+    text: 'text-danger',
+    textDark: 'dark:text-danger',
+    bg: 'bg-danger/10',
+    bgDark: 'dark:bg-danger/20',
+    border: 'border-danger/30',
+    badge: 'bg-danger/10 text-danger border-danger/30',
   },
   alto: {
-    text: 'text-red-600',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    badge: 'bg-red-100 text-red-600 border-red-200',
+    text: 'text-danger',
+    textDark: 'dark:text-danger',
+    bg: 'bg-danger/10',
+    bgDark: 'dark:bg-danger/20',
+    border: 'border-danger/30',
+    badge: 'bg-danger/10 text-danger border-danger/30',
   },
   medio: {
-    text: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    badge: 'bg-amber-100 text-amber-600 border-amber-200',
+    text: 'text-warning',
+    textDark: 'dark:text-warning',
+    bg: 'bg-warning/10',
+    bgDark: 'dark:bg-warning/20',
+    border: 'border-warning/30',
+    badge: 'bg-warning/10 text-warning border-warning/30',
   },
   baixo: {
-    text: 'text-green-600',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    badge: 'bg-green-100 text-green-600 border-green-200',
+    text: 'text-success',
+    textDark: 'dark:text-success',
+    bg: 'bg-success/10',
+    bgDark: 'dark:bg-success/20',
+    border: 'border-success/30',
+    badge: 'bg-success/10 text-success border-success/30',
   },
 } as const;
 
@@ -59,27 +67,30 @@ export type RiskLevel = keyof typeof riskColors;
 
 export const scopeColors = {
   1: {
-    text: 'text-violet-700',
-    bg: 'bg-violet-100',
-    bgLight: 'bg-violet-50',
-    border: 'border-violet-200',
-    badge: 'bg-violet-100 text-violet-700 border-violet-200',
+    text: 'text-violet-700 dark:text-violet-400',
+    textLight: 'text-violet-600 dark:text-violet-400',
+    bg: 'bg-violet-500',
+    bgLight: 'bg-violet-50 dark:bg-violet-950/30',
+    border: 'border-violet-200 dark:border-violet-800',
+    badge: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-400 dark:border-violet-800',
     label: 'Âmbito 1 - Emissões Directas',
   },
   2: {
-    text: 'text-blue-700',
-    bg: 'bg-blue-100',
-    bgLight: 'bg-blue-50',
-    border: 'border-blue-200',
-    badge: 'bg-blue-100 text-blue-700 border-blue-200',
+    text: 'text-primary dark:text-primary',
+    textLight: 'text-primary/80 dark:text-primary',
+    bg: 'bg-primary',
+    bgLight: 'bg-primary/10 dark:bg-primary/20',
+    border: 'border-primary/30 dark:border-primary/40',
+    badge: 'bg-primary/10 text-primary border-primary/30',
     label: 'Âmbito 2 - Energia',
   },
   3: {
-    text: 'text-orange-700',
-    bg: 'bg-orange-100',
-    bgLight: 'bg-orange-50',
-    border: 'border-orange-200',
-    badge: 'bg-orange-100 text-orange-700 border-orange-200',
+    text: 'text-orange-700 dark:text-orange-400',
+    textLight: 'text-orange-600 dark:text-orange-400',
+    bg: 'bg-orange-500',
+    bgLight: 'bg-orange-50 dark:bg-orange-950/30',
+    border: 'border-orange-200 dark:border-orange-800',
+    badge: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800',
     label: 'Âmbito 3 - Cadeia de Valor',
   },
 } as const;
@@ -92,24 +103,24 @@ export type Scope = keyof typeof scopeColors;
 
 export const fundingColors = {
   subsidio: {
-    text: 'text-green-700',
-    bg: 'bg-green-100',
-    bgLight: 'bg-green-50',
-    border: 'border-green-200',
+    text: 'text-success',
+    bg: 'bg-success/20',
+    bgLight: 'bg-success/10',
+    border: 'border-success/30',
     label: 'Subsídio',
   },
   incentivo: {
-    text: 'text-blue-700',
-    bg: 'bg-blue-100',
-    bgLight: 'bg-blue-50',
-    border: 'border-blue-200',
+    text: 'text-primary',
+    bg: 'bg-primary/20',
+    bgLight: 'bg-primary/10',
+    border: 'border-primary/30',
     label: 'Incentivo',
   },
   financiamento: {
-    text: 'text-purple-700',
-    bg: 'bg-purple-100',
-    bgLight: 'bg-purple-50',
-    border: 'border-purple-200',
+    text: 'text-purple-700 dark:text-purple-400',
+    bg: 'bg-purple-100 dark:bg-purple-900/30',
+    bgLight: 'bg-purple-50 dark:bg-purple-950/30',
+    border: 'border-purple-200 dark:border-purple-800',
     label: 'Financiamento',
   },
 } as const;
@@ -122,28 +133,28 @@ export type FundingType = keyof typeof fundingColors;
 
 export const getPercentageColors = (percentage: number) => {
   if (percentage >= 75) return { 
-    text: 'text-green-600', 
-    bg: 'bg-green-500', 
-    bgLight: 'bg-green-100', 
-    border: 'border-green-200' 
+    text: 'text-success', 
+    bg: 'bg-success', 
+    bgLight: 'bg-success/10', 
+    border: 'border-success/30' 
   };
   if (percentage >= 50) return { 
-    text: 'text-lime-600', 
+    text: 'text-lime-600 dark:text-lime-400', 
     bg: 'bg-lime-500', 
-    bgLight: 'bg-lime-100', 
-    border: 'border-lime-200' 
+    bgLight: 'bg-lime-100 dark:bg-lime-900/30', 
+    border: 'border-lime-200 dark:border-lime-800' 
   };
   if (percentage >= 25) return { 
-    text: 'text-amber-600', 
-    bg: 'bg-amber-500', 
-    bgLight: 'bg-amber-100', 
-    border: 'border-amber-200' 
+    text: 'text-warning', 
+    bg: 'bg-warning', 
+    bgLight: 'bg-warning/10', 
+    border: 'border-warning/30' 
   };
   return { 
-    text: 'text-red-600', 
-    bg: 'bg-red-500', 
-    bgLight: 'bg-red-100', 
-    border: 'border-red-200' 
+    text: 'text-danger', 
+    bg: 'bg-danger', 
+    bgLight: 'bg-danger/10', 
+    border: 'border-danger/30' 
   };
 };
 
@@ -208,33 +219,33 @@ export interface PlanStatusConfig {
 export const planStatusConfig: Record<PlanStatus, PlanStatusConfig> = {
   sem_plano: {
     label: 'Sem plano',
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
+    color: 'text-danger',
+    bgColor: 'bg-danger/10',
+    borderColor: 'border-danger/30',
     icon: XCircle,
     targetStep: 1,
   },
   em_preparacao: {
     label: 'Em preparação',
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
-    borderColor: 'border-amber-200',
+    color: 'text-warning',
+    bgColor: 'bg-warning/10',
+    borderColor: 'border-warning/30',
     icon: Clock,
     targetStep: 2,
   },
   plano_pronto: {
     label: 'Plano pronto',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
+    color: 'text-success',
+    bgColor: 'bg-success/10',
+    borderColor: 'border-success/30',
     icon: CheckCircle,
     targetStep: 4,
   },
   enviado: {
     label: 'Enviado',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
+    borderColor: 'border-primary/30',
     icon: Mail,
     targetStep: 4,
   },

@@ -72,8 +72,8 @@ export const ManageInfrastructureModal = ({
         <div className="space-y-6 py-4">
           
           {/* Texto introdutório */}
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-950/30 dark:border-blue-900">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <p className="text-sm text-primary">
               Estes dados influenciam as medidas de descarbonização disponíveis para as empresas do concelho. 
               Infraestruturas existentes permitem recomendar medidas mais eficazes e de menor investimento.
             </p>
@@ -91,15 +91,15 @@ export const ManageInfrastructureModal = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">89</span>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Link className="h-4 w-4 text-blue-500" />
+                    <Link className="h-4 w-4 text-primary" />
                     <span className="text-sm">Fonte: API MOBI.E</span>
-                    <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-400">Recomendada</span>
+                    <span className="text-xs px-2 py-0.5 bg-success/20 text-success rounded-full">Recomendada</span>
                   </div>
                   <button
                     onClick={() => handleRefreshData('postos')}
@@ -131,13 +131,13 @@ export const ManageInfrastructureModal = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">245</span>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-amber-500" />
+                    <PenLine className="h-4 w-4 text-warning" />
                     <span className="text-sm">Fonte: Inserção manual</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -174,13 +174,13 @@ export const ManageInfrastructureModal = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">52</span>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Link className="h-4 w-4 text-blue-500" />
+                    <Link className="h-4 w-4 text-primary" />
                     <span className="text-sm">Fonte:</span>
                     <Select value={bicicletasSource} onValueChange={setBicicletasSource}>
                       <SelectTrigger className="w-40 h-8">
@@ -242,16 +242,16 @@ export const ManageInfrastructureModal = ({
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">178</span>
                   {organicosCount ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-5 w-5 text-success" />
                   ) : (
-                    <AlertCircle className="h-5 w-5 text-amber-500" />
+                    <AlertCircle className="h-5 w-5 text-warning" />
                   )}
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-amber-500" />
+                    <PenLine className="h-4 w-4 text-warning" />
                     <span className="text-sm">Fonte: Inserção manual</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -289,13 +289,13 @@ export const ManageInfrastructureModal = ({
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">47.3</span>
                   <span className="text-sm text-muted-foreground">km</span>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-amber-500" />
+                    <PenLine className="h-4 w-4 text-warning" />
                     <span className="text-sm">Fonte: Inserção manual</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -334,13 +334,13 @@ export const ManageInfrastructureModal = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">312</span>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <PenLine className="h-4 w-4 text-amber-500" />
+                    <PenLine className="h-4 w-4 text-warning" />
                     <span className="text-sm">Fonte: Inserção manual</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -376,16 +376,16 @@ export const ManageInfrastructureModal = ({
                   <span className="font-medium">Qualidade do Ar</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-green-600">Bom</span>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span className="text-2xl font-bold text-success">Bom</span>
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Link className="h-4 w-4 text-blue-500" />
+                    <Link className="h-4 w-4 text-primary" />
                     <span className="text-sm">Fonte: API QualAr (APA)</span>
-                    <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-400">Recomendada</span>
+                    <span className="text-xs px-2 py-0.5 bg-success/20 text-success rounded-full">Recomendada</span>
                   </div>
                   <button
                     onClick={() => handleRefreshData('qualidade do ar')}
@@ -401,26 +401,24 @@ export const ManageInfrastructureModal = ({
                 <div className="p-3 bg-muted/30 rounded-lg">
                   <p className="text-sm text-muted-foreground">
                     <Info className="h-4 w-4 inline mr-1" />
-                    A qualidade do ar é um indicador do impacto das emissões locais. Concelhos com pior 
-                    qualidade devem priorizar mobilidade sustentável e redução de emissões directas.
+                    Dados de qualidade do ar permitem sensibilizar empresas para o impacto local das emissões 
+                    e priorizar medidas em zonas mais afetadas.
                   </p>
                 </div>
               </div>
             </div>
             
           </div>
-          
         </div>
         
         <DialogFooter>
           <button
             onClick={() => onOpenChange(false)}
-            className="px-4 py-2 border rounded-lg hover:bg-muted transition-colors"
+            className={elements.primaryButton}
           >
             Fechar
           </button>
         </DialogFooter>
-        
       </DialogContent>
     </Dialog>
   );

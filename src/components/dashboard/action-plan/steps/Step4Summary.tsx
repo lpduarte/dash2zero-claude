@@ -27,7 +27,7 @@ import { CollapsibleSection } from '../shared';
 import { mockMeasures } from '@/data/mockMeasures';
 import { mockFunding } from '@/data/mockFunding';
 import { cascaisInfrastructure } from '@/data/mockInfrastructure';
-import { elements } from '@/lib/styles';
+import { elements, riskColors, scopeColors } from '@/lib/styles';
 
 export const Step4Summary = ({
   supplier,
@@ -101,6 +101,26 @@ export const Step4Summary = ({
     }
   };
 
+  // Helper para estilos de deadline
+  const getDeadlineStyles = (daysRemaining: number) => {
+    if (daysRemaining <= 30) {
+      return {
+        container: `${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border}`,
+        text: 'text-danger'
+      };
+    }
+    if (daysRemaining <= 60) {
+      return {
+        container: `${riskColors.medio.bg} ${riskColors.medio.bgDark} border ${riskColors.medio.border}`,
+        text: 'text-warning'
+      };
+    }
+    return {
+      container: 'bg-muted/50',
+      text: 'text-muted-foreground'
+    };
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Header do step - Fixo */}
@@ -154,30 +174,21 @@ export const Step4Summary = ({
                 Prazos de Candidatura
               </h5>
               <div className="space-y-2">
-                {upcomingDeadlines.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      item.daysRemaining <= 30
-                        ? 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800'
-                        : item.daysRemaining <= 60
-                          ? 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800'
-                          : 'bg-muted/50'
-                    }`}
-                  >
-                    <span className="text-sm">{item.name}</span>
-                    <span className={`text-sm font-medium ${
-                      item.daysRemaining <= 30
-                        ? 'text-red-600 dark:text-red-400'
-                        : item.daysRemaining <= 60
-                          ? 'text-amber-600 dark:text-amber-400'
-                          : 'text-muted-foreground'
-                    }`}>
-                      {item.daysRemaining <= 30 && <AlertTriangle className="h-4 w-4 inline mr-1" />}
-                      {item.daysRemaining} dias ({item.deadline.toLocaleDateString('pt-PT')})
-                    </span>
-                  </div>
-                ))}
+                {upcomingDeadlines.map((item, idx) => {
+                  const styles = getDeadlineStyles(item.daysRemaining);
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex items-center justify-between p-3 rounded-lg ${styles.container}`}
+                    >
+                      <span className="text-sm">{item.name}</span>
+                      <span className={`text-sm font-medium ${styles.text}`}>
+                        {item.daysRemaining <= 30 && <AlertTriangle className="h-4 w-4 inline mr-1" />}
+                        {item.daysRemaining} dias ({item.deadline.toLocaleDateString('pt-PT')})
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -227,45 +238,45 @@ export const Step4Summary = ({
             <div>
               <h5 className="text-sm font-medium text-muted-foreground mb-3">Emissões por Âmbito</h5>
               <div className="grid grid-cols-3 gap-4">
-                <div className="p-3 bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800 rounded-lg text-center">
+                <div className={`p-3 ${scopeColors[1].bgLight} border ${scopeColors[1].border} rounded-lg text-center`}>
                   <div className="flex items-center justify-center gap-2 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-violet-500" />
-                    <p className="text-xs text-violet-600 dark:text-violet-400">Âmbito 1 - Diretas</p>
+                    <div className={`w-2 h-2 rounded-full ${scopeColors[1].bg}`} />
+                    <p className={`text-xs ${scopeColors[1].textLight}`}>Âmbito 1 - Diretas</p>
                   </div>
-                  <p className="font-semibold text-lg text-violet-700 dark:text-violet-300">
+                  <p className={`font-semibold text-lg ${scopeColors[1].text}`}>
                     {(supplier.scope1 || 0).toLocaleString('pt-PT')} t CO₂e
                   </p>
-                  <p className="text-xs text-violet-600 dark:text-violet-400">
+                  <p className={`text-xs ${scopeColors[1].textLight}`}>
                     {supplier.totalEmissions > 0
                       ? `${((supplier.scope1 || 0) / supplier.totalEmissions * 100).toFixed(0)}%`
                       : '0%'
                     }
                   </p>
                 </div>
-                <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
+                <div className={`p-3 ${scopeColors[2].bgLight} border ${scopeColors[2].border} rounded-lg text-center`}>
                   <div className="flex items-center justify-center gap-2 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                    <p className="text-xs text-blue-600 dark:text-blue-400">Âmbito 2 - Energia</p>
+                    <div className={`w-2 h-2 rounded-full ${scopeColors[2].bg}`} />
+                    <p className={`text-xs ${scopeColors[2].textLight}`}>Âmbito 2 - Energia</p>
                   </div>
-                  <p className="font-semibold text-lg text-blue-700 dark:text-blue-300">
+                  <p className={`font-semibold text-lg ${scopeColors[2].text}`}>
                     {(supplier.scope2 || 0).toLocaleString('pt-PT')} t CO₂e
                   </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                  <p className={`text-xs ${scopeColors[2].textLight}`}>
                     {supplier.totalEmissions > 0
                       ? `${((supplier.scope2 || 0) / supplier.totalEmissions * 100).toFixed(0)}%`
                       : '0%'
                     }
                   </p>
                 </div>
-                <div className="p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg text-center">
+                <div className={`p-3 ${scopeColors[3].bgLight} border ${scopeColors[3].border} rounded-lg text-center`}>
                   <div className="flex items-center justify-center gap-2 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-orange-500" />
-                    <p className="text-xs text-orange-600 dark:text-orange-400">Âmbito 3 - Indiretas</p>
+                    <div className={`w-2 h-2 rounded-full ${scopeColors[3].bg}`} />
+                    <p className={`text-xs ${scopeColors[3].textLight}`}>Âmbito 3 - Indiretas</p>
                   </div>
-                  <p className="font-semibold text-lg text-orange-700 dark:text-orange-300">
+                  <p className={`font-semibold text-lg ${scopeColors[3].text}`}>
                     {(supplier.scope3 || 0).toLocaleString('pt-PT')} t CO₂e
                   </p>
-                  <p className="text-xs text-orange-600 dark:text-orange-400">
+                  <p className={`text-xs ${scopeColors[3].textLight}`}>
                     {supplier.totalEmissions > 0
                       ? `${((supplier.scope3 || 0) / supplier.totalEmissions * 100).toFixed(0)}%`
                       : '0%'
@@ -281,15 +292,17 @@ export const Step4Summary = ({
             <div>
               <h5 className="text-sm font-medium text-muted-foreground mb-3">Intensidade de Carbono</h5>
               <div className="grid grid-cols-3 gap-4">
-                <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg text-center">
-                  <p className="text-xs text-red-600 dark:text-red-400 mb-1">Intensidade Actual</p>
-                  <p className="font-semibold text-xl text-red-700 dark:text-red-300">{currentIntensity.toFixed(2)}</p>
-                  <p className="text-xs text-red-600 dark:text-red-400">kg CO₂e/€</p>
+                <div className={`p-4 ${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border} rounded-lg text-center`}>
+                  <p className="text-xs text-danger mb-1">Intensidade Actual</p>
+                  <p className="font-semibold text-xl text-danger">{currentIntensity.toFixed(2)}</p>
+                  <p className="text-xs text-danger">kg CO₂e/€</p>
                 </div>
-                <div className={`p-4 rounded-lg text-center border ${reachedTarget ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800'}`}>
-                  <p className={`text-xs mb-1 ${reachedTarget ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>Nova Intensidade</p>
-                  <p className={`font-semibold text-xl ${reachedTarget ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>{newIntensity.toFixed(2)}</p>
-                  <p className={`text-xs ${reachedTarget ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>kg CO₂e/€</p>
+                <div className={`p-4 rounded-lg text-center border ${reachedTarget 
+                  ? `${riskColors.baixo.bg} ${riskColors.baixo.bgDark} ${riskColors.baixo.border}` 
+                  : `${riskColors.medio.bg} ${riskColors.medio.bgDark} ${riskColors.medio.border}`}`}>
+                  <p className={`text-xs mb-1 ${reachedTarget ? 'text-success' : 'text-warning'}`}>Nova Intensidade</p>
+                  <p className={`font-semibold text-xl ${reachedTarget ? 'text-success' : 'text-warning'}`}>{newIntensity.toFixed(2)}</p>
+                  <p className={`text-xs ${reachedTarget ? 'text-success' : 'text-warning'}`}>kg CO₂e/€</p>
                 </div>
                 <div className="p-4 bg-muted border border-border rounded-lg text-center">
                   <p className="text-xs text-muted-foreground mb-1">Média do Setor</p>
@@ -300,7 +313,9 @@ export const Step4Summary = ({
             </div>
 
             {/* Estado da Meta */}
-            <div className={`flex items-center gap-2 p-3 rounded-lg border ${reachedTarget ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'}`}>
+            <div className={`flex items-center gap-2 p-3 rounded-lg border ${reachedTarget 
+              ? `${riskColors.baixo.bg} ${riskColors.baixo.bgDark} text-success ${riskColors.baixo.border}` 
+              : `${riskColors.medio.bg} ${riskColors.medio.bgDark} text-warning ${riskColors.medio.border}`}`}>
               {reachedTarget ? (
                 <>
                   <CheckCircle className="h-5 w-5" />
@@ -320,25 +335,27 @@ export const Step4Summary = ({
             <div>
               <h5 className="text-sm font-medium text-muted-foreground mb-3">Impacto das Medidas</h5>
               <div className="grid grid-cols-4 gap-4">
-                <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg text-center">
-                  <p className="text-xs text-green-600 dark:text-green-400 mb-1">Redução</p>
-                  <p className="font-semibold text-xl text-green-700 dark:text-green-300">-{totalReduction.toLocaleString('pt-PT')}t</p>
-                  <p className="text-xs text-green-600 dark:text-green-400">CO₂e ({reductionPercent.toFixed(0)}%)</p>
+                <div className={`p-4 ${riskColors.baixo.bg} ${riskColors.baixo.bgDark} border ${riskColors.baixo.border} rounded-lg text-center`}>
+                  <p className="text-xs text-success mb-1">Redução</p>
+                  <p className="font-semibold text-xl text-success">-{totalReduction.toLocaleString('pt-PT')}t</p>
+                  <p className="text-xs text-success">CO₂e ({reductionPercent.toFixed(0)}%)</p>
                 </div>
                 <div className="p-4 bg-muted border border-border rounded-lg text-center">
                   <p className="text-xs text-muted-foreground mb-1">Investimento</p>
                   <p className="font-semibold text-xl">{totalInvestment.toLocaleString('pt-PT')}€</p>
                   <p className="text-xs text-muted-foreground">Total</p>
                 </div>
-                <div className="p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">Comparticipação</p>
-                  <p className="font-semibold text-xl text-blue-700 dark:text-blue-300">{totalCoverage.toLocaleString('pt-PT')}€</p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">Até {coveragePercent.toFixed(0)}%</p>
+                <div className={`p-4 ${scopeColors[2].bgLight} border ${scopeColors[2].border} rounded-lg text-center`}>
+                  <p className={`text-xs ${scopeColors[2].textLight} mb-1`}>Comparticipação</p>
+                  <p className={`font-semibold text-xl ${scopeColors[2].text}`}>{totalCoverage.toLocaleString('pt-PT')}€</p>
+                  <p className={`text-xs ${scopeColors[2].textLight}`}>Até {coveragePercent.toFixed(0)}%</p>
                 </div>
-                <div className={`p-4 rounded-lg text-center border ${remaining === 0 ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800'}`}>
-                  <p className={`text-xs mb-1 ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>A cargo da empresa</p>
-                  <p className={`font-semibold text-xl ${remaining === 0 ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>{remaining.toLocaleString('pt-PT')}€</p>
-                  <p className={`text-xs ${remaining === 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{(100 - coveragePercent).toFixed(0)}%</p>
+                <div className={`p-4 rounded-lg text-center border ${remaining === 0 
+                  ? `${riskColors.baixo.bg} ${riskColors.baixo.bgDark} ${riskColors.baixo.border}` 
+                  : `${riskColors.medio.bg} ${riskColors.medio.bgDark} ${riskColors.medio.border}`}`}>
+                  <p className={`text-xs mb-1 ${remaining === 0 ? 'text-success' : 'text-warning'}`}>A cargo da empresa</p>
+                  <p className={`font-semibold text-xl ${remaining === 0 ? 'text-success' : 'text-warning'}`}>{remaining.toLocaleString('pt-PT')}€</p>
+                  <p className={`text-xs ${remaining === 0 ? 'text-success' : 'text-warning'}`}>{(100 - coveragePercent).toFixed(0)}%</p>
                 </div>
               </div>
             </div>
@@ -359,10 +376,7 @@ export const Step4Summary = ({
               {selectedMeasuresData.map(measure => (
                 <div key={measure.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      measure.scope === 1 ? 'bg-violet-500' :
-                      measure.scope === 2 ? 'bg-blue-500' : 'bg-orange-500'
-                    }`} />
+                    <div className={`w-2 h-2 rounded-full ${scopeColors[measure.scope as 1 | 2 | 3].bg}`} />
                     <div>
                       <p className="text-sm font-medium">{measure.name}</p>
                       <p className="text-xs text-muted-foreground">
@@ -371,7 +385,7 @@ export const Step4Summary = ({
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-green-600 dark:text-green-400">-{measure.emissionReduction}t CO₂e</p>
+                    <p className="text-sm font-medium text-success">-{measure.emissionReduction}t CO₂e</p>
                     <p className="text-xs text-muted-foreground">{measure.investment.toLocaleString('pt-PT')}€</p>
                   </div>
                 </div>

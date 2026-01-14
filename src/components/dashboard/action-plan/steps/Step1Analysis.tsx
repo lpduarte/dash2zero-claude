@@ -1,7 +1,7 @@
 import { Separator } from '@/components/ui/separator';
 import { AlertTriangle, Minus, CheckCircle, Target, Search } from 'lucide-react';
 import type { Step1Props } from '../types';
-import { riskColors } from '@/lib/styles';
+import { riskColors, scopeColors } from '@/lib/styles';
 
 export const Step1Analysis = ({
   supplier,
@@ -19,23 +19,23 @@ export const Step1Analysis = ({
     alto: {
       label: 'Alto',
       icon: AlertTriangle,
-      iconColor: riskColors.alto.text.replace('text-', 'text-').replace('-600', '-500').replace('-700', '-500'),
-      iconBg: `${riskColors.alto.bg} dark:bg-red-900/30`,
-      tagColor: `${riskColors.alto.badge} dark:bg-red-900/30 dark:text-red-300 dark:border-red-800`
+      iconColor: 'text-danger',
+      iconBg: `${riskColors.alto.bg} ${riskColors.alto.bgDark}`,
+      tagColor: `${riskColors.alto.badge}`
     },
     medio: {
       label: 'Médio',
       icon: Minus,
-      iconColor: riskColors.medio.text.replace('-600', '-500'),
-      iconBg: `${riskColors.medio.bg} dark:bg-amber-900/30`,
-      tagColor: `${riskColors.medio.badge} dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800`
+      iconColor: 'text-warning',
+      iconBg: `${riskColors.medio.bg} ${riskColors.medio.bgDark}`,
+      tagColor: `${riskColors.medio.badge}`
     },
     normal: {
       label: 'Baixo',
       icon: CheckCircle,
-      iconColor: riskColors.baixo.text.replace('-600', '-500'),
-      iconBg: `${riskColors.baixo.bg} dark:bg-green-900/30`,
-      tagColor: `${riskColors.baixo.badge} dark:bg-green-900/30 dark:text-green-300 dark:border-green-800`
+      iconColor: 'text-success',
+      iconBg: `${riskColors.baixo.bg} ${riskColors.baixo.bgDark}`,
+      tagColor: `${riskColors.baixo.badge}`
     }
   };
   const config = riskConfig[riskLevel];
@@ -51,9 +51,9 @@ export const Step1Analysis = ({
 
   // Âmbitos acima de 30%
   const scopesAbove30 = [
-    { id: 1, name: 'Âmbito 1', value: supplier.scope1, pct: scope1Pct, color: 'violet', borderClass: 'border-violet-400' },
-    { id: 2, name: 'Âmbito 2', value: supplier.scope2, pct: scope2Pct, color: 'blue', borderClass: 'border-blue-400' },
-    { id: 3, name: 'Âmbito 3', value: supplier.scope3, pct: scope3Pct, color: 'orange', borderClass: 'border-orange-400' }
+    { id: 1 as const, name: 'Âmbito 1', value: supplier.scope1, pct: scope1Pct },
+    { id: 2 as const, name: 'Âmbito 2', value: supplier.scope2, pct: scope2Pct },
+    { id: 3 as const, name: 'Âmbito 3', value: supplier.scope3, pct: scope3Pct }
   ].filter(s => s.pct >= 30).sort((a, b) => b.pct - a.pct);
 
   // Problemas por âmbito
@@ -91,8 +91,8 @@ export const Step1Analysis = ({
             {/* Barra Empresa (100%) */}
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground w-28 shrink-0">Esta Empresa</span>
-              <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500 rounded-full" style={{ width: '100%' }} />
+              <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-danger rounded-full" style={{ width: '100%' }} />
               </div>
               <span className="text-sm font-medium w-36 text-right shrink-0">
                 {empresaIntensity.toFixed(2)} kg CO₂e/€
@@ -102,8 +102,8 @@ export const Step1Analysis = ({
             {/* Barra Média Setor (proporcional) */}
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground w-28 shrink-0">Média do Setor</span>
-              <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 rounded-full" style={{ width: `${Math.min(setorBarWidth, 100)}%` }} />
+              <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-success rounded-full" style={{ width: `${Math.min(setorBarWidth, 100)}%` }} />
               </div>
               <span className="text-sm font-medium w-36 text-right shrink-0">
                 {avgSectorIntensity.toFixed(2)} kg CO₂e/€
@@ -115,10 +115,10 @@ export const Step1Analysis = ({
         <Separator />
 
         {/* SECÇÃO 2: Consequências (Vermelho) - VISÃO MUNICÍPIO */}
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className={`p-4 ${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border} rounded-lg`}>
           <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <h4 className="font-medium text-sm text-red-700 dark:text-red-300">
+            <AlertTriangle className="h-4 w-4 text-danger" />
+            <h4 className="font-medium text-sm text-danger">
               Consequências para o Município (intensidade {'>'}1.5x média)
             </h4>
           </div>
@@ -126,40 +126,40 @@ export const Step1Analysis = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
             {/* Coluna 1 */}
             <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Empresa em risco de <strong>encerramento ou deslocalização</strong></span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Potencial <strong>perda de postos de trabalho</strong> no município</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Menor <strong>atratividade do território</strong> para investimento sustentável</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span><strong>Risco reputacional</strong> para o ecossistema empresarial local</span>
               </li>
             </ul>
 
             {/* Coluna 2 */}
             <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Perda de <strong>elegibilidade para fundos</strong> europeus e nacionais</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Exclusão de <strong>programas de apoio municipal</strong> à transição energética</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Dificuldade em atingir <strong>metas municipais</strong> de descarbonização</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                <span className="text-red-400 mt-0.5">•</span>
+              <li className="flex items-start gap-2 text-sm text-danger">
+                <span className="text-danger/60 mt-0.5">•</span>
                 <span>Aumento de <strong>custos regulatórios</strong> que afetam competitividade local</span>
               </li>
             </ul>
@@ -177,7 +177,7 @@ export const Step1Analysis = ({
           {/* Barra Stacked */}
           <div className="w-full h-6 rounded-full overflow-hidden flex mb-4">
             <div
-              className="h-full bg-violet-500 hover:opacity-80 transition-opacity cursor-pointer relative group"
+              className={`h-full ${scopeColors[1].bg} hover:opacity-80 transition-opacity cursor-pointer relative group`}
               style={{ width: `${scope1Pct}%` }}
             >
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-foreground text-background text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
@@ -185,7 +185,7 @@ export const Step1Analysis = ({
               </div>
             </div>
             <div
-              className="h-full bg-blue-500 hover:opacity-80 transition-opacity cursor-pointer relative group"
+              className={`h-full ${scopeColors[2].bg} hover:opacity-80 transition-opacity cursor-pointer relative group`}
               style={{ width: `${scope2Pct}%` }}
             >
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-foreground text-background text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
@@ -193,7 +193,7 @@ export const Step1Analysis = ({
               </div>
             </div>
             <div
-              className="h-full bg-orange-500 hover:opacity-80 transition-opacity cursor-pointer relative group"
+              className={`h-full ${scopeColors[3].bg} hover:opacity-80 transition-opacity cursor-pointer relative group`}
               style={{ width: `${scope3Pct}%` }}
             >
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-foreground text-background text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
@@ -205,15 +205,15 @@ export const Step1Analysis = ({
           {/* Legenda completa */}
           <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-violet-500" />
+              <div className={`w-3 h-3 rounded-full ${scopeColors[1].bg}`} />
               <span>Âmbito 1 ({supplier.scope1.toLocaleString('pt-PT')} t CO₂e, {scope1Pct.toFixed(0)}%)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
+              <div className={`w-3 h-3 rounded-full ${scopeColors[2].bg}`} />
               <span>Âmbito 2 ({supplier.scope2.toLocaleString('pt-PT')} t CO₂e, {scope2Pct.toFixed(0)}%)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
+              <div className={`w-3 h-3 rounded-full ${scopeColors[3].bg}`} />
               <span>Âmbito 3 ({supplier.scope3.toLocaleString('pt-PT')} t CO₂e, {scope3Pct.toFixed(0)}%)</span>
             </div>
           </div>
@@ -231,9 +231,9 @@ export const Step1Analysis = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {scopesAbove30.map(scope => (
-                <div key={scope.id} className={`p-3 rounded-lg border-2 ${scope.borderClass} bg-background`}>
+                <div key={scope.id} className={`p-3 rounded-lg border-2 ${scopeColors[scope.id].border} bg-background`}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-2 h-2 rounded-full bg-${scope.color}-500`} />
+                    <div className={`w-2 h-2 rounded-full ${scopeColors[scope.id].bg}`} />
                     <span className="text-sm font-medium">
                       {scope.name} ({scope.pct.toFixed(0)}%)
                     </span>
@@ -256,15 +256,15 @@ export const Step1Analysis = ({
         <Separator />
 
         {/* SECÇÃO 5: Para Atingir Zona Segura (Vermelho) */}
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className={`p-4 ${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border} rounded-lg`}>
           <div className="flex items-center gap-2 mb-3">
-            <Target className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <p className="text-sm font-medium text-red-700 dark:text-red-300">
+            <Target className="h-4 w-4 text-danger" />
+            <p className="text-sm font-medium text-danger">
               Para atingir zona segura
             </p>
           </div>
 
-          <ul className="space-y-1.5 text-sm text-red-700 dark:text-red-300">
+          <ul className="space-y-1.5 text-sm text-danger">
             <li className="flex items-start gap-2">
               <span>•</span>
               <span>Redução necessária: <span className="font-medium">{reducaoEstimada.toLocaleString('pt-PT')} t CO₂e (-{reducaoPct}%)</span></span>
