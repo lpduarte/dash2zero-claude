@@ -38,6 +38,7 @@ import {
   getSuppliersWithFootprintByOwnerType,
 } from "@/data/suppliers";
 import { emailTemplates, getCompanyEmailTracking, EmailRecord } from "@/data/emailTracking";
+import { getSectorName } from "@/data/sectors";
 import { SupplierWithoutFootprint } from "@/types/supplierNew";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -101,7 +102,9 @@ const Incentive = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(c => 
         c.name.toLowerCase().includes(query) ||
-        c.contact.email.toLowerCase().includes(query)
+        c.contact.email.toLowerCase().includes(query) ||
+        c.contact.nif.toLowerCase().includes(query) ||
+        getSectorName(c.sector).toLowerCase().includes(query)
       );
     }
     
@@ -124,7 +127,9 @@ const Incentive = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(c => 
         c.name.toLowerCase().includes(query) ||
-        c.contact.email.toLowerCase().includes(query)
+        c.contact.email.toLowerCase().includes(query) ||
+        c.contact.nif.toLowerCase().includes(query) ||
+        getSectorName(c.sector).toLowerCase().includes(query)
       );
     }
     
@@ -352,19 +357,32 @@ const Incentive = () => {
                     variant={selectedCluster === "all" ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedCluster("all")}
+                    className="gap-1.5"
                   >
                     Todos
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
+                      {activeTab === "pending" ? companiesWithoutFootprint.length : companiesWithFootprint.length}
+                    </Badge>
                   </Button>
-                  {clusters.map(cluster => (
-                    <Button
-                      key={cluster.id}
-                      variant={selectedCluster === cluster.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedCluster(cluster.id)}
-                    >
-                      {cluster.name}
-                    </Button>
-                  ))}
+                  {clusters.map(cluster => {
+                    const count = activeTab === "pending"
+                      ? companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length
+                      : companiesWithFootprint.filter(c => c.clusterId === cluster.id).length;
+                    return (
+                      <Button
+                        key={cluster.id}
+                        variant={selectedCluster === cluster.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedCluster(cluster.id)}
+                        className="gap-1.5"
+                      >
+                        {cluster.name}
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
+                          {count}
+                        </Badge>
+                      </Button>
+                    );
+                  })}
                 </div>
                 
                 {activeTab === "pending" && (
@@ -376,13 +394,12 @@ const Incentive = () => {
                         onCheckedChange={(checked) => setShowOnlyNeverContacted(checked === true)}
                       />
                       <span className="text-sm">Só nunca contactadas</span>
+                      <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
+                        {metrics.neverContacted}
+                      </Badge>
                     </label>
                   </>
                 )}
-                
-                <span className="text-sm text-muted-foreground ml-auto">
-                  {currentList.length} empresa{currentList.length !== 1 ? "s" : ""}
-                </span>
               </div>
             </div>
             
@@ -417,7 +434,11 @@ const Incentive = () => {
                                   </TooltipProvider>
                                 )}
                               </div>
-                              <p className="text-sm text-muted-foreground truncate">{company.contact.email}</p>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span className="truncate">{company.contact.email}</span>
+                                <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
+                                <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
+                              </div>
                             </div>
                             
                             {/* Histórico expandível */}
@@ -509,7 +530,11 @@ const Incentive = () => {
                             <p className="font-medium truncate">{company.name}</p>
                             <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
                           </div>
-                          <p className="text-sm text-muted-foreground truncate">{company.contact.email}</p>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="truncate">{company.contact.email}</span>
+                            <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
+                            <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
+                          </div>
                         </div>
                         
                         <div className="flex items-center gap-2">
