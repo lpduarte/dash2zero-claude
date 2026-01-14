@@ -30,13 +30,16 @@ import { FilterButton } from "@/components/dashboard/FilterButton";
 import { FilterModal } from "@/components/dashboard/FilterModal";
 import { ActiveFiltersDisplay } from "@/components/dashboard/ActiveFiltersDisplay";
 import { emailTemplates } from "@/data/mockClusters";
-import { mockSuppliers } from "@/data/mockSuppliers";
+import { 
+  getSuppliersWithFootprintByOwnerType,
+} from "@/data/suppliers";
+import { getClustersByOwnerType } from "@/data/clusters";
 import { ClusterProvider } from "@/types/cluster";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
 import { Mail, Upload, Download, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
-import { getClusterConfig, ClusterType } from "@/config/clusters";
+import { getClusterConfig } from "@/config/clusters";
 
 // Converter Supplier para ClusterProvider
 const supplierToProvider = (supplier: Supplier): ClusterProvider => ({
@@ -56,7 +59,7 @@ export default function ClusterManagement() {
   const { user, isMunicipio, userType } = useUser();
   const clusterOptions = getClusterConfig(userType);
   
-  const [selectedClusterType, setSelectedClusterType] = useState<ClusterType>('all');
+  const [selectedClusterType, setSelectedClusterType] = useState<string>('all');
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
@@ -71,13 +74,17 @@ export default function ClusterManagement() {
     parish: [],
   });
 
-  // Base suppliers - filtrados por município se userType === 'municipio'
+  // Base suppliers - filtrados por ownerType
   const baseSuppliers = useMemo(() => {
-    if (isMunicipio && user.municipality) {
-      return mockSuppliers.filter(s => s.municipality === user.municipality);
-    }
-    return mockSuppliers;
-  }, [isMunicipio, user.municipality]);
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getSuppliersWithFootprintByOwnerType(ownerType) as Supplier[];
+  }, [isMunicipio]);
+
+  // Clusters dinâmicos
+  const clusters = useMemo(() => {
+    const ownerType = isMunicipio ? 'municipio' : 'empresa';
+    return getClustersByOwnerType(ownerType);
+  }, [isMunicipio]);
 
   // Calculate active filters count
   const activeFiltersCount = useMemo(() => {
@@ -113,20 +120,21 @@ export default function ClusterManagement() {
     setUniversalFilters(newFilters);
   };
 
-  // Get cluster counts
-  const clusterCounts = useMemo(() => ({
-    all: baseSuppliers.length,
-    fornecedor: baseSuppliers.filter(s => s.cluster === 'fornecedor').length,
-    cliente: baseSuppliers.filter(s => s.cluster === 'cliente').length,
-    parceiro: baseSuppliers.filter(s => s.cluster === 'parceiro').length,
-  }), [baseSuppliers]);
+  // Get cluster counts - dinâmicos
+  const clusterCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: baseSuppliers.length };
+    clusters.forEach(cluster => {
+      counts[cluster.id] = baseSuppliers.filter(s => s.clusterId === cluster.id).length;
+    });
+    return counts;
+  }, [baseSuppliers, clusters]);
 
   // Filter suppliers by selected cluster and universal filters
   const filteredSuppliers = useMemo(() => {
     let filtered = baseSuppliers;
     
     if (selectedClusterType !== 'all') {
-      filtered = filtered.filter(s => s.cluster === selectedClusterType);
+      filtered = filtered.filter(s => s.clusterId === selectedClusterType);
     }
     
     // Filtro de dimensão (multiselect)
@@ -201,7 +209,7 @@ export default function ClusterManagement() {
           company.id,
           company.contact.email,
           company.sector,
-          company.cluster,
+          company.clusterId || '',
           company.region,
           company.revenue * 1000000,
           company.employees,
