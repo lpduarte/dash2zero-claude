@@ -453,16 +453,26 @@ const Incentive = () => {
                                   <Mail className="h-3 w-3" />
                                   Histórico de emails
                                 </p>
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                   {company.emailHistory.map(email => (
-                                    <div key={email.id} className="text-sm border-l-2 border-primary/30 pl-2">
-                                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <div key={email.id} className="flex items-center gap-2 text-xs">
+                                      {email.templateUsed === "Personalizado" ? (
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Badge variant="outline" className="text-xs py-0 cursor-help">
+                                              {email.templateUsed}
+                                            </Badge>
+                                          </TooltipTrigger>
+                                          <TooltipContent side="top" className="max-w-[300px]">
+                                            <p className="text-xs">{email.subject}</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      ) : (
                                         <Badge variant="outline" className="text-xs py-0">
                                           {email.templateUsed}
                                         </Badge>
-                                        <span>{formatEmailDate(email.sentAt)}</span>
-                                      </div>
-                                      <p className="truncate">{email.subject}</p>
+                                      )}
+                                      <span className="text-muted-foreground">{formatEmailDate(email.sentAt)}</span>
                                     </div>
                                   ))}
                                 </div>
