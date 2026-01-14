@@ -56,7 +56,7 @@ export const SectorBenchmarking = ({
       sectorKey: supplier.sector,
       rank: rank,
       totalInSector: sectorAverages[supplier.sector].count,
-      cluster: supplier.cluster
+      cluster: supplier.clusterId || supplier.cluster
     };
   }).sort((a, b) => b.deviation - a.deviation);
 

@@ -16,6 +16,7 @@ interface BulkStep1SelectionProps {
   onManualSelectionChange: (ids: string[]) => void;
   customFilters: CustomFilters;
   onCustomFiltersChange: (filters: CustomFilters) => void;
+  clusters?: Array<{ id: string; name: string }>;
 }
 
 export const BulkStep1Selection = ({
@@ -30,6 +31,7 @@ export const BulkStep1Selection = ({
   onManualSelectionChange,
   customFilters,
   onCustomFiltersChange,
+  clusters,
 }: BulkStep1SelectionProps) => {
   return (
     <div className="space-y-6">
@@ -145,10 +147,12 @@ export const BulkStep1Selection = ({
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="todos">Todos</SelectItem>
-                    <SelectItem value="apoiadas">Apoiadas</SelectItem>
-                    <SelectItem value="monitorizadas">Monitorizadas</SelectItem>
-                    <SelectItem value="parceiras">Parceiras</SelectItem>
+                    <SelectItem value="todos">Todos os clusters</SelectItem>
+                    {clusters?.map(cluster => (
+                      <SelectItem key={cluster.id} value={cluster.id}>
+                        {cluster.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
