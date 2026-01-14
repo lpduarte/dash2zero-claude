@@ -35,8 +35,8 @@ export const BulkStep4Confirm = ({
   if (showSuccess) {
     return (
       <div className="space-y-6 text-center py-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900">
-          <CheckCircle className="h-8 w-8 text-green-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/20">
+          <CheckCircle className="h-8 w-8 text-success" />
         </div>
         <div>
           <h3 className="text-xl font-semibold mb-2">Planos gerados com sucesso!</h3>
@@ -64,28 +64,28 @@ export const BulkStep4Confirm = ({
 
       {/* Estatísticas */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg text-center">
-          <p className="text-sm text-green-600">Atingem meta</p>
-          <p className="text-2xl font-bold text-green-700">{withTarget.length}</p>
-          <p className="text-xs text-green-600">empresas</p>
+        <div className="p-4 bg-success/10 border border-success/30 rounded-lg text-center">
+          <p className="text-sm text-success">Atingem meta</p>
+          <p className="text-2xl font-bold text-success">{withTarget.length}</p>
+          <p className="text-xs text-success">empresas</p>
         </div>
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-center">
-          <p className="text-sm text-amber-600">Não atingem meta</p>
-          <p className="text-2xl font-bold text-amber-700">{withoutTarget.length}</p>
-          <p className="text-xs text-amber-600">empresas</p>
+        <div className="p-4 bg-warning/10 border border-warning/30 rounded-lg text-center">
+          <p className="text-sm text-warning">Não atingem meta</p>
+          <p className="text-2xl font-bold text-warning">{withoutTarget.length}</p>
+          <p className="text-xs text-warning">empresas</p>
         </div>
       </div>
 
       {/* Aviso se há empresas sem meta */}
       {withoutTarget.length > 0 && (
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg space-y-4">
+        <div className="p-4 bg-warning/10 border border-warning/30 rounded-lg space-y-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
             <div>
-              <p className="font-medium text-amber-800 dark:text-amber-200">
+              <p className="font-medium text-warning">
                 {withoutTarget.length} empresas não atingem meta com estas medidas.
               </p>
-              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+              <p className="text-sm text-warning mt-1">
                 Os planos podem ser revistos individualmente depois.
               </p>
             </div>
@@ -137,7 +137,7 @@ export const BulkStep4Confirm = ({
         </div>
         <div className="p-4 bg-muted/50 border rounded-lg text-center">
           <p className="text-sm text-muted-foreground">Redução esperada</p>
-          <p className="text-2xl font-bold text-green-600">-{totalReduction.toLocaleString('pt-PT')}t</p>
+          <p className="text-2xl font-bold text-success">-{totalReduction.toLocaleString('pt-PT')}t</p>
           <p className="text-xs text-muted-foreground">CO₂e</p>
         </div>
       </div>
@@ -164,11 +164,11 @@ export const BulkStep4Confirm = ({
                 </p>
               </div>
               {result.reachedTarget ? (
-                <span className="text-xs text-green-600 flex items-center gap-2">
+                <span className="text-xs text-success flex items-center gap-2">
                   <CheckCircle className="h-3 w-3" /> Meta ✓
                 </span>
               ) : (
-                <span className="text-xs text-amber-600 flex items-center gap-2">
+                <span className="text-xs text-warning flex items-center gap-2">
                   <AlertTriangle className="h-3 w-3" /> Meta ✗
                 </span>
               )}

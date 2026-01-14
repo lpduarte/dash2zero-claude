@@ -29,8 +29,8 @@ export function ClusterStats({ providers }: ClusterStatsProps) {
 
       <Card className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-500/10">
-            <Clock className="h-5 w-5 text-blue-500" />
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Clock className="h-5 w-5 text-primary" />
           </div>
           <div>
             <div className="text-2xl font-bold">{inProgress}</div>
@@ -41,8 +41,8 @@ export function ClusterStats({ providers }: ClusterStatsProps) {
 
       <Card className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-green-500/10">
-            <CheckCircle2 className="h-5 w-5 text-green-500" />
+          <div className="p-2 rounded-lg bg-success/10">
+            <CheckCircle2 className="h-5 w-5 text-success" />
           </div>
           <div>
             <div className="text-2xl font-bold">{completed}</div>

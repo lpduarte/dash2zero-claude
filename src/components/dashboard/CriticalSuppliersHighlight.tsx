@@ -354,7 +354,7 @@ export const CriticalSuppliersHighlight = ({
                                   <div className="flex items-center gap-2">
                                     <span className="font-medium">{item.supplier.emissionsPerRevenue.toFixed(2)}</span>
                                     <span className="text-xs text-muted-foreground">kg CO₂e/€</span>
-                                    {riskInfo.isAbove ? <TrendingUp className="h-3 w-3 text-red-500" /> : <TrendingDown className="h-3 w-3 text-green-500" />}
+                                    {riskInfo.isAbove ? <TrendingUp className="h-3 w-3 text-danger" /> : <TrendingDown className="h-3 w-3 text-success" />}
                                   </div>
                                   <div className="flex items-center gap-2 text-xs">
                                     <span className={riskInfo.color}>Risco {riskInfo.level}</span>

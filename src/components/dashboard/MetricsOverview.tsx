@@ -20,18 +20,14 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useUser } from "@/contexts/UserContext";
+import { getPercentageColors } from "@/lib/styles";
 
 interface MetricsOverviewProps {
   suppliers: Supplier[];
   totalCompanies?: number;
 }
 
-const getPercentageColor = (percentage: number) => {
-  if (percentage >= 75) return { text: "text-green-600", bg: "bg-green-500", bgLight: "bg-green-100", border: "border-green-200" };
-  if (percentage >= 50) return { text: "text-lime-600", bg: "bg-lime-500", bgLight: "bg-lime-100", border: "border-lime-200" };
-  if (percentage >= 25) return { text: "text-amber-600", bg: "bg-amber-500", bgLight: "bg-amber-100", border: "border-amber-200" };
-  return { text: "text-red-600", bg: "bg-red-500", bgLight: "bg-red-100", border: "border-red-200" };
-};
+// Usar getPercentageColors de lib/styles.ts (já importado)
 
 export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewProps) => {
   const navigate = useNavigate();
@@ -89,7 +85,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
   const companiesCalculated = suppliers.length;
   const total = totalCompanies || companiesCalculated;
   const percentageCalculated = total > 0 ? Math.round((companiesCalculated / total) * 100) : 0;
-  const percentageColors = getPercentageColor(percentageCalculated);
+  const percentageColors = getPercentageColors(percentageCalculated);
   const companiesMissing = total - companiesCalculated;
 
   const formularioCount = suppliers.filter(s => s.dataSource === "formulario").length;

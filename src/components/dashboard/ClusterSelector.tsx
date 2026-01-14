@@ -24,18 +24,18 @@ const getPotentialConfig = (potential: ImprovementPotential, isSelected: boolean
   const configs = {
     high: { 
       icon: TrendingDown, 
-      color: isSelected ? 'text-red-200' : 'text-danger',
-      bgColor: isSelected ? 'bg-red-200/30' : 'bg-danger/15'
+      color: isSelected ? 'text-danger/70' : 'text-danger',
+      bgColor: isSelected ? 'bg-danger/30' : 'bg-danger/15'
     },
     medium: { 
       icon: TrendingDown, 
-      color: isSelected ? 'text-yellow-200' : 'text-warning',
-      bgColor: isSelected ? 'bg-yellow-200/30' : 'bg-warning/15'
+      color: isSelected ? 'text-warning/70' : 'text-warning',
+      bgColor: isSelected ? 'bg-warning/30' : 'bg-warning/15'
     },
     low: { 
       icon: TrendingDown, 
-      color: isSelected ? 'text-green-200' : 'text-success',
-      bgColor: isSelected ? 'bg-green-200/30' : 'bg-success/15'
+      color: isSelected ? 'text-success/70' : 'text-success',
+      bgColor: isSelected ? 'bg-success/30' : 'bg-success/15'
     },
   };
   return configs[potential];

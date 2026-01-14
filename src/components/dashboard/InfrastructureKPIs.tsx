@@ -78,7 +78,7 @@ export const InfrastructureKPIs = () => {
       inlineSubtitle: '3 estações',
       icon: Wind,
       iconColor: 'text-teal-500',
-      valueColor: 'text-green-600'
+      valueColor: 'text-success'
     }
   ];
 
