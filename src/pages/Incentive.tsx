@@ -50,6 +50,54 @@ interface CompanyWithTracking extends SupplierWithoutFootprint {
   emailHistory: EmailRecord[];
 }
 
+const onboardingStatusConfig: Record<string, { label: string; color: string; tooltip: string }> = {
+  por_contactar: { 
+    label: 'Por contactar', 
+    color: 'bg-muted text-muted-foreground', 
+    tooltip: 'Ainda não recebeu nenhum email' 
+  },
+  sem_interacao: { 
+    label: 'Sem interação', 
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', 
+    tooltip: 'Recebeu email mas não clicou no link' 
+  },
+  interessada: { 
+    label: 'Interessada', 
+    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    tooltip: 'Clicou no link do email' 
+  },
+  interessada_simple: { 
+    label: 'Interessada / Simple', 
+    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    tooltip: 'Escolheu o caminho Simple na landing page' 
+  },
+  interessada_formulario: { 
+    label: 'Interessada / Formulário', 
+    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    tooltip: 'Escolheu o caminho Formulário na landing page' 
+  },
+  registada_simple: { 
+    label: 'Registada', 
+    color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 
+    tooltip: 'Criou conta no Simple' 
+  },
+  em_progresso_simple: { 
+    label: 'Em progresso / Simple', 
+    color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 
+    tooltip: 'Iniciou o cálculo da pegada no Simple' 
+  },
+  em_progresso_formulario: { 
+    label: 'Em progresso / Formulário', 
+    color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 
+    tooltip: 'Iniciou o preenchimento do formulário' 
+  },
+  completo: { 
+    label: 'Completo', 
+    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', 
+    tooltip: 'Pegada calculada com sucesso' 
+  },
+};
+
 const Incentive = () => {
   const { isMunicipio } = useUser();
   const { toast } = useToast();
@@ -446,7 +494,19 @@ const Incentive = () => {
                             
                             <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
                               <p className="font-medium truncate">{company.name}</p>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Badge className={`text-xs py-0 shrink-0 ${onboardingStatusConfig[company.onboardingStatus]?.color || 'bg-muted text-muted-foreground'}`}>
+                                        {onboardingStatusConfig[company.onboardingStatus]?.label || company.onboardingStatus}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {onboardingStatusConfig[company.onboardingStatus]?.tooltip || ''}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                                 <Badge variant="outline" className="text-xs py-0 shrink-0 truncate max-w-[200px]">{company.contact.email}</Badge>
                                 <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
                                 <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
