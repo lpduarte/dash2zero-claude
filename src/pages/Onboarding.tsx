@@ -49,7 +49,7 @@ const Onboarding = () => {
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             {/* Option 1: Simple (Recommended) */}
             <Card className="relative p-8 flex flex-col border-2 border-primary/20 bg-card hover:border-primary/40 hover:shadow-lg transition-all duration-300 group">
-              <Badge className="absolute -top-3 left-6 bg-primary text-primary-foreground">
+              <Badge className="absolute -top-3 right-6 bg-primary text-primary-foreground">
                 Recomendado
               </Badge>
               
