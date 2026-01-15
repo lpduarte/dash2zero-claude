@@ -52,6 +52,7 @@ interface CompanyWithTracking extends SupplierWithoutFootprint {
   emailsSent: number;
   lastContactDate?: string;
   emailHistory: EmailRecord[];
+  completedVia?: 'simple' | 'formulario';
 }
 
 const onboardingStatusConfig: Record<string, { label: string; color: string; tooltip: string }> = {
@@ -180,11 +181,16 @@ const Incentive = () => {
     
     return suppliers.map(s => {
       const tracking = getCompanyEmailTracking(s.id);
+      // Derivar caminho de conclusão baseado no ID (simulação - em produção viria do backend)
+      const completedVia: 'simple' | 'formulario' = s.id.includes('001') || s.id.includes('003') || s.id.includes('005') 
+        ? 'simple' 
+        : 'formulario';
       return {
         ...s,
         emailsSent: tracking.emailsSent,
         lastContactDate: tracking.emailHistory[0]?.sentAt,
         emailHistory: tracking.emailHistory,
+        completedVia,
       };
     });
   }, [isMunicipio]);
@@ -865,6 +871,9 @@ const Incentive = () => {
                         </div>
                         
                         <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {company.completedVia === 'simple' ? 'Simple' : 'Formulário'}
+                          </Badge>
                           <Badge variant="outline" className="text-success border-success/30 bg-success/10">
                             <Calculator className="h-3 w-3 mr-1" />
                             Pegada calculada
