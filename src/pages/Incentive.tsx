@@ -114,26 +114,53 @@ const templateSuggestions: Record<string, string> = {
   completo: 't1',                // Ignorado mas mapeado
 };
 
-// Funnel stage component for visual representation
-const FunnelStage = ({ 
-  label, 
-  value, 
-  percentage, 
-  color,
-}: { 
-  label: string; 
-  value: number; 
-  percentage: number; 
-  color: string;
-}) => (
-  <div className="flex flex-col items-center min-w-0 flex-1">
-    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold", color)}>
-      {value}
+// Funnel bar component for visual representation
+const FunnelBar = ({ stages }: { stages: Array<{ label: string; value: number; percentage: number; color: string }> }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
+  return (
+    <div className="space-y-2">
+      {/* Barra horizontal */}
+      <div className="flex h-3 rounded-full overflow-hidden">
+        {stages.map((stage, index) => (
+          <div
+            key={stage.label}
+            className={cn(
+              "transition-all duration-200 cursor-pointer relative",
+              stage.color,
+              hoveredIndex === index ? "h-5 -my-1 z-10" : "h-3",
+              index > 0 && "border-l border-white/50"
+            )}
+            style={{ width: `${stage.percentage}%`, minWidth: stage.percentage > 0 ? '8px' : '0' }}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            {hoveredIndex === index && (
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-md whitespace-nowrap z-20 border">
+                {stage.label}: {stage.value} ({stage.percentage}%)
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      
+      {/* Labels em baixo */}
+      <div className="flex">
+        {stages.map((stage) => (
+          <div
+            key={stage.label}
+            className="text-center"
+            style={{ width: `${stage.percentage}%`, minWidth: stage.percentage > 0 ? '8px' : '0' }}
+          >
+            {stage.percentage >= 15 && (
+              <p className="text-xs text-muted-foreground truncate px-0.5">{stage.label}</p>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
-    <p className="text-xs text-muted-foreground mt-1 text-center truncate max-w-[70px]">{label}</p>
-    <p className="text-xs font-medium">{percentage}%</p>
-  </div>
-);
+  );
+};
 
 // Next action helper based on onboarding status
 const getNextAction = (status: string): string => {
@@ -531,42 +558,15 @@ const Incentive = () => {
                   {/* Funnel visual */}
                   <div className="col-span-3 border rounded-lg p-4 bg-card shadow-sm">
                     <p className="text-xs font-medium text-muted-foreground mb-3">Progressão do Funil</p>
-                    <div className="flex items-center justify-between gap-2">
-                      <FunnelStage 
-                        label="Por contactar" 
-                        value={funnelMetrics.porContactar} 
-                        percentage={funnelMetrics.porContactarPerc} 
-                        color="bg-muted-foreground" 
-                      />
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <FunnelStage 
-                        label="Sem interação" 
-                        value={funnelMetrics.semInteracao} 
-                        percentage={funnelMetrics.semInteracaoPerc} 
-                        color="bg-primary" 
-                      />
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <FunnelStage 
-                        label="Interessada" 
-                        value={funnelMetrics.interessada} 
-                        percentage={funnelMetrics.interessadaPerc} 
-                        color="bg-warning" 
-                      />
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <FunnelStage 
-                        label="Em progresso" 
-                        value={funnelMetrics.emProgresso} 
-                        percentage={funnelMetrics.emProgressoPerc} 
-                        color="bg-orange-500" 
-                      />
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <FunnelStage 
-                        label="Completo" 
-                        value={funnelMetrics.completo} 
-                        percentage={funnelMetrics.completoPerc} 
-                        color="bg-success" 
-                      />
-                    </div>
+                    <FunnelBar 
+                      stages={[
+                        { label: 'Por contactar', value: funnelMetrics.porContactar, percentage: funnelMetrics.porContactarPerc, color: 'bg-slate-400' },
+                        { label: 'Sem interação', value: funnelMetrics.semInteracao, percentage: funnelMetrics.semInteracaoPerc, color: 'bg-blue-500' },
+                        { label: 'Interessada', value: funnelMetrics.interessada, percentage: funnelMetrics.interessadaPerc, color: 'bg-yellow-500' },
+                        { label: 'Em progresso', value: funnelMetrics.emProgresso, percentage: funnelMetrics.emProgressoPerc, color: 'bg-orange-500' },
+                        { label: 'Completo', value: funnelMetrics.completo, percentage: funnelMetrics.completoPerc, color: 'bg-green-500' },
+                      ]}
+                    />
                   </div>
                 </div>
               </CardContent>
