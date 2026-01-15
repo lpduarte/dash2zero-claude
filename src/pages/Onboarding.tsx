@@ -45,10 +45,7 @@ const Onboarding = () => {
   };
 
   const handleFormClick = () => {
-    toast({
-      title: "Formulário de Totais",
-      description: "A abrir formulário de submissão..."
-    });
+    navigate("/formulario-totais");
   };
 
   const scrollToVantagens = () => {
