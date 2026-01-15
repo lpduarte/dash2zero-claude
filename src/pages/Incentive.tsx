@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Search, 
   Send, 
@@ -31,7 +32,8 @@ import {
   Star,
   Users,
   UserX,
-  Lightbulb
+  Lightbulb,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
@@ -198,6 +200,7 @@ const Incentive = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
   const [sortBy, setSortBy] = useState<'name' | 'status' | 'emails' | 'lastContact'>('status');
+  const [showSmartSendDialog, setShowSmartSendDialog] = useState(false);
   
   // Status order for sorting (most advanced first)
   const statusOrder: Record<string, number> = {
@@ -452,6 +455,51 @@ const Incentive = () => {
     const template = emailTemplates.find(t => t.id === suggestedTemplate);
     return template?.name || null;
   }, [suggestedTemplate]);
+  
+  // Smart send summary - group companies by suggested template
+  const getSmartSendSummary = useMemo(() => {
+    if (selectedCompanies.length === 0) return [];
+    
+    const groups: Record<string, { template: string; templateName: string; companies: string[] }> = {};
+    
+    selectedCompanies.forEach(companyId => {
+      const company = companiesWithoutFootprint.find(c => c.id === companyId);
+      if (!company) return;
+      
+      const suggestedId = templateSuggestions[company.onboardingStatus] || 't1';
+      const template = emailTemplates.find(t => t.id === suggestedId);
+      
+      if (!groups[suggestedId]) {
+        groups[suggestedId] = {
+          template: suggestedId,
+          templateName: template?.name || 'Template',
+          companies: []
+        };
+      }
+      groups[suggestedId].companies.push(company.name);
+    });
+    
+    return Object.values(groups);
+  }, [selectedCompanies, companiesWithoutFootprint]);
+  
+  const handleSmartSendPreview = () => {
+    setShowSmartSendDialog(true);
+  };
+  
+  const handleSmartSend = async () => {
+    setShowSmartSendDialog(false);
+    setIsLoading(true);
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast({
+      title: "Emails enviados",
+      description: `${selectedCompanies.length} email(s) enviados com templates optimizados.`,
+    });
+    
+    setSelectedCompanies([]);
+    setIsLoading(false);
+  };
   
   const previewSubject = useMemo(() => {
     if (!firstSelectedCompany) return subject;
@@ -834,6 +882,28 @@ const Incentive = () => {
           
           {/* Right Column: Email Compose - altura fixa com scroll próprio */}
           <div className="flex flex-col border rounded-lg overflow-hidden bg-card h-[700px]">
+            {/* Super Wizard - Envio Inteligente */}
+            {selectedCompanies.length > 0 && (
+              <div className="p-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Zap className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Envio Inteligente</p>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedCompanies.length} empresa{selectedCompanies.length !== 1 ? 's' : ''} · Templates optimizados por status
+                      </p>
+                    </div>
+                  </div>
+                  <Button onClick={handleSmartSendPreview} size="sm" className="gap-1.5">
+                    <Zap className="h-4 w-4" />
+                    Preparar Envio
+                  </Button>
+                </div>
+              </div>
+            )}
             <Tabs defaultValue="compose" className="flex flex-col flex-1 min-h-0">
               <TabsList className="m-4 mb-0 grid grid-cols-2 shrink-0">
                 <TabsTrigger value="compose">Compor</TabsTrigger>
@@ -950,6 +1020,50 @@ const Incentive = () => {
             </div>
           </div>
         </div>
+        
+        {/* Smart Send Dialog */}
+        <Dialog open={showSmartSendDialog} onOpenChange={setShowSmartSendDialog}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                Confirmar Envio Inteligente
+              </DialogTitle>
+              <DialogDescription>
+                Os emails serão enviados com o template mais adequado ao status de cada empresa.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-3 py-4">
+              {getSmartSendSummary.map(group => (
+                <div key={group.template} className="p-3 border rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-medium text-sm">{group.templateName}</p>
+                    <Badge variant="secondary">{group.companies.length}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {group.companies.slice(0, 3).join(', ')}
+                    {group.companies.length > 3 && ` +${group.companies.length - 3} mais`}
+                  </p>
+                </div>
+              ))}
+            </div>
+            
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setShowSmartSendDialog(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSmartSend} disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                Enviar {selectedCompanies.length} emails
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
