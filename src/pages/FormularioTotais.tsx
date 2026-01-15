@@ -286,9 +286,14 @@ const GroupedBreakdown = ({
   });
 
   const handleChange = (key: string, value: number) => {
-    const newBreakdown = { ...breakdown, [key]: value };
-    const autoCompleted = autoCompleteBreakdown(newBreakdown, categories);
-    onChange(autoCompleted);
+    onChange({ ...breakdown, [key]: value });
+  };
+
+  const handleBlur = () => {
+    const autoCompleted = autoCompleteBreakdown(breakdown, categories);
+    if (autoCompleted !== breakdown) {
+      onChange(autoCompleted);
+    }
   };
 
   return (
@@ -303,9 +308,10 @@ const GroupedBreakdown = ({
                   type="number"
                   min="0"
                   max="100"
-                  className="w-20 text-right"
+                  className="w-20 text-right placeholder:text-muted-foreground/50"
                   value={breakdown[cat.key] || ""}
                   onChange={(e) => handleChange(cat.key, Number(e.target.value) || 0)}
+                  onBlur={handleBlur}
                 />
                 <span className="text-sm text-muted-foreground">%</span>
                 <span className="text-sm flex-1">{cat.label}</span>
@@ -329,9 +335,14 @@ const SimpleBreakdown = ({
   onChange: (breakdown: ScopeBreakdown) => void;
 }) => {
   const handleChange = (key: string, value: number) => {
-    const newBreakdown = { ...breakdown, [key]: value };
-    const autoCompleted = autoCompleteBreakdown(newBreakdown, categories);
-    onChange(autoCompleted);
+    onChange({ ...breakdown, [key]: value });
+  };
+
+  const handleBlur = () => {
+    const autoCompleted = autoCompleteBreakdown(breakdown, categories);
+    if (autoCompleted !== breakdown) {
+      onChange(autoCompleted);
+    }
   };
 
   return (
@@ -342,9 +353,10 @@ const SimpleBreakdown = ({
             type="number"
             min="0"
             max="100"
-            className="w-20 text-right"
+            className="w-20 text-right placeholder:text-muted-foreground/50"
             value={breakdown[cat.key] || ""}
             onChange={(e) => handleChange(cat.key, Number(e.target.value) || 0)}
+            onBlur={handleBlur}
           />
           <span className="text-sm text-muted-foreground">%</span>
           <span className="text-sm flex-1">{cat.label}</span>
