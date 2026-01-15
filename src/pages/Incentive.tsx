@@ -40,7 +40,6 @@ import { useUser } from "@/contexts/UserContext";
 import { getClustersByOwnerType } from "@/data/clusters";
 import { 
   getSuppliersWithoutFootprintByOwnerType,
-  getSuppliersWithFootprintByOwnerType,
 } from "@/data/suppliers";
 import { emailTemplates, getCompanyEmailTracking, EmailRecord } from "@/data/emailTracking";
 import { SupplierWithoutFootprint } from "@/types/supplierNew";
@@ -174,12 +173,6 @@ const Incentive = () => {
     return getClustersByOwnerType(ownerType);
   }, [isMunicipio]);
   
-  // Empresas COM pegada (para o arquivo)
-  const companiesWithFootprint = useMemo(() => {
-    const ownerType = isMunicipio ? 'municipio' : 'empresa';
-    return getSuppliersWithFootprintByOwnerType(ownerType);
-  }, [isMunicipio]);
-  
   // Empresas SEM pegada (para contactar)
   const companiesWithoutFootprint = useMemo((): CompanyWithTracking[] => {
     const ownerType = isMunicipio ? 'municipio' : 'empresa';
@@ -195,6 +188,11 @@ const Incentive = () => {
       };
     });
   }, [isMunicipio]);
+
+  // Empresas que completaram o onboarding (para o arquivo)
+  const companiesCompleted = useMemo(() => {
+    return companiesWithoutFootprint.filter(c => c.onboardingStatus === 'completo');
+  }, [companiesWithoutFootprint]);
   
   // Filtered companies (sem pegada)
   const filteredCompanies = useMemo(() => {
@@ -252,9 +250,9 @@ const Incentive = () => {
     return filtered;
   }, [companiesWithoutFootprint, searchQuery, selectedCluster, advancedFilters, sortBy, statusOrder]);
   
-  // Filtered archive (com pegada)
+  // Filtered archive (empresas que completaram onboarding)
   const filteredArchive = useMemo(() => {
-    let filtered = [...companiesWithFootprint];
+    let filtered = [...companiesCompleted];
     
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -268,7 +266,7 @@ const Incentive = () => {
     }
     
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
-  }, [companiesWithFootprint, searchQuery, selectedCluster]);
+  }, [companiesCompleted, searchQuery, selectedCluster]);
   
   // Funnel metrics based on onboardingStatus
   const funnelMetrics = useMemo(() => {
@@ -404,8 +402,8 @@ const Incentive = () => {
     if (selectedCompanies.length === 0) return null;
     // Procurar em ambas as listas
     return companiesWithoutFootprint.find(c => c.id === selectedCompanies[0]) ||
-           companiesWithFootprint.find(c => c.id === selectedCompanies[0]) as any;
-  }, [selectedCompanies, companiesWithoutFootprint, companiesWithFootprint]);
+           companiesCompleted.find(c => c.id === selectedCompanies[0]) as any;
+  }, [selectedCompanies, companiesWithoutFootprint, companiesCompleted]);
   
   // Suggested template based on first selected company's status
   const suggestedTemplate = useMemo(() => {
@@ -501,7 +499,7 @@ const Incentive = () => {
             <CardHeader className={cn("transition-all duration-[400ms]", isMetricsExpanded ? "pb-3" : "pb-6")}>
               <SectionHeader
                 icon={TrendingUp}
-                title="Funil de Conversão"
+                title="Progresso do Onboarding"
                 collapsible
                 expanded={isMetricsExpanded}
                 onToggle={() => setIsMetricsExpanded(!isMetricsExpanded)}
@@ -521,7 +519,7 @@ const Incentive = () => {
                     valueColor="text-success"
                   />
                   <KPICard
-                    title="Por Contactar"
+                    title="Por Calcular"
                     value={funnelMetrics.porContactar}
                     unit="sem nenhum email"
                     icon={UserX}
@@ -641,11 +639,11 @@ const Incentive = () => {
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="pending" className="flex items-center gap-2">
                     <Target className="h-4 w-4" />
-                    Por Contactar ({companiesWithoutFootprint.length})
+                    Por calcular pegada ({companiesWithoutFootprint.length})
                   </TabsTrigger>
                   <TabsTrigger value="archive" className="flex items-center gap-2">
                     <Archive className="h-4 w-4" />
-                    Arquivo ({companiesWithFootprint.length})
+                    Arquivo ({companiesCompleted.length})
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -666,7 +664,7 @@ const Incentive = () => {
                 <IncentiveFiltersDialog
                   filters={advancedFilters}
                   onFiltersChange={setAdvancedFilters}
-                  companies={activeTab === "pending" ? companiesWithoutFootprint : companiesWithFootprint as any}
+                  companies={activeTab === "pending" ? companiesWithoutFootprint : companiesCompleted as any}
                 />
                 <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
                   <SelectTrigger className="w-[160px]">
@@ -693,13 +691,13 @@ const Incentive = () => {
                 >
                   Todos
                   <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
-                    {activeTab === "pending" ? companiesWithoutFootprint.length : companiesWithFootprint.length}
+                    {activeTab === "pending" ? companiesWithoutFootprint.length : companiesCompleted.length}
                   </Badge>
                 </Button>
                 {clusters.map(cluster => {
                   const count = activeTab === "pending"
                     ? companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length
-                    : companiesWithFootprint.filter(c => c.clusterId === cluster.id).length;
+                    : companiesCompleted.filter(c => c.clusterId === cluster.id).length;
                   return (
                     <Button
                       key={cluster.id}
@@ -867,7 +865,7 @@ const Incentive = () => {
                             Pegada calculada
                           </Badge>
                           <Badge variant="secondary" className="text-xs">
-                            {company.dataSource === 'get2zero' ? 'Simple' : 'Formulário'}
+                            Completo
                           </Badge>
                         </div>
                       </div>
