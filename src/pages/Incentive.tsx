@@ -573,13 +573,13 @@ const Incentive = () => {
                     <p className="text-xs font-medium text-muted-foreground mb-4">Progressão do Funil</p>
                     
                     {/* Barra CSS */}
-                    <div className="h-8 w-full flex rounded-md overflow-hidden">
+                    <div className="h-4 w-full flex gap-[3px]">
                       {[
-                        { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-slate-300 dark:bg-slate-600', label: 'Por contactar' },
-                        { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-blue-500', label: 'Sem interação' },
-                        { key: 'interessada', value: funnelMetrics.interessada, color: 'bg-yellow-400', label: 'Interessada' },
-                        { key: 'emProgresso', value: funnelMetrics.emProgresso, color: 'bg-orange-500', label: 'Em progresso' },
-                        { key: 'completo', value: funnelMetrics.completo, color: 'bg-green-500', label: 'Completo' },
+                        { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-slate-400 dark:bg-slate-500', label: 'Por contactar' },
+                        { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-primary/70', label: 'Sem interação' },
+                        { key: 'interessada', value: funnelMetrics.interessada, color: 'bg-amber-500', label: 'Interessada' },
+                        { key: 'emProgresso', value: funnelMetrics.emProgresso, color: 'bg-orange-600', label: 'Em progresso' },
+                        { key: 'completo', value: funnelMetrics.completo, color: 'bg-teal-600', label: 'Completo' },
                       ].map((stage, index, arr) => {
                         const total = arr.reduce((sum, s) => sum + s.value, 0);
                         const percentage = total > 0 ? (stage.value / total) * 100 : 0;
@@ -591,8 +591,7 @@ const Incentive = () => {
                                 <div 
                                   className={cn(
                                     stage.color,
-                                    "h-full transition-opacity hover:opacity-80 cursor-default",
-                                    index > 0 && "border-l border-white/50"
+                                    "h-full rounded-full transition-opacity hover:opacity-80 cursor-default"
                                   )}
                                   style={{ width: `${percentage}%` }}
                                 />
@@ -609,11 +608,11 @@ const Incentive = () => {
                     {/* Legenda */}
                     <div className="flex flex-wrap justify-center gap-4 mt-3">
                       {[
-                        { label: 'Por contactar', value: funnelMetrics.porContactar, color: 'bg-slate-300 dark:bg-slate-600' },
-                        { label: 'Sem interação', value: funnelMetrics.semInteracao, color: 'bg-blue-500' },
-                        { label: 'Interessada', value: funnelMetrics.interessada, color: 'bg-yellow-400' },
-                        { label: 'Em progresso', value: funnelMetrics.emProgresso, color: 'bg-orange-500' },
-                        { label: 'Completo', value: funnelMetrics.completo, color: 'bg-green-500' },
+                        { label: 'Por contactar', value: funnelMetrics.porContactar, color: 'bg-slate-400 dark:bg-slate-500' },
+                        { label: 'Sem interação', value: funnelMetrics.semInteracao, color: 'bg-primary/70' },
+                        { label: 'Interessada', value: funnelMetrics.interessada, color: 'bg-amber-500' },
+                        { label: 'Em progresso', value: funnelMetrics.emProgresso, color: 'bg-orange-600' },
+                        { label: 'Completo', value: funnelMetrics.completo, color: 'bg-teal-600' },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center gap-1.5 text-xs">
                           <div className={cn("h-2.5 w-2.5 rounded-full", item.color)} />
