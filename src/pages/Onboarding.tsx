@@ -194,7 +194,7 @@ const Onboarding = () => {
       </section>
 
       {/* Section 2: Benefits */}
-      <section id="vantagens" className="py-24 px-6 bg-muted/30 relative">
+      <section id="vantagens" className="py-24 px-6 bg-muted/30 relative shadow-[0_-8px_20px_-8px_rgba(0,0,0,0.08)]">
         <div className="w-full max-w-[1000px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-4">
