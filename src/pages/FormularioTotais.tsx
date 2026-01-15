@@ -18,7 +18,11 @@ import {
   User,
   Flame,
   Sparkles,
-  X
+  X,
+  BarChart3,
+  TrendingDown,
+  Lightbulb,
+  ArrowRight
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -505,6 +509,7 @@ const FormularioTotais = () => {
   // Step 3: Confirmation
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   
   // NIF lookup handler
   const handleNifLookup = useCallback(async () => {
@@ -578,13 +583,10 @@ const FormularioTotais = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSubmitting(false);
     
-    toast({
-      title: "Dados submetidos com sucesso!",
-      description: "A sua pegada de carbono foi registada na plataforma.",
-    });
-    
-    navigate("/");
+    // Show success screen instead of navigating
+    setSubmitted(true);
   };
   
   // Validation
@@ -608,6 +610,135 @@ const FormularioTotais = () => {
   }, [scope1Total, scope2Total, revenue]);
 
   // ============ Render ============
+  
+  // Success screen after submission
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+        <div className="max-w-3xl mx-auto px-6 py-12">
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Leaf className="h-6 w-6 text-primary" />
+              </div>
+              <span className="text-xl font-bold">Dash2Zero</span>
+            </div>
+          </div>
+
+          {/* Success confirmation */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">
+              <CheckCircle className="h-10 w-10 text-success" />
+            </div>
+            <h1 className="text-3xl font-bold text-foreground mb-3">
+              Dados submetidos com sucesso
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              A pegada de carbono de {companyData?.name || "sua empresa"} foi registada
+            </p>
+          </div>
+
+          {/* Quick summary */}
+          <Card className="p-6 mb-8">
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div>
+                <p className="text-3xl font-bold text-primary">{scope1Total || "0"}</p>
+                <p className="text-sm text-muted-foreground">t CO₂e Âmbito 1</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-primary">{scope2Total || "0"}</p>
+                <p className="text-sm text-muted-foreground">t CO₂e Âmbito 2</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-primary">{scope3Total || "—"}</p>
+                <p className="text-sm text-muted-foreground">t CO₂e Âmbito 3</p>
+              </div>
+            </div>
+            {intensity > 0 && (
+              <>
+                <Separator className="my-6" />
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">Intensidade carbónica</p>
+                  <p className="text-2xl font-bold">{formatNumber(intensity, 4)} <span className="text-base font-normal text-muted-foreground">kg CO₂e/€</span></p>
+                </div>
+              </>
+            )}
+          </Card>
+
+          {/* Invitation to Simple */}
+          <Card className="p-8 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-4">
+                <Sparkles className="h-6 w-6 text-primary" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">
+                Quer ir mais longe?
+              </h2>
+              <p className="text-muted-foreground">
+                Com o Dash2Zero Simple, pode obter análises detalhadas e descobrir oportunidades de melhoria
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="p-4 bg-background rounded-xl border text-center">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                </div>
+                <p className="font-medium mb-1">Comparação sectorial</p>
+                <p className="text-sm text-muted-foreground">
+                  Veja como se posiciona face à média do seu sector
+                </p>
+              </div>
+              
+              <div className="p-4 bg-background rounded-xl border text-center">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <TrendingDown className="h-5 w-5 text-primary" />
+                </div>
+                <p className="font-medium mb-1">Potencial de redução</p>
+                <p className="text-sm text-muted-foreground">
+                  Identifique onde pode reduzir até 30% das emissões
+                </p>
+              </div>
+              
+              <div className="p-4 bg-background rounded-xl border text-center">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                </div>
+                <p className="font-medium mb-1">Medidas concretas</p>
+                <p className="text-sm text-muted-foreground">
+                  Receba sugestões personalizadas de acções
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                size="lg" 
+                className="gap-2"
+                onClick={() => navigate("/onboarding")}
+              >
+                Experimentar o Simple
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => navigate("/")}
+              >
+                Voltar ao início
+              </Button>
+            </div>
+          </Card>
+
+          {/* Final note */}
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            Os seus dados foram guardados. Pode aceder ao Simple a qualquer momento.
+          </p>
+        </div>
+      </div>
+    );
+  }
   
   // Pre-form selection screen (no stepper)
   if (step === 1 && importMode === null) {
@@ -1012,54 +1143,6 @@ const FormularioTotais = () => {
                   </div>
                 </>
               )}
-            </Card>
-            
-            {/* Simple Preview Card */}
-            <Card className="p-6 border-primary/20 bg-primary/5">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">
-                    Descubra mais com o Dash2Zero Simple
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Com os dados que submeteu, poderia obter análises mais detalhadas:
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="p-3 bg-background rounded-lg border">
-                      <p className="text-xs text-muted-foreground">Comparação sectorial</p>
-                      <p className="font-semibold text-primary">
-                        {intensity > 0.5 ? "Acima" : "Abaixo"} da média
-                      </p>
-                    </div>
-                    <div className="p-3 bg-background rounded-lg border">
-                      <p className="text-xs text-muted-foreground">Potencial de redução</p>
-                      <p className="font-semibold text-primary">
-                        Até 30% identificado
-                      </p>
-                    </div>
-                    <div className="p-3 bg-background rounded-lg border">
-                      <p className="text-xs text-muted-foreground">Medidas sugeridas</p>
-                      <p className="font-semibold text-primary">
-                        12 oportunidades
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => navigate("/onboarding")}
-                  >
-                    Experimentar o Simple
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
             </Card>
             
             <div className="flex items-start gap-3 p-4 border rounded-lg">
