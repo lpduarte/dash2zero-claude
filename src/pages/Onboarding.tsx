@@ -5,72 +5,34 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-// Decorative Dashboard Illustration Component
-const DashboardIllustration = () => (
-  <div className="relative w-full max-w-[400px] mx-auto">
-    {/* Main dashboard card */}
-    <div className="bg-card border rounded-2xl shadow-lg p-6 space-y-4">
-      {/* KPI Card */}
-      <div className="bg-success/10 border border-success/20 rounded-xl p-4">
-        <p className="text-xs text-muted-foreground mb-1">Emissões Totais</p>
-        <p className="text-3xl font-bold text-success">124</p>
-        <p className="text-sm text-muted-foreground">t CO₂e / ano</p>
-      </div>
-      
-      {/* Mini bar chart */}
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">Emissões por âmbito</p>
-        <div className="flex items-end gap-2 h-16">
-          <div className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full bg-violet-500/80 rounded-t-md" style={{ height: '40%' }} />
-            <span className="text-[10px] text-muted-foreground">S1</span>
-          </div>
-          <div className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full bg-blue-500/80 rounded-t-md" style={{ height: '25%' }} />
-            <span className="text-[10px] text-muted-foreground">S2</span>
-          </div>
-          <div className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full bg-orange-500/80 rounded-t-md" style={{ height: '100%' }} />
-            <span className="text-[10px] text-muted-foreground">S3</span>
-          </div>
-        </div>
-      </div>
-      
-      {/* Mini donut placeholder */}
-      <div className="flex items-center gap-4">
-        <div className="relative h-12 w-12">
-          <svg viewBox="0 0 36 36" className="h-12 w-12 -rotate-90">
-            <circle
-              cx="18"
-              cy="18"
-              r="14"
-              fill="none"
-              stroke="hsl(var(--muted))"
-              strokeWidth="4"
-            />
-            <circle
-              cx="18"
-              cy="18"
-              r="14"
-              fill="none"
-              stroke="hsl(var(--success))"
-              strokeWidth="4"
-              strokeDasharray="60 100"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Progresso</p>
-          <p className="text-sm font-semibold">60% concluído</p>
-        </div>
-      </div>
-    </div>
+// Abstract Analytics Illustration Component
+const AbstractIllustration = () => (
+  <div className="relative w-full max-w-md aspect-[4/3] bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8 flex items-end justify-center gap-4">
+    {/* Abstract bars */}
+    <div className="w-12 h-[40%] bg-primary/20 rounded-lg" />
+    <div className="w-12 h-[65%] bg-primary/40 rounded-lg" />
+    <div className="w-12 h-[85%] bg-primary rounded-lg" />
+    <div className="w-12 h-[55%] bg-primary/30 rounded-lg" />
     
-    {/* Floating badge */}
-    <div className="absolute -top-3 -right-3 bg-success text-success-foreground text-xs font-medium px-3 py-1 rounded-full shadow-md">
-      ✓ Calculado
-    </div>
+    {/* Decorative circle (progress indicator style) */}
+    <div className="absolute top-6 right-6 w-16 h-16 rounded-full border-4 border-primary/30 border-t-primary" />
+    
+    {/* Trend line */}
+    <svg className="absolute top-1/3 left-8 w-24 h-12 opacity-40" viewBox="0 0 100 50">
+      <path 
+        d="M 0 40 Q 25 35, 50 20 T 100 10" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="3"
+        strokeLinecap="round"
+        className="text-primary"
+      />
+    </svg>
+    
+    {/* Small decorative dots */}
+    <div className="absolute top-8 left-12 w-2 h-2 rounded-full bg-primary/40" />
+    <div className="absolute top-14 left-16 w-1.5 h-1.5 rounded-full bg-primary/30" />
+    <div className="absolute bottom-12 right-20 w-2.5 h-2.5 rounded-full bg-primary/50" />
   </div>
 );
 
@@ -164,17 +126,17 @@ const Onboarding = () => {
                 </ul>
               </div>
               
-              <div className="space-y-3">
-                <Button size="lg" className="w-full" onClick={handleSimpleClick}>
+              <div className="flex gap-3 mt-6">
+                <Button size="lg" className="flex-1" onClick={handleSimpleClick}>
                   Começar
                 </Button>
                 <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full text-muted-foreground hover:text-primary"
+                  variant="outline" 
+                  size="lg"
+                  className="flex-1 border-primary text-primary hover:bg-primary/10"
                   onClick={scrollToVantagens}
                 >
-                  Saber mais <ChevronDown className="h-4 w-4 ml-1" />
+                  Saber mais
                 </Button>
               </div>
             </Card>
@@ -247,9 +209,9 @@ const Onboarding = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-            {/* Left: Dashboard illustration */}
-            <div className="order-2 md:order-1">
-              <DashboardIllustration />
+            {/* Left: Abstract illustration */}
+            <div className="order-2 md:order-1 flex justify-center">
+              <AbstractIllustration />
             </div>
 
             {/* Right: Benefits list */}
