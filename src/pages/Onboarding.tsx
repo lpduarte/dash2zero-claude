@@ -104,9 +104,7 @@ const Onboarding = () => {
                   Já tenho dados calculados
                 </h2>
                 
-                <p className="text-muted-foreground mb-6">
-                  Já calculei a minha pegada de carbono noutra plataforma ou consultoria.
-                </p>
+                <p className="text-muted-foreground mb-6">Já calculei a minha pegada de carbono noutra plataforma.</p>
                 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 text-sm">
