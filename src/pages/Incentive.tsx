@@ -41,7 +41,6 @@ import {
   getSuppliersWithFootprintByOwnerType,
 } from "@/data/suppliers";
 import { emailTemplates, getCompanyEmailTracking, EmailRecord } from "@/data/emailTracking";
-import { getSectorName } from "@/data/sectors";
 import { SupplierWithoutFootprint } from "@/types/supplierNew";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -57,62 +56,62 @@ interface CompanyWithTracking extends SupplierWithoutFootprint {
 const onboardingStatusConfig: Record<string, { label: string; color: string; tooltip: string }> = {
   por_contactar: { 
     label: 'Por contactar', 
-    color: 'bg-muted text-muted-foreground', 
+    color: 'bg-muted text-muted-foreground hover:bg-muted/80', 
     tooltip: 'Ainda não recebeu nenhum email' 
   },
   sem_interacao: { 
     label: 'Sem interação', 
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', 
+    color: 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50', 
     tooltip: 'Recebeu email mas não clicou no link' 
   },
   interessada: { 
     label: 'Interessada', 
-    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50', 
     tooltip: 'Clicou no link do email' 
   },
   interessada_simple: { 
     label: 'Interessada / Simple', 
-    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50', 
     tooltip: 'Escolheu o caminho Simple na landing page' 
   },
   interessada_formulario: { 
     label: 'Interessada / Formulário', 
-    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50', 
     tooltip: 'Escolheu o caminho Formulário na landing page' 
   },
   registada_simple: { 
     label: 'Registada', 
-    color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 
+    color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50', 
     tooltip: 'Criou conta no Simple' 
   },
   em_progresso_simple: { 
     label: 'Em progresso / Simple', 
-    color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 
+    color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50', 
     tooltip: 'Iniciou o cálculo da pegada no Simple' 
   },
   em_progresso_formulario: { 
     label: 'Em progresso / Formulário', 
-    color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 
+    color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50', 
     tooltip: 'Iniciou o preenchimento do formulário' 
   },
   completo: { 
     label: 'Completo', 
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', 
+    color: 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/50', 
     tooltip: 'Pegada calculada com sucesso' 
   },
 };
 
-// Template suggestions based on onboarding status
+// Template suggestions based on onboarding status (map to template IDs)
 const templateSuggestions: Record<string, string> = {
-  por_contactar: 'convite',
-  sem_interacao: 'lembrete', 
-  interessada: 'ajuda',
-  interessada_simple: 'ajuda',
-  interessada_formulario: 'ajuda',
-  registada_simple: 'incentivo',
-  em_progresso_simple: 'suporte',
-  em_progresso_formulario: 'suporte',
-  completo: 'parabens',
+  por_contactar: 't1',           // Convite Inicial
+  sem_interacao: 't2',           // Lembrete
+  interessada: 't3',             // Benefícios (como ajuda)
+  interessada_simple: 't3',
+  interessada_formulario: 't3',
+  registada_simple: 't3',        // Benefícios
+  em_progresso_simple: 't2',     // Lembrete (suporte)
+  em_progresso_formulario: 't2',
+  completo: 't1',                // Ignorado mas mapeado
 };
 
 // Funnel stage component for visual representation
@@ -163,9 +162,6 @@ const Incentive = () => {
   const [advancedFilters, setAdvancedFilters] = useState<IncentiveFilters>({
     onboardingStatus: [],
     emailCount: "all",
-    sectors: [],
-    companySize: [],
-    regions: [],
   });
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [expandedCompany, setExpandedCompany] = useState<string | null>(null);
@@ -224,10 +220,7 @@ const Incentive = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(c => 
-        c.name.toLowerCase().includes(query) ||
-        c.contact.email.toLowerCase().includes(query) ||
-        c.contact.nif.toLowerCase().includes(query) ||
-        getSectorName(c.sector).toLowerCase().includes(query)
+        c.name.toLowerCase().includes(query)
       );
     }
     
@@ -246,21 +239,6 @@ const Incentive = () => {
       } else if (advancedFilters.emailCount === "3+") {
         filtered = filtered.filter(c => c.emailsSent >= 3);
       }
-    }
-    
-    // Advanced filters - sectors
-    if (advancedFilters.sectors.length > 0) {
-      filtered = filtered.filter(c => advancedFilters.sectors.includes(c.sector));
-    }
-    
-    // Advanced filters - company size
-    if (advancedFilters.companySize.length > 0) {
-      filtered = filtered.filter(c => advancedFilters.companySize.includes(c.companySize || ""));
-    }
-    
-    // Advanced filters - regions
-    if (advancedFilters.regions.length > 0) {
-      filtered = filtered.filter(c => advancedFilters.regions.includes(c.region || ""));
     }
     
     // Advanced filters - onboarding status
@@ -298,10 +276,7 @@ const Incentive = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(c => 
-        c.name.toLowerCase().includes(query) ||
-        c.contact.email.toLowerCase().includes(query) ||
-        c.contact.nif.toLowerCase().includes(query) ||
-        getSectorName(c.sector).toLowerCase().includes(query)
+        c.name.toLowerCase().includes(query)
       );
     }
     
@@ -705,10 +680,6 @@ const Incentive = () => {
                             
                             <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
                               <p className="font-medium truncate">{company.name}</p>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-                                <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
-                                <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
-                              </div>
                             </div>
                             
                             {/* Status + próxima acção + histórico */}
@@ -830,11 +801,6 @@ const Incentive = () => {
                           <div className="flex items-center gap-2">
                             <p className="font-medium truncate">{company.name}</p>
                             <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Badge variant="outline" className="text-xs py-0 shrink-0 truncate max-w-[200px]">{company.contact.email}</Badge>
-                            <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
-                            <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
                           </div>
                         </div>
                         
