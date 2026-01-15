@@ -66,7 +66,7 @@ const Onboarding = () => {
               <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Leaf className="h-6 w-6 text-primary" />
               </div>
-              <span className="text-xl font-semibold">Get2Zero</span>
+              <span className="text-xl font-semibold">Dash2Zero</span>
             </div>
             
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
