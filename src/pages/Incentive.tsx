@@ -174,6 +174,20 @@ const Incentive = () => {
   const [message, setMessage] = useState(emailTemplates[0].body);
   const [isLoading, setIsLoading] = useState(false);
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
+  const [sortBy, setSortBy] = useState<'name' | 'status' | 'emails' | 'lastContact'>('status');
+  
+  // Status order for sorting (most advanced first)
+  const statusOrder: Record<string, number> = {
+    completo: 0,
+    em_progresso_formulario: 1,
+    em_progresso_simple: 2,
+    registada_simple: 3,
+    interessada_formulario: 4,
+    interessada_simple: 5,
+    interessada: 6,
+    sem_interacao: 7,
+    por_contactar: 8,
+  };
   
   // Data
   const clusters = useMemo(() => {
@@ -254,8 +268,28 @@ const Incentive = () => {
       filtered = filtered.filter(c => advancedFilters.onboardingStatus.includes(c.onboardingStatus));
     }
     
-    return filtered.sort((a, b) => a.name.localeCompare(b.name));
-  }, [companiesWithoutFootprint, searchQuery, selectedCluster, advancedFilters]);
+    // Apply sorting
+    switch (sortBy) {
+      case 'status':
+        filtered.sort((a, b) => (statusOrder[a.onboardingStatus] || 99) - (statusOrder[b.onboardingStatus] || 99));
+        break;
+      case 'name':
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'emails':
+        filtered.sort((a, b) => b.emailsSent - a.emailsSent);
+        break;
+      case 'lastContact':
+        filtered.sort((a, b) => {
+          if (!a.lastContactDate) return 1;
+          if (!b.lastContactDate) return -1;
+          return new Date(b.lastContactDate).getTime() - new Date(a.lastContactDate).getTime();
+        });
+        break;
+    }
+    
+    return filtered;
+  }, [companiesWithoutFootprint, searchQuery, selectedCluster, advancedFilters, sortBy, statusOrder]);
   
   // Filtered archive (com pegada)
   const filteredArchive = useMemo(() => {
@@ -588,64 +622,67 @@ const Incentive = () => {
             {/* Filters */}
             <div className="p-4 border-b space-y-3 bg-muted/30">
               <div className="flex items-center gap-2">
-                <div className="relative flex-1">
+                <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Pesquisar empresa ou email..."
+                    placeholder="Pesquisar empresa..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
                   />
                 </div>
+                <IncentiveFiltersDialog
+                  filters={advancedFilters}
+                  onFiltersChange={setAdvancedFilters}
+                  companies={activeTab === "pending" ? companiesWithoutFootprint : companiesWithFootprint as any}
+                />
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue placeholder="Ordenar por" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="status">Status (avançado)</SelectItem>
+                    <SelectItem value="name">Nome (A-Z)</SelectItem>
+                    <SelectItem value="emails">Nº emails</SelectItem>
+                    <SelectItem value="lastContact">Último contacto</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button variant="outline" onClick={handleSelectAll} size="sm">
                   {allSelected ? "Desmarcar" : "Selec. todas"}
                 </Button>
               </div>
               
-              <div className="flex items-center gap-4 flex-wrap">
-                <div className="flex gap-1 flex-wrap">
-                  <Button
-                    variant={selectedCluster === "all" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCluster("all")}
-                    className="gap-1.5"
-                  >
-                    Todos
-                    <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
-                      {activeTab === "pending" ? companiesWithoutFootprint.length : companiesWithFootprint.length}
-                    </Badge>
-                  </Button>
-                  {clusters.map(cluster => {
-                    const count = activeTab === "pending"
-                      ? companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length
-                      : companiesWithFootprint.filter(c => c.clusterId === cluster.id).length;
-                    return (
-                      <Button
-                        key={cluster.id}
-                        variant={selectedCluster === cluster.id ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedCluster(cluster.id)}
-                        className="gap-1.5"
-                      >
-                        {cluster.name}
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
-                          {count}
-                        </Badge>
-                      </Button>
-                    );
-                  })}
-                </div>
-                
-                {activeTab === "pending" && (
-                  <>
-                    <div className="h-5 w-px bg-border" />
-                    <IncentiveFiltersDialog
-                      filters={advancedFilters}
-                      onFiltersChange={setAdvancedFilters}
-                      companies={companiesWithoutFootprint}
-                    />
-                  </>
-                )}
+              <div className="flex gap-1 flex-wrap">
+                <Button
+                  variant={selectedCluster === "all" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCluster("all")}
+                  className="gap-1.5"
+                >
+                  Todos
+                  <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
+                    {activeTab === "pending" ? companiesWithoutFootprint.length : companiesWithFootprint.length}
+                  </Badge>
+                </Button>
+                {clusters.map(cluster => {
+                  const count = activeTab === "pending"
+                    ? companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length
+                    : companiesWithFootprint.filter(c => c.clusterId === cluster.id).length;
+                  return (
+                    <Button
+                      key={cluster.id}
+                      variant={selectedCluster === cluster.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedCluster(cluster.id)}
+                      className="gap-1.5"
+                    >
+                      {cluster.name}
+                      <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
+                        {count}
+                      </Badge>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
             
