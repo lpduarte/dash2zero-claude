@@ -21,7 +21,6 @@ import {
   Loader2,
   Mail,
   Target,
-  Users,
   TrendingUp,
   ChevronDown,
   ChevronRight,
@@ -43,6 +42,7 @@ import { SupplierWithoutFootprint } from "@/types/supplierNew";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
+import { IncentiveFiltersDialog, IncentiveFilters } from "@/components/dashboard/IncentiveFiltersDialog";
 
 interface CompanyWithTracking extends SupplierWithoutFootprint {
   emailsSent: number;
@@ -58,7 +58,12 @@ const Incentive = () => {
   const [activeTab, setActiveTab] = useState<"pending" | "archive">("pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCluster, setSelectedCluster] = useState("all");
-  const [showOnlyNeverContacted, setShowOnlyNeverContacted] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<IncentiveFilters>({
+    emailCount: "all",
+    sectors: [],
+    companySize: [],
+    regions: [],
+  });
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [expandedCompany, setExpandedCompany] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState(emailTemplates[0].id);
@@ -112,12 +117,36 @@ const Incentive = () => {
       filtered = filtered.filter(c => c.clusterId === selectedCluster);
     }
     
-    if (showOnlyNeverContacted) {
-      filtered = filtered.filter(c => c.emailsSent === 0);
+    // Advanced filters - email count
+    if (advancedFilters.emailCount !== "all") {
+      if (advancedFilters.emailCount === "0") {
+        filtered = filtered.filter(c => c.emailsSent === 0);
+      } else if (advancedFilters.emailCount === "1") {
+        filtered = filtered.filter(c => c.emailsSent === 1);
+      } else if (advancedFilters.emailCount === "2") {
+        filtered = filtered.filter(c => c.emailsSent === 2);
+      } else if (advancedFilters.emailCount === "3+") {
+        filtered = filtered.filter(c => c.emailsSent >= 3);
+      }
+    }
+    
+    // Advanced filters - sectors
+    if (advancedFilters.sectors.length > 0) {
+      filtered = filtered.filter(c => advancedFilters.sectors.includes(c.sector));
+    }
+    
+    // Advanced filters - company size
+    if (advancedFilters.companySize.length > 0) {
+      filtered = filtered.filter(c => advancedFilters.companySize.includes(c.companySize || ""));
+    }
+    
+    // Advanced filters - regions
+    if (advancedFilters.regions.length > 0) {
+      filtered = filtered.filter(c => advancedFilters.regions.includes(c.region || ""));
     }
     
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
-  }, [companiesWithoutFootprint, searchQuery, selectedCluster, showOnlyNeverContacted]);
+  }, [companiesWithoutFootprint, searchQuery, selectedCluster, advancedFilters]);
   
   // Filtered archive (com pegada)
   const filteredArchive = useMemo(() => {
@@ -388,16 +417,11 @@ const Incentive = () => {
                 {activeTab === "pending" && (
                   <>
                     <div className="h-5 w-px bg-border" />
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <Checkbox
-                        checked={showOnlyNeverContacted}
-                        onCheckedChange={(checked) => setShowOnlyNeverContacted(checked === true)}
-                      />
-                      <span className="text-sm">Só nunca contactadas</span>
-                      <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
-                        {metrics.neverContacted}
-                      </Badge>
-                    </label>
+                    <IncentiveFiltersDialog
+                      filters={advancedFilters}
+                      onFiltersChange={setAdvancedFilters}
+                      companies={companiesWithoutFootprint}
+                    />
                   </>
                 )}
               </div>
@@ -421,49 +445,51 @@ const Incentive = () => {
                             />
                             
                             <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium truncate">{company.name}</p>
-                                {company.emailsSent >= 3 && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger>
-                                        <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
-                                      </TooltipTrigger>
-                                      <TooltipContent>Risco de saturação</TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                              </div>
+                              <p className="font-medium truncate">{company.name}</p>
                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <span className="truncate">{company.contact.email}</span>
+                                <Badge variant="outline" className="text-xs py-0 shrink-0 truncate max-w-[200px]">{company.contact.email}</Badge>
                                 <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
                                 <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
                               </div>
                             </div>
                             
-                            {/* Histórico expandível */}
-                            {company.emailHistory.length > 0 ? (
-                              <CollapsibleTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`gap-1 ${getEmailCountColor(company.emailsSent)}`}
-                                  onClick={() => toggleExpandCompany(company.id)}
-                                >
-                                  <Mail className="h-3 w-3" />
-                                  {company.emailsSent}
-                                  {expandedCompany === company.id ? (
-                                    <ChevronDown className="h-3 w-3" />
-                                  ) : (
-                                    <ChevronRight className="h-3 w-3" />
-                                  )}
-                                </Button>
-                              </CollapsibleTrigger>
-                            ) : (
-                              <Badge variant="outline" className="text-muted-foreground">
-                                0 emails
-                              </Badge>
-                            )}
+                            {/* Histórico expandível com ícone de aviso */}
+                            <div className="flex items-center gap-2">
+                              {company.emailsSent >= 3 && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center justify-center h-8 w-8 rounded-md bg-warning/20">
+                                        <AlertTriangle className="h-4 w-4 text-warning" />
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Risco de saturação</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                              {company.emailHistory.length > 0 ? (
+                                <CollapsibleTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`gap-1 ${getEmailCountColor(company.emailsSent)}`}
+                                    onClick={() => toggleExpandCompany(company.id)}
+                                  >
+                                    <Mail className="h-3 w-3" />
+                                    {company.emailsSent}
+                                    {expandedCompany === company.id ? (
+                                      <ChevronDown className="h-3 w-3" />
+                                    ) : (
+                                      <ChevronRight className="h-3 w-3" />
+                                    )}
+                                  </Button>
+                                </CollapsibleTrigger>
+                              ) : (
+                                <Badge variant="outline" className="text-muted-foreground">
+                                  0 emails
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           
                           {/* Histórico expandido */}
@@ -531,7 +557,7 @@ const Incentive = () => {
                             <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span className="truncate">{company.contact.email}</span>
+                            <Badge variant="outline" className="text-xs py-0 shrink-0 truncate max-w-[200px]">{company.contact.email}</Badge>
                             <Badge variant="outline" className="text-xs py-0 shrink-0">{company.contact.nif}</Badge>
                             <Badge variant="outline" className="text-xs py-0 shrink-0">{getSectorName(company.sector)}</Badge>
                           </div>
