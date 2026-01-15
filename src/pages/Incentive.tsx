@@ -264,9 +264,11 @@ const Incentive = () => {
     const emFunil = semInteracao + interessada + registada + emProgresso;
     const conversionRate = total > 0 ? Math.round((completo / total) * 100) : 0;
     
-    // Mock data for time to value and bottleneck
+    // Mock data for time to value, bottleneck and best template
     const avgDaysToConversion = 12;
     const bottleneck = "Sem interação → Interessada";
+    const bestTemplate = "Convite Inicial";
+    const bestTemplateRate = 42;
     
     return {
       conversionRate,
@@ -274,6 +276,8 @@ const Incentive = () => {
       emFunil,
       avgDaysToConversion,
       bottleneck,
+      bestTemplate,
+      bestTemplateRate,
       total,
       completo,
     };
@@ -404,6 +408,7 @@ const Incentive = () => {
             </CardHeader>
             <CollapsibleContent>
               <CardContent>
+                {/* Linha 1 - 5 KPIs */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   <KPICard
                     title="Taxa de Conversão"
@@ -440,14 +445,31 @@ const Incentive = () => {
                     iconBgColor="bg-muted"
                   />
                   <KPICard
-                    title="Bottleneck"
-                    value={funnelMetrics.bottleneck}
-                    unit="maior drop-off"
-                    icon={AlertTriangle}
+                    title="Melhor Template"
+                    value={funnelMetrics.bestTemplate}
+                    unit={`${funnelMetrics.bestTemplateRate}% conversão`}
+                    icon={Star}
                     iconColor="text-warning"
                     iconBgColor="bg-warning/10"
-                    valueColor="text-warning"
                   />
+                </div>
+                
+                {/* Linha 2 - Bottleneck largo + espaço para funil visual */}
+                <div className="grid grid-cols-5 gap-4 mt-4">
+                  <div className="col-span-2">
+                    <KPICard
+                      title="Bottleneck"
+                      value={funnelMetrics.bottleneck}
+                      unit="fase com maior drop-off no funil"
+                      icon={AlertTriangle}
+                      iconColor="text-warning"
+                      iconBgColor="bg-warning/10"
+                      valueColor="text-warning"
+                    />
+                  </div>
+                  {/* Placeholder para funil visual - próximo prompt */}
+                  <div className="col-span-3">
+                  </div>
                 </div>
               </CardContent>
             </CollapsibleContent>
