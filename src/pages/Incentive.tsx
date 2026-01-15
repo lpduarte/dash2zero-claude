@@ -15,8 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Bar, BarChart, XAxis, Cell } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { 
   Search, 
   Send, 
@@ -118,29 +116,6 @@ const templateSuggestions: Record<string, string> = {
   completo: 't1',                // Ignorado mas mapeado
 };
 
-// Chart configuration for funnel visualization
-const funnelChartConfig = {
-  porContactar: {
-    label: "Por contactar",
-    color: "hsl(var(--muted))",
-  },
-  semInteracao: {
-    label: "Sem interação",
-    color: "hsl(217, 91%, 60%)",
-  },
-  interessada: {
-    label: "Interessada",
-    color: "hsl(48, 96%, 53%)",
-  },
-  emProgresso: {
-    label: "Em progresso",
-    color: "hsl(25, 95%, 53%)",
-  },
-  completo: {
-    label: "Completo",
-    color: "hsl(142, 71%, 45%)",
-  },
-} satisfies ChartConfig;
 
 // Next action helper based on onboarding status
 const getNextAction = (status: string): string => {
@@ -593,57 +568,57 @@ const Incentive = () => {
                       valueColor="text-warning"
                     />
                   </div>
-                  {/* Funnel visual with Recharts */}
+                  {/* Funnel visual with CSS */}
                   <div className="col-span-3 border rounded-lg p-4 bg-card shadow-sm">
-                    <p className="text-xs font-medium text-muted-foreground mb-3">Progressão do Funil</p>
-                    <ChartContainer config={funnelChartConfig} className="h-[40px] w-full">
-                      <BarChart
-                        data={funnelMetrics.chartData}
-                        layout="vertical"
-                        stackOffset="expand"
-                        barSize={24}
-                        margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-                      >
-                        <XAxis type="number" hide />
-                        <ChartTooltip
-                          cursor={false}
-                          content={
-                            <ChartTooltipContent
-                              formatter={(value, name) => {
-                                const config = funnelChartConfig[name as keyof typeof funnelChartConfig];
-                                return (
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className="h-2.5 w-2.5 rounded-sm shrink-0" 
-                                      style={{ backgroundColor: config?.color }} 
-                                    />
-                                    {config?.label}: {value}
-                                  </div>
-                                );
-                              }}
-                            />
-                          }
-                        />
-                        <Bar dataKey="porContactar" stackId="a" fill="var(--color-porContactar)" radius={[4, 0, 0, 4]} />
-                        <Bar dataKey="semInteracao" stackId="a" fill="var(--color-semInteracao)" />
-                        <Bar dataKey="interessada" stackId="a" fill="var(--color-interessada)" />
-                        <Bar dataKey="emProgresso" stackId="a" fill="var(--color-emProgresso)" />
-                        <Bar dataKey="completo" stackId="a" fill="var(--color-completo)" radius={[0, 4, 4, 0]} />
-                      </BarChart>
-                    </ChartContainer>
+                    <p className="text-xs font-medium text-muted-foreground mb-4">Progressão do Funil</p>
+                    
+                    {/* Barra CSS */}
+                    <div className="h-8 w-full flex rounded-md overflow-hidden">
+                      {[
+                        { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-slate-300 dark:bg-slate-600', label: 'Por contactar' },
+                        { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-blue-500', label: 'Sem interação' },
+                        { key: 'interessada', value: funnelMetrics.interessada, color: 'bg-yellow-400', label: 'Interessada' },
+                        { key: 'emProgresso', value: funnelMetrics.emProgresso, color: 'bg-orange-500', label: 'Em progresso' },
+                        { key: 'completo', value: funnelMetrics.completo, color: 'bg-green-500', label: 'Completo' },
+                      ].map((stage, index, arr) => {
+                        const total = arr.reduce((sum, s) => sum + s.value, 0);
+                        const percentage = total > 0 ? (stage.value / total) * 100 : 0;
+                        if (percentage === 0) return null;
+                        return (
+                          <TooltipProvider key={stage.key}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div 
+                                  className={cn(
+                                    stage.color,
+                                    "h-full transition-opacity hover:opacity-80 cursor-default",
+                                    index > 0 && "border-l border-white/50"
+                                  )}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{stage.label}: {stage.value} ({percentage.toFixed(0)}%)</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        );
+                      })}
+                    </div>
                     
                     {/* Legenda */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
-                      {Object.entries(funnelChartConfig).map(([key, config]) => (
-                        <div key={key} className="flex items-center gap-1.5">
-                          <div 
-                            className="h-2.5 w-2.5 rounded-sm shrink-0" 
-                            style={{ backgroundColor: config.color }} 
-                          />
-                          <span className="text-xs text-muted-foreground">{config.label}</span>
-                          <span className="text-xs font-medium">
-                            {funnelMetrics.chartData[0][key as keyof typeof funnelMetrics.chartData[0]]}
-                          </span>
+                    <div className="flex flex-wrap justify-center gap-4 mt-3">
+                      {[
+                        { label: 'Por contactar', value: funnelMetrics.porContactar, color: 'bg-slate-300 dark:bg-slate-600' },
+                        { label: 'Sem interação', value: funnelMetrics.semInteracao, color: 'bg-blue-500' },
+                        { label: 'Interessada', value: funnelMetrics.interessada, color: 'bg-yellow-400' },
+                        { label: 'Em progresso', value: funnelMetrics.emProgresso, color: 'bg-orange-500' },
+                        { label: 'Completo', value: funnelMetrics.completo, color: 'bg-green-500' },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center gap-1.5 text-xs">
+                          <div className={cn("h-2.5 w-2.5 rounded-full", item.color)} />
+                          <span className="text-muted-foreground">{item.label}</span>
+                          <span className="font-medium">{item.value}</span>
                         </div>
                       ))}
                     </div>
