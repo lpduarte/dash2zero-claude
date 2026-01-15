@@ -28,8 +28,11 @@ import {
   CheckCircle2,
   Calculator,
   Clock,
-  Star
+  Star,
+  Users,
+  UserX
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { getClustersByOwnerType } from "@/data/clusters";
 import { 
@@ -119,6 +122,7 @@ const Incentive = () => {
   const [subject, setSubject] = useState(emailTemplates[0].subject);
   const [message, setMessage] = useState(emailTemplates[0].body);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
   
   // Data
   const clusters = useMemo(() => {
@@ -223,26 +227,43 @@ const Incentive = () => {
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
   }, [companiesWithFootprint, searchQuery, selectedCluster]);
   
-  // Metrics
-  const metrics = useMemo(() => {
-    const companiesContacted = companiesWithoutFootprint.filter(c => c.emailsSent > 0);
-    const totalConverted = companiesWithFootprint.length;
-    const conversionRate = companiesContacted.length > 0 
-      ? Math.round((totalConverted / (totalConverted + companiesContacted.length)) * 100) 
-      : 0;
+  // Funnel metrics based on onboardingStatus
+  const funnelMetrics = useMemo(() => {
+    const allCompanies = companiesWithoutFootprint;
+    const total = allCompanies.length;
+    
+    const statusCounts = allCompanies.reduce((acc, c) => {
+      acc[c.onboardingStatus] = (acc[c.onboardingStatus] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const porContactar = statusCounts['por_contactar'] || 0;
+    const semInteracao = statusCounts['sem_interacao'] || 0;
+    const interessada = (statusCounts['interessada'] || 0) + 
+                        (statusCounts['interessada_simple'] || 0) + 
+                        (statusCounts['interessada_formulario'] || 0);
+    const registada = statusCounts['registada_simple'] || 0;
+    const emProgresso = (statusCounts['em_progresso_simple'] || 0) + 
+                        (statusCounts['em_progresso_formulario'] || 0);
+    const completo = statusCounts['completo'] || 0;
+    
+    const emFunil = semInteracao + interessada + registada + emProgresso;
+    const conversionRate = total > 0 ? Math.round((completo / total) * 100) : 0;
+    
+    // Mock data for time to value and bottleneck
+    const avgDaysToConversion = 12;
+    const bottleneck = "Sem interação → Interessada";
     
     return {
       conversionRate,
-      totalEmailsSent: companiesWithoutFootprint.reduce((sum, c) => sum + c.emailsSent, 0),
-      emailsThisMonth: 23, // mock
-      neverContacted: companiesWithoutFootprint.filter(c => c.emailsSent === 0).length,
-      avgDaysToConversion: 12, // mock
-      bestTemplate: "Convite Inicial",
-      bestTemplateRate: 34, // mock
-      saturatedCount: companiesWithoutFootprint.filter(c => c.emailsSent >= 3).length,
-      archivedCount: companiesWithFootprint.length,
+      porContactar,
+      emFunil,
+      avgDaysToConversion,
+      bottleneck,
+      total,
+      completo,
     };
-  }, [companiesWithoutFootprint, companiesWithFootprint]);
+  }, [companiesWithoutFootprint]);
   
   // Handlers
   const handleSelectCompany = (companyId: string) => {
@@ -341,61 +362,69 @@ const Incentive = () => {
           </p>
         </div>
         
-        {/* Metrics Cards */}
-        <Card className="mb-6">
-          <CardHeader className="pb-4">
-            <SectionHeader
-              icon={Target}
-              title="Métricas de Campanha"
-            />
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <KPICard
-                title="Taxa de Conversão"
-                value={`${metrics.conversionRate}%`}
-                unit="contactadas → calcularam"
+        {/* Funnel Metrics Card */}
+        <Collapsible open={isMetricsExpanded} onOpenChange={setIsMetricsExpanded}>
+          <Card className="shadow-sm mb-6">
+            <CardHeader className={cn("transition-all duration-[400ms]", isMetricsExpanded ? "pb-3" : "pb-6")}>
+              <SectionHeader
                 icon={TrendingUp}
-                iconColor="text-success"
-                iconBgColor="bg-success/10"
-                valueColor="text-success"
+                title="Funil de Conversão"
+                collapsible
+                expanded={isMetricsExpanded}
+                onToggle={() => setIsMetricsExpanded(!isMetricsExpanded)}
               />
-              <KPICard
-                title="Emails Enviados"
-                value={metrics.totalEmailsSent}
-                unit={`${metrics.emailsThisMonth} este mês`}
-                icon={Send}
-                iconColor="text-primary"
-                iconBgColor="bg-primary/10"
-              />
-              <KPICard
-                title="Tempo até Conversão"
-                value={metrics.avgDaysToConversion}
-                unit="dias em média"
-                icon={Clock}
-                iconColor="text-muted-foreground"
-                iconBgColor="bg-muted"
-              />
-              <KPICard
-                title="Melhor Template"
-                value={metrics.bestTemplate}
-                unit={`${metrics.bestTemplateRate}% conversão`}
-                icon={Star}
-                iconColor="text-warning"
-                iconBgColor="bg-warning/10"
-              />
-              <KPICard
-                title="Saturadas (3+)"
-                value={metrics.saturatedCount}
-                unit="parar de insistir"
-                icon={AlertTriangle}
-                iconColor="text-warning"
-                iconBgColor="bg-warning/10"
-                valueColor="text-warning"
-              />
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  <KPICard
+                    title="Taxa de Conversão"
+                    value={`${funnelMetrics.conversionRate}%`}
+                    unit={`${funnelMetrics.completo} de ${funnelMetrics.total} empresas`}
+                    icon={TrendingUp}
+                    iconColor="text-success"
+                    iconBgColor="bg-success/10"
+                    valueColor="text-success"
+                  />
+                  <KPICard
+                    title="Por Contactar"
+                    value={funnelMetrics.porContactar}
+                    unit="sem nenhum email"
+                    icon={UserX}
+                    iconColor="text-muted-foreground"
+                    iconBgColor="bg-muted"
+                  />
+                  <KPICard
+                    title="Em Funil"
+                    value={funnelMetrics.emFunil}
+                    unit="contactadas em progresso"
+                    icon={Users}
+                    iconColor="text-primary"
+                    iconBgColor="bg-primary/10"
+                    valueColor="text-primary"
+                  />
+                  <KPICard
+                    title="Time to Value"
+                    value={funnelMetrics.avgDaysToConversion}
+                    unit="dias em média"
+                    icon={Clock}
+                    iconColor="text-muted-foreground"
+                    iconBgColor="bg-muted"
+                  />
+                  <KPICard
+                    title="Bottleneck"
+                    value={funnelMetrics.bottleneck}
+                    unit="maior drop-off"
+                    icon={AlertTriangle}
+                    iconColor="text-warning"
+                    iconBgColor="bg-warning/10"
+                    valueColor="text-warning"
+                  />
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
         
         {/* Main Grid: List + Compose */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
