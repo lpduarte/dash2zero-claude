@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Leaf, 
@@ -12,8 +12,11 @@ import {
   Edit3, 
   Loader2,
   CheckCircle,
+  CheckCircle2,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  User,
+  Flame
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -160,54 +163,99 @@ const generateGenericCompanyData = (nif: string): CompanyData => ({
 
 // ============ Components ============
 
-// Stepper Component
+// Stepper Component with Icons
+const stepConfig = [
+  { number: 1, title: "Identificação", icon: User },
+  { number: 2, title: "Emissões", icon: Flame },
+  { number: 3, title: "Confirmação", icon: CheckCircle2 },
+];
+
 const Stepper = ({ currentStep }: { currentStep: number }) => {
-  const steps = [
-    { number: 1, label: "Identificação" },
-    { number: 2, label: "Emissões" },
-    { number: 3, label: "Confirmação" },
-  ];
+  const getStepState = (stepNumber: number) => {
+    if (stepNumber < currentStep) return "completed";
+    if (stepNumber === currentStep) return "current";
+    return "upcoming";
+  };
 
   return (
     <div className="flex items-center justify-center mb-12">
-      {steps.map((step, index) => (
-        <div key={step.number} className="flex items-center">
-          <div className="flex flex-col items-center">
-            <div
-              className={`
-                w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors
-                ${currentStep > step.number 
-                  ? "bg-success text-success-foreground" 
-                  : currentStep === step.number 
-                    ? "bg-primary text-primary-foreground" 
-                    : "bg-muted text-muted-foreground border-2 border-muted-foreground/30"
-                }
-              `}
-            >
-              {currentStep > step.number ? (
-                <Check className="h-5 w-5" />
-              ) : (
-                step.number
-              )}
+      {stepConfig.map((step, idx) => {
+        const StepIcon = step.icon;
+        const state = getStepState(step.number);
+
+        return (
+          <div key={step.number} className="flex items-center">
+            {idx > 0 && (
+              <div
+                className={`
+                  h-0.5 w-16 md:w-24 mx-2 transition-colors
+                  ${state !== "upcoming" || currentStep > step.number
+                    ? "bg-primary/40"
+                    : "bg-border"
+                  }
+                `}
+              />
+            )}
+
+            <div className="flex flex-col items-center gap-2">
+              <div
+                className={`
+                  w-12 h-12 rounded-full flex items-center justify-center transition-all
+                  ${state === "current"
+                    ? "bg-primary text-primary-foreground"
+                    : state === "completed"
+                      ? "bg-primary/20 text-primary border-2 border-primary/30"
+                      : "bg-background text-muted-foreground border-2 border-border"
+                  }
+                `}
+              >
+                <StepIcon className="h-5 w-5" />
+              </div>
+
+              <span
+                className={`
+                  text-sm font-medium transition-colors
+                  ${state === "current"
+                    ? "text-primary"
+                    : state === "completed"
+                      ? "text-primary/70"
+                      : "text-muted-foreground"
+                  }
+                `}
+              >
+                {step.title}
+              </span>
             </div>
-            <span className={`mt-2 text-xs font-medium ${
-              currentStep >= step.number ? "text-foreground" : "text-muted-foreground"
-            }`}>
-              {step.label}
-            </span>
           </div>
-          
-          {index < steps.length - 1 && (
-            <div 
-              className={`w-16 md:w-24 h-0.5 mx-2 transition-colors ${
-                currentStep > step.number ? "bg-success" : "bg-muted"
-              }`}
-            />
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
+};
+
+// Helper function to auto-complete last percentage field
+const autoCompleteBreakdown = (
+  newBreakdown: ScopeBreakdown,
+  categories: { key: string }[]
+): ScopeBreakdown => {
+  const sum = Object.values(newBreakdown).reduce((a, b) => a + (b || 0), 0);
+  const emptyFields = categories.filter(
+    cat => !newBreakdown[cat.key] || newBreakdown[cat.key] === 0
+  );
+  const filledCount = categories.length - emptyFields.length;
+  
+  // Auto-fill if: sum < 100, exactly 1 field empty, and at least 1 field filled
+  if (emptyFields.length === 1 && sum < 100 && sum > 0 && filledCount >= 1) {
+    const remaining = 100 - sum;
+    if (remaining > 0 && remaining <= 100) {
+      return {
+        ...newBreakdown,
+        [emptyFields[0].key]: remaining
+      };
+    }
+  }
+  
+  return newBreakdown;
 };
 
 // Grouped Breakdown Component for Scope 3
@@ -231,6 +279,12 @@ const GroupedBreakdown = ({
     }
   });
 
+  const handleChange = (key: string, value: number) => {
+    const newBreakdown = { ...breakdown, [key]: value };
+    const autoCompleted = autoCompleteBreakdown(newBreakdown, categories);
+    onChange(autoCompleted);
+  };
+
   return (
     <div className="space-y-6">
       {Object.entries(groups).map(([key, group]) => (
@@ -245,7 +299,7 @@ const GroupedBreakdown = ({
                   max="100"
                   className="w-20 text-right"
                   value={breakdown[cat.key] || ""}
-                  onChange={(e) => onChange({ ...breakdown, [cat.key]: Number(e.target.value) || 0 })}
+                  onChange={(e) => handleChange(cat.key, Number(e.target.value) || 0)}
                 />
                 <span className="text-sm text-muted-foreground">%</span>
                 <span className="text-sm flex-1">{cat.label}</span>
@@ -268,6 +322,12 @@ const SimpleBreakdown = ({
   breakdown: ScopeBreakdown;
   onChange: (breakdown: ScopeBreakdown) => void;
 }) => {
+  const handleChange = (key: string, value: number) => {
+    const newBreakdown = { ...breakdown, [key]: value };
+    const autoCompleted = autoCompleteBreakdown(newBreakdown, categories);
+    onChange(autoCompleted);
+  };
+
   return (
     <div className="space-y-2">
       {categories.map(cat => (
@@ -278,7 +338,7 @@ const SimpleBreakdown = ({
             max="100"
             className="w-20 text-right"
             value={breakdown[cat.key] || ""}
-            onChange={(e) => onChange({ ...breakdown, [cat.key]: Number(e.target.value) || 0 })}
+            onChange={(e) => handleChange(cat.key, Number(e.target.value) || 0)}
           />
           <span className="text-sm text-muted-foreground">%</span>
           <span className="text-sm flex-1">{cat.label}</span>
@@ -421,8 +481,8 @@ const FormularioTotais = () => {
   const [importComplete, setImportComplete] = useState(false);
   const [importMode, setImportMode] = useState<"manual" | "import" | null>(null);
   
-  // Step 1: Identification
-  const [nif, setNif] = useState("");
+  // Step 1: Identification - Pre-filled NIF for demo
+  const [nif, setNif] = useState("509876543");
   const [isLoadingNif, setIsLoadingNif] = useState(false);
   const [nifError, setNifError] = useState("");
   const [nifValid, setNifValid] = useState(false);
@@ -445,7 +505,9 @@ const FormularioTotais = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // NIF lookup handler
-  const handleNifLookup = async () => {
+  const handleNifLookup = useCallback(async () => {
+    if (!nif || nif.length !== 9) return;
+    
     setIsLoadingNif(true);
     setNifError("");
     setNifValid(false);
@@ -463,7 +525,19 @@ const FormularioTotais = () => {
     setCompanyData(data);
     setNifValid(true);
     setIsLoadingNif(false);
-  };
+  }, [nif]);
+  
+  // Auto-validate NIF on mount (for demo)
+  useEffect(() => {
+    if (nif && nif.length === 9 && !nifValid && !companyData) {
+      handleNifLookup();
+    }
+  }, []); // Only on mount
+  
+  // Scroll to top on step change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
   
   // Import handler
   const handleImport = async () => {
@@ -535,15 +609,35 @@ const FormularioTotais = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <div className="max-w-[800px] mx-auto px-6 py-12">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Leaf className="h-6 w-6 text-primary" />
             </div>
             <span className="text-xl font-semibold">Dash2Zero</span>
           </div>
-          <h1 className="text-2xl font-bold">Submissão de Pegada de Carbono</h1>
         </div>
+        
+        {/* Welcome message - personalized when company data exists */}
+        {companyData ? (
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground">
+              Bem-vindo, {companyData.name}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Complete os dados da sua pegada de carbono
+            </p>
+          </div>
+        ) : (
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground">
+              Submissão de Pegada de Carbono
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Preencha os dados da sua empresa e emissões
+            </p>
+          </div>
+        )}
         
         {/* Stepper */}
         <Stepper currentStep={step} />
