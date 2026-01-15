@@ -14,20 +14,16 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Filter, X } from "lucide-react";
-import { getSectorsWithCounts } from "@/data/sectors";
 
 export interface IncentiveFilters {
   onboardingStatus: string[];
   emailCount: "all" | "0" | "1" | "2" | "3+";
-  sectors: string[];
-  companySize: string[];
-  regions: string[];
 }
 
 interface IncentiveFiltersDialogProps {
   filters: IncentiveFilters;
   onFiltersChange: (filters: IncentiveFilters) => void;
-  companies: { sector: string; companySize?: string; region?: string; onboardingStatus?: string }[];
+  companies: { onboardingStatus?: string; emailsSent?: number }[];
 }
 
 const onboardingStatusOptions = [
@@ -48,13 +44,6 @@ const emailCountOptions = [
   { value: "1", label: "1 email" },
   { value: "2", label: "2 emails" },
   { value: "3+", label: "3+ emails (saturadas)" },
-];
-
-const companySizeOptions = [
-  { value: "micro", label: "Micro" },
-  { value: "pequena", label: "Pequena" },
-  { value: "media", label: "Média" },
-  { value: "grande", label: "Grande" },
 ];
 
 export const IncentiveFiltersDialog = ({
@@ -79,46 +68,11 @@ export const IncentiveFiltersDialog = ({
     })).filter(opt => opt.count > 0);
   }, [companies]);
 
-  // Calculate sectors with counts
-  const sectorsWithCounts = useMemo(() => {
-    return getSectorsWithCounts(companies);
-  }, [companies]);
-
-  // Calculate regions with counts
-  const regionsWithCounts = useMemo(() => {
-    const regionCounts = companies.reduce((acc, c) => {
-      const region = c.region || "Desconhecida";
-      acc[region] = (acc[region] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return Object.entries(regionCounts)
-      .map(([region, count]) => ({ region, count }))
-      .sort((a, b) => a.region.localeCompare(b.region));
-  }, [companies]);
-
-  // Calculate company sizes with counts
-  const sizesWithCounts = useMemo(() => {
-    const sizeCounts = companies.reduce((acc, c) => {
-      const size = c.companySize || "Desconhecida";
-      acc[size] = (acc[size] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return companySizeOptions.map(opt => ({
-      ...opt,
-      count: sizeCounts[opt.value] || 0,
-    }));
-  }, [companies]);
-
   // Count active filters
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.onboardingStatus.length > 0) count++;
     if (filters.emailCount !== "all") count++;
-    if (filters.sectors.length > 0) count++;
-    if (filters.companySize.length > 0) count++;
-    if (filters.regions.length > 0) count++;
     return count;
   }, [filters]);
 
@@ -138,33 +92,6 @@ export const IncentiveFiltersDialog = ({
     }));
   };
 
-  const handleSectorToggle = (sector: string) => {
-    setLocalFilters(prev => ({
-      ...prev,
-      sectors: prev.sectors.includes(sector)
-        ? prev.sectors.filter(s => s !== sector)
-        : [...prev.sectors, sector],
-    }));
-  };
-
-  const handleSizeToggle = (size: string) => {
-    setLocalFilters(prev => ({
-      ...prev,
-      companySize: prev.companySize.includes(size)
-        ? prev.companySize.filter(s => s !== size)
-        : [...prev.companySize, size],
-    }));
-  };
-
-  const handleRegionToggle = (region: string) => {
-    setLocalFilters(prev => ({
-      ...prev,
-      regions: prev.regions.includes(region)
-        ? prev.regions.filter(r => r !== region)
-        : [...prev.regions, region],
-    }));
-  };
-
   const handleApply = () => {
     onFiltersChange(localFilters);
     setOpen(false);
@@ -174,9 +101,6 @@ export const IncentiveFiltersDialog = ({
     const resetFilters: IncentiveFilters = {
       onboardingStatus: [],
       emailCount: "all",
-      sectors: [],
-      companySize: [],
-      regions: [],
     };
     setLocalFilters(resetFilters);
     onFiltersChange(resetFilters);
@@ -248,72 +172,6 @@ export const IncentiveFiltersDialog = ({
                       onCheckedChange={() => handleEmailCountChange(option.value)}
                     />
                     <span className="text-sm">{option.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Sector Filter */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Sector de actividade</Label>
-              <div className="space-y-2">
-                {sectorsWithCounts.map(({ sector, name, count }) => (
-                  <label
-                    key={sector}
-                    className="flex items-center gap-3 cursor-pointer"
-                  >
-                    <Checkbox
-                      checked={localFilters.sectors.includes(sector)}
-                      onCheckedChange={() => handleSectorToggle(sector)}
-                    />
-                    <span className="text-sm flex-1">{name}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {count}
-                    </Badge>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Company Size Filter */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Dimensão da empresa</Label>
-              <div className="space-y-2">
-                {sizesWithCounts.map(({ value, label, count }) => (
-                  <label
-                    key={value}
-                    className="flex items-center gap-3 cursor-pointer"
-                  >
-                    <Checkbox
-                      checked={localFilters.companySize.includes(value)}
-                      onCheckedChange={() => handleSizeToggle(value)}
-                    />
-                    <span className="text-sm flex-1">{label}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {count}
-                    </Badge>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Region Filter */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Região</Label>
-              <div className="space-y-2">
-                {regionsWithCounts.map(({ region, count }) => (
-                  <label
-                    key={region}
-                    className="flex items-center gap-3 cursor-pointer"
-                  >
-                    <Checkbox
-                      checked={localFilters.regions.includes(region)}
-                      onCheckedChange={() => handleRegionToggle(region)}
-                    />
-                    <span className="text-sm flex-1">{region}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {count}
-                    </Badge>
                   </label>
                 ))}
               </div>
