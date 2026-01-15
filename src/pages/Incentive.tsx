@@ -569,11 +569,11 @@ const Incentive = () => {
                     />
                   </div>
                   {/* Funnel visual with CSS */}
-                  <div className="col-span-3 border rounded-lg p-4 bg-card shadow-sm">
-                    <p className="text-xs font-medium text-muted-foreground mb-4">Progressão do Funil</p>
+                  <div className="col-span-3 border rounded-lg p-4 bg-card shadow-sm flex flex-col">
+                    <p className="text-xs font-medium text-muted-foreground">Progressão do Funil</p>
                     
-                    {/* Barra CSS */}
-                    <div className="h-4 w-full flex gap-px mt-1">
+                    {/* Barra CSS - alinhada com o valor do KPI vizinho */}
+                    <div className="h-4 w-full flex gap-px mt-3">
                       {[
                         { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-slate-400 dark:bg-slate-500', label: 'Por contactar' },
                         { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-primary/70', label: 'Sem interação' },
