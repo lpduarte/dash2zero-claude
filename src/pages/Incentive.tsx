@@ -275,7 +275,7 @@ const Incentive = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container mx-auto px-4 py-6 max-w-7xl">
+      <main className="max-w-[1400px] mx-auto px-8 py-8">
         {/* Page Title */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">
