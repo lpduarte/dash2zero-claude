@@ -573,17 +573,18 @@ const Incentive = () => {
                     <p className="text-xs font-medium text-muted-foreground mb-4">Progressão do Funil</p>
                     
                     {/* Barra CSS */}
-                    <div className="h-4 w-full flex gap-[3px]">
+                    <div className="h-4 w-full flex gap-px mt-1">
                       {[
                         { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-slate-400 dark:bg-slate-500', label: 'Por contactar' },
                         { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-primary/70', label: 'Sem interação' },
                         { key: 'interessada', value: funnelMetrics.interessada, color: 'bg-amber-500', label: 'Interessada' },
                         { key: 'emProgresso', value: funnelMetrics.emProgresso, color: 'bg-orange-600', label: 'Em progresso' },
                         { key: 'completo', value: funnelMetrics.completo, color: 'bg-teal-600', label: 'Completo' },
-                      ].map((stage, index, arr) => {
-                        const total = arr.reduce((sum, s) => sum + s.value, 0);
+                      ].filter(stage => stage.value > 0).map((stage, index, visibleArr) => {
+                        const total = visibleArr.reduce((sum, s) => sum + s.value, 0);
                         const percentage = total > 0 ? (stage.value / total) * 100 : 0;
-                        if (percentage === 0) return null;
+                        const isFirst = index === 0;
+                        const isLast = index === visibleArr.length - 1;
                         return (
                           <TooltipProvider key={stage.key}>
                             <Tooltip>
@@ -591,7 +592,9 @@ const Incentive = () => {
                                 <div 
                                   className={cn(
                                     stage.color,
-                                    "h-full rounded-full transition-opacity hover:opacity-80 cursor-default"
+                                    "h-full transition-opacity hover:opacity-80 cursor-default",
+                                    isFirst && "rounded-l-full",
+                                    isLast && "rounded-r-full"
                                   )}
                                   style={{ width: `${percentage}%` }}
                                 />
