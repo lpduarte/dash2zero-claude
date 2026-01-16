@@ -9,6 +9,7 @@ import ClusterManagement from "./pages/ClusterManagement";
 import Incentive from "./pages/Incentive";
 import Onboarding from "./pages/Onboarding";
 import FormularioTotais from "./pages/FormularioTotais";
+import EmailTemplate from "./pages/EmailTemplate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/incentivo" element={<Incentive />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/formulario-totais" element={<FormularioTotais />} />
+            <Route path="/email-template" element={<EmailTemplate />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
