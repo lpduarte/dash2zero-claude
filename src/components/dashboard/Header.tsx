@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Leaf, LayoutDashboard, Boxes, Moon, Sun } from "lucide-react";
+import { Leaf, LayoutDashboard, CircleDot, Moon, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
@@ -62,12 +62,12 @@ export const Header = () => {
             <div className="flex items-center gap-4">
               <UserTypeToggle currentType={userType} onTypeChange={setUserType} />
 
-              <nav className="flex gap-1 bg-primary/10 rounded-lg p-1 border border-primary/20">
+              <nav className="flex gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20">
                 <Link to="/" className={cn(
                   "flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all duration-200",
                   location.pathname === "/"
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-primary/60 hover:text-primary hover:bg-primary/10"
+                    : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
                 )}>
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
@@ -76,23 +76,23 @@ export const Header = () => {
                   "flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all duration-200",
                   location.pathname === "/clusters"
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-primary/60 hover:text-primary hover:bg-primary/10"
+                    : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
                 )}>
-                  <Boxes className="h-4 w-4" />
-                  Clusters
+                  <CircleDot className="h-4 w-4" />
+                  Gerir clusters
                 </Link>
               </nav>
 
               <NotificationBell suppliers={userType === 'municipio' ? allMunicipioSuppliers as any : allEmpresaSuppliers as any} />
 
-              <div className="flex gap-1 bg-primary/10 rounded-lg p-1 border border-primary/20">
+              <div className="flex gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20">
                 <button
                   onClick={() => setDarkMode(false)}
                   className={cn(
                     "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
                     !darkMode
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-primary/60 hover:text-primary hover:bg-primary/10"
+                      : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
                   )}
                   title="Light mode"
                 >
@@ -104,7 +104,7 @@ export const Header = () => {
                     "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
                     darkMode
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-primary/60 hover:text-primary hover:bg-primary/10"
+                      : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
                   )}
                   title="Dark mode"
                 >

@@ -130,7 +130,7 @@ export const NotificationBell = ({ suppliers }: NotificationBellProps) => {
         <Button
           variant="ghost"
           size="icon"
-          className="relative bg-primary/10 border border-primary/20 text-primary/60 hover:text-primary hover:bg-primary/20"
+          className="relative bg-background/40 backdrop-blur-md rounded-lg border border-primary/20 text-foreground/70 hover:text-foreground hover:bg-primary/10"
         >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (

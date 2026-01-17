@@ -11,7 +11,7 @@ interface UserTypeToggleProps {
 export const UserTypeToggle = ({ currentType, onTypeChange }: UserTypeToggleProps) => {
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-1 bg-primary/10 rounded-lg p-1 border border-primary/20">
+      <div className="flex items-center gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -20,7 +20,7 @@ export const UserTypeToggle = ({ currentType, onTypeChange }: UserTypeToggleProp
                 "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
                 currentType === 'empresa'
                   ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-primary/60 hover:text-primary hover:bg-primary/10"
+                  : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
               )}
             >
               <Building2 className="h-4 w-4" />
@@ -39,7 +39,7 @@ export const UserTypeToggle = ({ currentType, onTypeChange }: UserTypeToggleProp
                 "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
                 currentType === 'municipio'
                   ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-primary/60 hover:text-primary hover:bg-primary/10"
+                  : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
               )}
             >
               <Landmark className="h-4 w-4" />
