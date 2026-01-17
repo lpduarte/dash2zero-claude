@@ -148,6 +148,24 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
   .animate-pulse-slower {
     animation: pulse-slower 7s ease-in-out infinite;
   }
+
+  .animate-glow-line {
+    animation: glow-line 4s ease-in-out infinite;
+  }
+}
+
+/* Glowing line animation for header accent */
+@keyframes glow-line {
+  0%, 100% {
+    opacity: 0.3;
+    box-shadow: 0 0 4px hsl(175 66% 38% / 0.2);
+    transform: scaleX(0.98);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 12px hsl(175 66% 38% / 0.6);
+    transform: scaleX(1);
+  }
 }
 
 /* Chart tooltip CSS removed - testing Tremor default behavior */

@@ -127,12 +127,12 @@ export const NotificationBell = ({ suppliers }: NotificationBellProps) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
-          className="relative hover:bg-primary-foreground/10"
+          className="relative bg-primary/10 border border-primary/20 text-primary/60 hover:text-primary hover:bg-primary/20"
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
             <Badge 
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-danger text-[10px]"

@@ -247,7 +247,7 @@ export default function ClusterManagement() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="max-w-[1400px] mx-auto px-8 py-8">
+      <main className="relative z-10 max-w-[1400px] mx-auto px-8 py-8">
         {/* Cluster Selector with Filter Button */}
         <div className="mb-6">
           <div className="flex justify-between items-start gap-4">

@@ -127,10 +127,8 @@ export function ClusterSelector({
       <div 
         ref={stickyRef}
         className={cn(
-          "sticky top-4 z-50 pb-4 mb-2 -mx-8 px-8 pt-2 rounded-lg transition-all duration-200",
-          isStuck 
-            ? "bg-background/80 backdrop-blur-md shadow-md border-b border-border/30" 
-            : "bg-background"
+          "sticky top-4 z-50 py-2 px-4 mb-4 -mx-4 rounded-lg transition-all duration-200",
+          isStuck && "bg-background/80 backdrop-blur-md shadow-md border-b border-border/30"
         )}
       >
         <div className="flex justify-between items-center gap-4">

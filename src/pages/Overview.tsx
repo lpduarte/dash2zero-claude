@@ -150,7 +150,7 @@ const Overview = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="max-w-[1400px] mx-auto px-8 py-8">
+      <main className="relative z-10 max-w-[1400px] mx-auto px-8 py-8">
         <WelcomeBanner />
         <ClusterSelector
           selectedCluster={selectedCluster}
