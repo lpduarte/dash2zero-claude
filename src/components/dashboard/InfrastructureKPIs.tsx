@@ -37,25 +37,29 @@ export const InfrastructureKPIs = () => {
       label: 'Postos de Carregamento',
       value: data.chargingStations,
       icon: Zap,
-      iconColor: 'text-teal-500'
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10'
     },
     {
       label: 'Ecopontos',
       value: data.ecoPoints,
       icon: Recycle,
-      iconColor: 'text-teal-500'
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10'
     },
     {
       label: 'Estações de Bicicletas',
       value: data.bikeStations,
       icon: Bike,
-      iconColor: 'text-teal-500'
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10'
     },
     {
       label: 'Contentores Orgânicos',
       value: data.organicBins,
       icon: Leaf,
-      iconColor: 'text-teal-500'
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10'
     }
   ];
 
@@ -64,20 +68,23 @@ export const InfrastructureKPIs = () => {
       label: 'Ciclovias (km)',
       value: 47.3,
       icon: Route,
-      iconColor: 'text-teal-500'
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10'
     },
     {
       label: 'Paragens Transportes Públicos',
       value: 312,
       icon: Bus,
-      iconColor: 'text-teal-500'
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10'
     },
     {
       label: 'Qualidade do Ar',
       value: 'Bom',
       inlineSubtitle: '3 estações',
       icon: Wind,
-      iconColor: 'text-teal-500',
+      iconColor: 'text-primary',
+      iconBgColor: 'bg-primary/10',
       valueColor: 'text-success'
     }
   ];
@@ -118,6 +125,7 @@ export const InfrastructureKPIs = () => {
                       value={kpi.value.toLocaleString('pt-PT')}
                       icon={kpi.icon}
                       iconColor={kpi.iconColor}
+                      iconBgColor={kpi.iconBgColor}
                     />
                   ))}
                 </div>
@@ -131,6 +139,7 @@ export const InfrastructureKPIs = () => {
                       value={typeof kpi.value === 'number' ? kpi.value.toLocaleString('pt-PT') : kpi.value}
                       icon={kpi.icon}
                       iconColor={kpi.iconColor}
+                      iconBgColor={kpi.iconBgColor}
                       valueColor={kpi.valueColor}
                       inlineSubtitle={kpi.inlineSubtitle}
                     />

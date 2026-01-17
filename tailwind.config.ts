@@ -102,7 +102,7 @@ export default {
         },
         warning: {
           DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
+          foreground: "hsl(var(--foreground))",
         },
         danger: {
           DEFAULT: "hsl(var(--danger))",
@@ -113,6 +113,14 @@ export default {
           1: "hsl(var(--scope-1))",
           2: "hsl(var(--scope-2))",
           3: "hsl(var(--scope-3))",
+        },
+        // Onboarding status colors
+        status: {
+          pending: "hsl(var(--status-pending))",
+          contacted: "hsl(var(--status-contacted))",
+          interested: "hsl(var(--status-interested))",
+          progress: "hsl(var(--status-progress))",
+          complete: "hsl(var(--status-complete))",
         },
         // Medal/Ranking colors
         medal: {

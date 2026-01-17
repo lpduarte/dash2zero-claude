@@ -67,35 +67,69 @@ export type RiskLevel = keyof typeof riskColors;
 
 export const scopeColors = {
   1: {
-    text: 'text-violet-700 dark:text-violet-400',
-    textLight: 'text-violet-600 dark:text-violet-400',
-    bg: 'bg-violet-500',
-    bgLight: 'bg-violet-50 dark:bg-violet-950/30',
-    border: 'border-violet-200 dark:border-violet-800',
-    badge: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-400 dark:border-violet-800',
-    label: 'Âmbito 1 - Emissões Directas',
+    text: 'text-scope-1',
+    textLight: 'text-scope-1/80',
+    bg: 'bg-scope-1',
+    bgLight: 'bg-scope-1/10',
+    border: 'border-scope-1/30',
+    badge: 'bg-scope-1/10 text-scope-1 border-scope-1/30',
+    label: 'Âmbito 1 - Emissões Diretas (Coral)',
   },
   2: {
-    text: 'text-primary dark:text-primary',
-    textLight: 'text-primary/80 dark:text-primary',
-    bg: 'bg-primary',
-    bgLight: 'bg-primary/10 dark:bg-primary/20',
-    border: 'border-primary/30 dark:border-primary/40',
-    badge: 'bg-primary/10 text-primary border-primary/30',
-    label: 'Âmbito 2 - Energia',
+    text: 'text-scope-2',
+    textLight: 'text-scope-2/80',
+    bg: 'bg-scope-2',
+    bgLight: 'bg-scope-2/10',
+    border: 'border-scope-2/30',
+    badge: 'bg-scope-2/10 text-scope-2 border-scope-2/30',
+    label: 'Âmbito 2 - Energia (Âmbar)',
   },
   3: {
-    text: 'text-orange-700 dark:text-orange-400',
-    textLight: 'text-orange-600 dark:text-orange-400',
-    bg: 'bg-orange-500',
-    bgLight: 'bg-orange-50 dark:bg-orange-950/30',
-    border: 'border-orange-200 dark:border-orange-800',
-    badge: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800',
-    label: 'Âmbito 3 - Cadeia de Valor',
+    text: 'text-scope-3',
+    textLight: 'text-scope-3/80',
+    bg: 'bg-scope-3',
+    bgLight: 'bg-scope-3/10',
+    border: 'border-scope-3/30',
+    badge: 'bg-scope-3/10 text-scope-3 border-scope-3/30',
+    label: 'Âmbito 3 - Cadeia de Valor (Petróleo)',
   },
 } as const;
 
 export type Scope = keyof typeof scopeColors;
+
+// ===========================================
+// CORES DE STATUS DE ONBOARDING
+// ===========================================
+
+export const onboardingStatusColors = {
+  pending: {
+    bg: 'bg-status-pending',
+    text: 'text-status-pending',
+    label: 'Por contactar',
+  },
+  contacted: {
+    bg: 'bg-status-contacted',
+    text: 'text-status-contacted',
+    label: 'Sem interação',
+  },
+  interested: {
+    bg: 'bg-status-interested',
+    text: 'text-status-interested',
+    label: 'Interessada',
+  },
+  progress: {
+    bg: 'bg-status-progress',
+    text: 'text-status-progress',
+    label: 'Em progresso',
+  },
+  complete: {
+    bg: 'bg-status-complete',
+    text: 'text-status-complete',
+    label: 'Completo',
+  },
+} as const;
+
+export type OnboardingStatus = keyof typeof onboardingStatusColors;
 
 // ===========================================
 // CORES DE FINANCIAMENTO

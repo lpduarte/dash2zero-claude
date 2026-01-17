@@ -86,7 +86,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Zap className="h-5 w-5 text-teal-500" />
+                  <Zap className="h-5 w-5 text-primary" />
                   <span className="font-medium">Postos de Carregamento</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Recycle className="h-5 w-5 text-teal-500" />
+                  <Recycle className="h-5 w-5 text-primary" />
                   <span className="font-medium">Ecopontos</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Bike className="h-5 w-5 text-teal-500" />
+                  <Bike className="h-5 w-5 text-primary" />
                   <span className="font-medium">Estações de Bicicletas</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Leaf className="h-5 w-5 text-teal-500" />
+                  <Leaf className="h-5 w-5 text-primary" />
                   <span className="font-medium">Contentores Orgânicos</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Route className="h-5 w-5 text-teal-500" />
+                  <Route className="h-5 w-5 text-primary" />
                   <span className="font-medium">Ciclovias</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -329,7 +329,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Bus className="h-5 w-5 text-teal-500" />
+                  <Bus className="h-5 w-5 text-primary" />
                   <span className="font-medium">Paragens Transportes Públicos</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -372,7 +372,7 @@ export const ManageInfrastructureModal = ({
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Wind className="h-5 w-5 text-teal-500" />
+                  <Wind className="h-5 w-5 text-primary" />
                   <span className="font-medium">Qualidade do Ar</span>
                 </div>
                 <div className="flex items-center gap-2">

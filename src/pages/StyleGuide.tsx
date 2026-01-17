@@ -14,9 +14,10 @@ import {
 const STYLE_GUIDE_VERSION = {
   major: 1,
   minor: 4,
-  patch: 3,
+  patch: 4,
   date: "2026-01-17",
   changelog: [
+    "Auto-update via commit",
     "Auto-update via commit",
     "Auto-update via commit",
     "Auto-update via commit",
@@ -127,15 +128,22 @@ const allColors = {
   ],
   // Status colors (3 CSS variables)
   status: [
-    { name: '--warning', tailwind: 'bg-warning', hsl: '42 90% 50%', hex: '#F2A91E', note: 'Atenção / Médio Risco' },
-    { name: '--warning-foreground', tailwind: 'text-warning-foreground', hsl: '0 0% 10%', hex: '#1A1A1A', note: 'Texto sobre warning (escuro)' },
+    { name: '--warning', tailwind: 'bg-warning', hsl: '42 90% 50%', hex: '#F2A91E', note: 'Atenção / Médio Risco (texto usa --foreground)' },
     { name: '--danger', tailwind: 'bg-danger', hsl: '0 70% 55%', hex: '#DF4545', note: 'Erro / Alto Risco (= destructive)' },
   ],
   // Scope/Âmbito colors for emissions charts (3 CSS variables)
   scope: [
-    { name: '--scope-1', tailwind: 'bg-scope-1', hsl: '220 70% 55%', hex: '#4A7FE0', note: 'Âmbito 1 - Emissões Diretas' },
-    { name: '--scope-2', tailwind: 'bg-scope-2', hsl: '280 60% 60%', hex: '#A366CC', note: 'Âmbito 2 - Energia' },
-    { name: '--scope-3', tailwind: 'bg-scope-3', hsl: '25 85% 55%', hex: '#E87A30', note: 'Âmbito 3 - Cadeia de Valor' },
+    { name: '--scope-1', tailwind: 'bg-scope-1', hsl: '12 50% 65%', hex: '#CC9080', note: 'Âmbito 1 - Emissões Diretas (Coral)' },
+    { name: '--scope-2', tailwind: 'bg-scope-2', hsl: '45 50% 65%', hex: '#CCB380', note: 'Âmbito 2 - Energia (Âmbar)' },
+    { name: '--scope-3', tailwind: 'bg-scope-3', hsl: '195 45% 55%', hex: '#5A9EB3', note: 'Âmbito 3 - Cadeia de Valor (Petróleo)' },
+  ],
+  // Onboarding status colors (5 CSS variables)
+  onboarding: [
+    { name: '--status-pending', tailwind: 'bg-status-pending', hsl: '215 16% 65%', hex: '#94A3B8', note: 'Por contactar' },
+    { name: '--status-contacted', tailwind: 'bg-status-contacted', hsl: '21 90% 48%', hex: '#EA580C', note: 'Sem interação' },
+    { name: '--status-interested', tailwind: 'bg-status-interested', hsl: '38 92% 50%', hex: '#F59E0B', note: 'Interessada' },
+    { name: '--status-progress', tailwind: 'bg-status-progress', hsl: '175 55% 48%', hex: '#3AB5A8', note: 'Em progresso' },
+    { name: '--status-complete', tailwind: 'bg-status-complete', hsl: '175 66% 38%', hex: '#219F94', note: 'Completo' },
   ],
   // Medal/Ranking colors (3 CSS variables)
   medals: [
@@ -147,23 +155,11 @@ const allColors = {
 
 // Cores Tailwind hardcoded encontradas no código (para análise)
 const hardcodedTailwindColors = {
-  funnel: [
-    { tailwind: 'bg-slate-400', usage: 'Por contactar', hsl: '215 16% 65%', hex: '#94A3B8' },
-    { tailwind: 'bg-blue-100', usage: 'Contactada', hsl: '214 95% 93%', hex: '#DBEAFE' },
-    { tailwind: 'bg-yellow-100', usage: 'Interessada / Em Negociação', hsl: '55 97% 88%', hex: '#FEF9C3' },
-    { tailwind: 'bg-amber-500', usage: 'Interessada (funil)', hsl: '38 92% 50%', hex: '#F59E0B' },
-    { tailwind: 'bg-orange-100', usage: 'Documentação Pendente', hsl: '34 100% 92%', hex: '#FFEDD5' },
-    { tailwind: 'bg-orange-600', usage: 'Em progresso (funil)', hsl: '21 90% 48%', hex: '#EA580C' },
-    { tailwind: 'bg-green-100', usage: 'Concluído', hsl: '138 76% 93%', hex: '#DCFCE7' },
-    { tailwind: 'bg-teal-600', usage: 'Completo (funil)', hsl: '175 84% 32%', hex: '#0D9488' },
-  ],
-  scopes: [
-    { tailwind: 'bg-violet-50', usage: 'Âmbito 1', hsl: '250 100% 98%', hex: '#F5F3FF' },
-    { tailwind: 'bg-blue-50', usage: 'Âmbito 2', hsl: '214 100% 97%', hex: '#EFF6FF' },
-    { tailwind: 'bg-orange-50', usage: 'Âmbito 3', hsl: '33 100% 96%', hex: '#FFF7ED' },
-  ],
-  infrastructure: [
-    { tailwind: 'bg-teal-500', usage: 'Ícones de infraestrutura', hsl: '173 80% 40%', hex: '#14B8A6' },
+  // Cores dos badges de estado (ainda hardcoded nos configs de status)
+  badges: [
+    { tailwind: 'bg-blue-100', usage: 'Sem interação (badge)', hsl: '214 95% 93%', hex: '#DBEAFE' },
+    { tailwind: 'bg-yellow-100', usage: 'Interessada (badge)', hsl: '55 97% 88%', hex: '#FEF9C3' },
+    { tailwind: 'bg-orange-100', usage: 'Registada / Em progresso (badge)', hsl: '34 100% 92%', hex: '#FFEDD5' },
   ],
   funding: [
     { tailwind: 'bg-purple-100', usage: 'Financiamento', hsl: '270 100% 95%', hex: '#F3E8FF' },
@@ -226,19 +222,15 @@ const ColorSwatch = ({
   hex?: string;
   note?: string;
 }) => (
-  <div className="flex items-center gap-3 p-3 border rounded-lg bg-card">
+  <div className="border rounded-lg bg-card overflow-hidden">
     <div
-      className="w-12 h-12 rounded-lg border shrink-0"
+      className="h-16"
       style={{ backgroundColor: `hsl(${hsl})` }}
     />
-    <div className="flex-1 min-w-0">
-      <p className="font-mono text-xs font-medium truncate">{label}</p>
-      <p className="font-mono text-xs text-muted-foreground/70 truncate">{tailwind}</p>
-      <div className="flex gap-2">
-        <p className="font-mono text-xs text-muted-foreground/50">{hsl}</p>
-        {hex && <p className="font-mono text-xs text-muted-foreground/50">{hex}</p>}
-      </div>
-      {note && <p className="text-xs text-muted-foreground/60 mt-1 truncate">{note}</p>}
+    <div className="p-3">
+      <p className="text-xs font-medium truncate">{note || label}</p>
+      <p className="text-[10px] text-muted-foreground font-mono truncate">{tailwind}</p>
+      <p className="text-[10px] text-muted-foreground/60 font-mono truncate">{hsl}{hex && ` · ${hex}`}</p>
     </div>
   </div>
 );
@@ -340,7 +332,6 @@ const TextReveal = ({ children, className = "" }: { children: string; className?
 const StyleGuide = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [activeSection, setActiveSection] = useState('stack');
-  const [previewColor, setPreviewColor] = useState('bg-primary');
 
   useEffect(() => {
     if (darkMode) {
@@ -574,7 +565,7 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-lg font-semibold mb-2">Base</h3>
             <p className="text-sm text-muted-foreground mb-4">Fundos, texto e bordas da aplicação</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.base.map((c) => (
                 <ColorSwatch
                   key={c.name}
@@ -592,7 +583,7 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-lg font-semibold mb-2">Marca / Primary</h3>
             <p className="text-sm text-muted-foreground mb-4">Cor principal da marca e variações</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.brand.map((c) => (
                 <ColorSwatch
                   key={c.name}
@@ -610,7 +601,7 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-lg font-semibold mb-2">Status</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para feedback e estados</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.status.map((c) => (
                 <ColorSwatch
                   key={c.name}
@@ -628,8 +619,27 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-lg font-semibold mb-2">Âmbitos</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para gráficos de emissões por âmbito</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.scope.map((c) => (
+                <ColorSwatch
+                  key={c.name}
+                  label={c.name}
+                  hsl={c.hsl}
+                  tailwind={c.tailwind}
+                  hex={c.hex}
+                  note={c.note}
+                />
+              ))}
+            </div>
+
+          </div>
+
+          {/* Cores de Onboarding Status */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Status de Onboarding</h3>
+            <p className="text-sm text-muted-foreground mb-4">Cores para os estados do funil de conversão</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+              {allColors.onboarding.map((c) => (
                 <ColorSwatch
                   key={c.name}
                   label={c.name}
@@ -646,7 +656,7 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-lg font-semibold mb-2">Rankings</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para destaques de ranking</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.medals.map((c) => (
                 <ColorSwatch
                   key={c.name}
@@ -671,36 +681,17 @@ const StyleGuide = () => {
             </p>
 
             <div className="space-y-6">
-              {/* Funil de Contacto */}
+              {/* Badges de Estado */}
               <div>
-                <h4 className="font-medium mb-3 text-sm">Estados do Funil (Incentive.tsx)</h4>
+                <h4 className="font-medium mb-3 text-sm">Badges de Estado</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                  {hardcodedTailwindColors.funnel.map((c, i) => (
+                  {hardcodedTailwindColors.badges.map((c, i) => (
                     <div key={i} className="border rounded-lg bg-card overflow-hidden">
                       <div className={`h-16 ${c.tailwind}`} />
                       <div className="p-3">
                         <p className="text-xs font-medium truncate">{c.usage}</p>
                         <p className="text-[10px] text-muted-foreground font-mono">{c.tailwind}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hsl}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hex}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Âmbitos alternativos */}
-              <div>
-                <h4 className="font-medium mb-3 text-sm">Âmbitos (FormularioTotais.tsx) - Diferente de --scope-*</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {hardcodedTailwindColors.scopes.map((c, i) => (
-                    <div key={i} className="border rounded-lg bg-card overflow-hidden">
-                      <div className={`h-16 ${c.tailwind}`} />
-                      <div className="p-3">
-                        <p className="text-xs font-medium">{c.usage}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{c.tailwind}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hsl}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hex}</p>
+                        <p className="text-[10px] text-muted-foreground/60 font-mono truncate">{c.hsl} · {c.hex}</p>
                       </div>
                     </div>
                   ))}
@@ -708,21 +699,7 @@ const StyleGuide = () => {
               </div>
 
               {/* Outras */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <h4 className="font-medium mb-3 text-sm">Infraestrutura</h4>
-                  {hardcodedTailwindColors.infrastructure.map((c, i) => (
-                    <div key={i} className="border rounded-lg bg-card overflow-hidden">
-                      <div className={`h-16 ${c.tailwind}`} />
-                      <div className="p-3">
-                        <p className="text-xs font-medium">{c.usage}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{c.tailwind}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hsl}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hex}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-medium mb-3 text-sm">Financiamento</h4>
                   {hardcodedTailwindColors.funding.map((c, i) => (
@@ -731,8 +708,7 @@ const StyleGuide = () => {
                       <div className="p-3">
                         <p className="text-xs font-medium">{c.usage}</p>
                         <p className="text-[10px] text-muted-foreground font-mono">{c.tailwind}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hsl}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hex}</p>
+                        <p className="text-[10px] text-muted-foreground/60 font-mono truncate">{c.hsl} · {c.hex}</p>
                       </div>
                     </div>
                   ))}
@@ -745,8 +721,7 @@ const StyleGuide = () => {
                       <div className="p-3">
                         <p className="text-xs font-medium">{c.usage}</p>
                         <p className="text-[10px] text-muted-foreground font-mono">{c.tailwind}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hsl}</p>
-                        <p className="text-[10px] text-muted-foreground/60 font-mono">{c.hex}</p>
+                        <p className="text-[10px] text-muted-foreground/60 font-mono truncate">{c.hsl} · {c.hex}</p>
                       </div>
                     </div>
                   ))}
@@ -758,76 +733,26 @@ const StyleGuide = () => {
           {/* Gradientes */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Gradientes</h3>
-            <div className="space-y-3">
-              <div className="h-12 rounded-lg bg-gradient-primary" />
-              <p className="font-mono text-xs text-muted-foreground">--gradient-primary · bg-gradient-primary</p>
-
-              <div className="h-12 rounded-lg bg-gradient-accent" />
-              <p className="font-mono text-xs text-muted-foreground">--gradient-accent · bg-gradient-accent</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="border rounded-lg bg-card overflow-hidden">
+                <div className="h-16 bg-gradient-primary" />
+                <div className="p-3">
+                  <p className="text-xs font-medium">Gradiente Principal</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">bg-gradient-primary</p>
+                  <p className="text-[10px] text-muted-foreground/60 font-mono truncate">--gradient-primary</p>
+                </div>
+              </div>
+              <div className="border rounded-lg bg-card overflow-hidden">
+                <div className="h-16 bg-gradient-accent" />
+                <div className="p-3">
+                  <p className="text-xs font-medium">Gradiente Accent</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">bg-gradient-accent</p>
+                  <p className="text-[10px] text-muted-foreground/60 font-mono truncate">--gradient-accent</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Playground de Cores */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Playground de Cores</h3>
-            <Card className={cardStyles.section}>
-              <p className="text-sm text-muted-foreground mb-4">
-                Clica numa cor para ver como fica aplicada no preview
-              </p>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Seletor de cores */}
-                <div className="space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Selecciona uma cor</p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[
-                      { color: 'bg-primary', label: 'Primary' },
-                      { color: 'bg-primary-light', label: 'Primary Light' },
-                      { color: 'bg-primary-dark', label: 'Primary Dark' },
-                      { color: 'bg-warning', label: 'Warning' },
-                      { color: 'bg-danger', label: 'Danger' },
-                      { color: 'bg-muted', label: 'Muted' },
-                    ].map((item) => (
-                      <button
-                        key={item.color}
-                        onClick={() => setPreviewColor(item.color)}
-                        className={`h-12 rounded-lg transition-all ${item.color} ${
-                          previewColor === item.color
-                            ? 'ring-2 ring-offset-2 ring-foreground scale-105'
-                            : 'hover:scale-105'
-                        }`}
-                        title={item.label}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Preview */}
-                <div className="space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</p>
-                  <div className="p-4 border rounded-lg bg-card">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`p-2 rounded-lg ${previewColor}/20`}>
-                        <Factory className={`h-5 w-5 ${previewColor.replace('bg-', 'text-')}`} />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Card de Exemplo</p>
-                        <p className="text-xs text-muted-foreground">Com a cor seleccionada</p>
-                      </div>
-                    </div>
-                    <div className={`h-2 rounded-full ${previewColor} mb-3`} />
-                    <div className="flex gap-2">
-                      <Badge className={`${previewColor}/10 ${previewColor.replace('bg-', 'text-')} border-current/30`}>
-                        Badge
-                      </Badge>
-                      <Button size="sm" className={previewColor}>
-                        Botão
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
         </div>
 
         {/* === SECÇÃO: TIPOGRAFIA === */}
@@ -1810,7 +1735,7 @@ body {
                 index="name"
                 category="value"
                 variant="donut"
-                colors={["violet", "teal", "amber"]}
+                colors={["rose", "amber", "cyan"]}
                 showAnimation={true}
                 showLabel={false}
                 className="h-44 w-44"
@@ -1818,15 +1743,15 @@ body {
             </div>
             <div className="flex justify-center gap-4 mt-2">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-violet-500" />
+                <div className="w-3 h-3 rounded bg-scope-1" />
                 <span className="text-xs">Âmbito 1</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-teal-500" />
+                <div className="w-3 h-3 rounded bg-scope-2" />
                 <span className="text-xs">Âmbito 2</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-amber-500" />
+                <div className="w-3 h-3 rounded bg-scope-3" />
                 <span className="text-xs">Âmbito 3</span>
               </div>
             </div>

@@ -96,10 +96,10 @@ const onboardingStatusConfig: Record<string, { label: string; color: string; too
     color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50', 
     tooltip: 'Iniciou o preenchimento do formulário' 
   },
-  completo: { 
-    label: 'Completo', 
-    color: 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/50', 
-    tooltip: 'Pegada calculada com sucesso' 
+  completo: {
+    label: 'Completo',
+    color: 'bg-success/10 text-success hover:bg-success/20',
+    tooltip: 'Pegada calculada com sucesso'
   },
 };
 
@@ -529,8 +529,8 @@ const Incentive = () => {
                     value={funnelMetrics.porContactar}
                     unit="sem nenhum email"
                     icon={UserX}
-                    iconColor="text-muted-foreground"
-                    iconBgColor="bg-muted"
+                    iconColor="text-primary"
+                    iconBgColor="bg-primary/10"
                   />
                   <KPICard
                     title="Em Funil"
@@ -546,8 +546,8 @@ const Incentive = () => {
                     value={funnelMetrics.avgDaysToConversion}
                     unit="dias em média"
                     icon={Clock}
-                    iconColor="text-muted-foreground"
-                    iconBgColor="bg-muted"
+                    iconColor="text-primary"
+                    iconBgColor="bg-primary/10"
                   />
                   <KPICard
                     title="Melhor Template"
@@ -579,11 +579,11 @@ const Incentive = () => {
                     {/* Barra CSS - alinhada com "Sem interação..." do card à esquerda */}
                     <div className="h-4 w-full flex gap-px">
                       {[
-                        { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-slate-400 dark:bg-slate-500', label: 'Por contactar' },
-                        { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-primary/70', label: 'Sem interação' },
-                        { key: 'interessada', value: funnelMetrics.interessada, color: 'bg-amber-500', label: 'Interessada' },
-                        { key: 'emProgresso', value: funnelMetrics.emProgresso, color: 'bg-orange-600', label: 'Em progresso' },
-                        { key: 'completo', value: funnelMetrics.completo, color: 'bg-teal-600', label: 'Completo' },
+                        { key: 'porContactar', value: funnelMetrics.porContactar, color: 'bg-status-pending', label: 'Por contactar' },
+                        { key: 'semInteracao', value: funnelMetrics.semInteracao, color: 'bg-status-contacted', label: 'Sem interação' },
+                        { key: 'interessada', value: funnelMetrics.interessada, color: 'bg-status-interested', label: 'Interessada' },
+                        { key: 'emProgresso', value: funnelMetrics.emProgresso, color: 'bg-status-progress', label: 'Em progresso' },
+                        { key: 'completo', value: funnelMetrics.completo, color: 'bg-status-complete', label: 'Completo' },
                       ].filter(stage => stage.value > 0).map((stage, index, visibleArr) => {
                         const total = visibleArr.reduce((sum, s) => sum + s.value, 0);
                         const percentage = total > 0 ? (stage.value / total) * 100 : 0;
@@ -615,11 +615,11 @@ const Incentive = () => {
                     {/* Legenda */}
                     <div className="flex flex-wrap justify-center gap-4">
                       {[
-                        { label: 'Por contactar', value: funnelMetrics.porContactar, color: 'bg-slate-400 dark:bg-slate-500' },
-                        { label: 'Sem interação', value: funnelMetrics.semInteracao, color: 'bg-primary/70' },
-                        { label: 'Interessada', value: funnelMetrics.interessada, color: 'bg-amber-500' },
-                        { label: 'Em progresso', value: funnelMetrics.emProgresso, color: 'bg-orange-600' },
-                        { label: 'Completo', value: funnelMetrics.completo, color: 'bg-teal-600' },
+                        { label: 'Por contactar', value: funnelMetrics.porContactar, color: 'bg-status-pending' },
+                        { label: 'Sem interação', value: funnelMetrics.semInteracao, color: 'bg-status-contacted' },
+                        { label: 'Interessada', value: funnelMetrics.interessada, color: 'bg-status-interested' },
+                        { label: 'Em progresso', value: funnelMetrics.emProgresso, color: 'bg-status-progress' },
+                        { label: 'Completo', value: funnelMetrics.completo, color: 'bg-status-complete' },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center gap-1.5 text-xs">
                           <div className={cn("h-2.5 w-2.5 rounded-full", item.color)} />

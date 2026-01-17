@@ -1129,15 +1129,15 @@ const FormularioTotais = () => {
               <Separator className="my-6" />
               
               <div className="grid grid-cols-3 gap-4 text-center mb-6">
-                <div className="p-4 bg-violet-50 dark:bg-violet-950/30 rounded-lg">
+                <div className="p-4 bg-scope-1/10 rounded-lg">
                   <p className="text-2xl font-bold">{scope1Total || "—"}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e Âmbito 1</p>
                 </div>
-                <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                <div className="p-4 bg-scope-2/10 rounded-lg">
                   <p className="text-2xl font-bold">{scope2Total || "—"}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e Âmbito 2</p>
                 </div>
-                <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-lg">
+                <div className="p-4 bg-scope-3/10 rounded-lg">
                   <p className="text-2xl font-bold">{scope3Total || "—"}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e Âmbito 3</p>
                 </div>
