@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Supplier } from "@/types/supplier";
 
 interface EmissionsBreakdownProps {
@@ -10,6 +10,7 @@ export const EmissionsBreakdown = ({ suppliers }: EmissionsBreakdownProps) => {
   const totalScope1 = suppliers.reduce((sum, s) => sum + s.scope1, 0);
   const totalScope2 = suppliers.reduce((sum, s) => sum + s.scope2, 0);
   const totalScope3 = suppliers.reduce((sum, s) => sum + s.scope3, 0);
+  const total = totalScope1 + totalScope2 + totalScope3;
 
   const data = [
     { name: "Âmbito 1", value: totalScope1, color: "hsl(var(--scope-1))" },
@@ -39,15 +40,21 @@ export const EmissionsBreakdown = ({ suppliers }: EmissionsBreakdownProps) => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `${value.toFixed(2)} t CO₂e`} />
+              <Tooltip
+                formatter={(value: number) => `${value.toFixed(2)} t CO₂e`}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
-      
+
       <div className="grid grid-cols-3 gap-3 mt-3">
         {data.map((scope, index) => {
-          const total = totalScope1 + totalScope2 + totalScope3;
           const percentage = total > 0 ? (scope.value / total) * 100 : 0;
           return (
             <Card key={scope.name} className="p-3 shadow-sm">

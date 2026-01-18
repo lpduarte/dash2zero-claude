@@ -13,35 +13,57 @@ export default {
   ],
   prefix: "",
   // Safelist Tremor colors for charts - only the colors we actually use
-  // teal: primary/brand, violet: scope 1, amber: scope 3/warning, emerald: success, red: danger
-  // gray: neutral elements
+  // teal: primary/brand, scope1/scope2/scope3: âmbitos, emerald: success, red: danger, gray: neutral
   safelist: [
+    // Standard Tailwind colors with shades (for Tremor base colors)
     {
       pattern:
-        /^(bg-(?:gray|red|amber|emerald|teal|violet)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+        /^(bg-(?:gray|red|emerald|teal)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
       variants: ["hover", "ui-selected"],
     },
     {
       pattern:
-        /^(text-(?:gray|red|amber|emerald|teal|violet)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+        /^(text-(?:gray|red|emerald|teal)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
       variants: ["hover", "ui-selected"],
     },
     {
       pattern:
-        /^(border-(?:gray|red|amber|emerald|teal|violet)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+        /^(border-(?:gray|red|emerald|teal)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
       variants: ["hover", "ui-selected"],
     },
     {
       pattern:
-        /^(ring-(?:gray|red|amber|emerald|teal|violet)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+        /^(ring-(?:gray|red|emerald|teal)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
     {
       pattern:
-        /^(stroke-(?:gray|red|amber|emerald|teal|violet)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+        /^(stroke-(?:gray|red|emerald|teal)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
     {
       pattern:
-        /^(fill-(?:gray|red|amber|emerald|teal|violet)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+        /^(fill-(?:gray|red|emerald|teal)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+    },
+    // Custom scope colors without shades (for Tremor custom colors)
+    {
+      pattern: /^(bg-(?:scope1|scope2|scope3))$/,
+      variants: ["hover", "ui-selected"],
+    },
+    {
+      pattern: /^(text-(?:scope1|scope2|scope3))$/,
+      variants: ["hover", "ui-selected"],
+    },
+    {
+      pattern: /^(border-(?:scope1|scope2|scope3))$/,
+      variants: ["hover", "ui-selected"],
+    },
+    {
+      pattern: /^(ring-(?:scope1|scope2|scope3))$/,
+    },
+    {
+      pattern: /^(stroke-(?:scope1|scope2|scope3))$/,
+    },
+    {
+      pattern: /^(fill-(?:scope1|scope2|scope3))$/,
     },
   ],
   theme: {
@@ -114,6 +136,10 @@ export default {
           2: "hsl(var(--scope-2))",
           3: "hsl(var(--scope-3))",
         },
+        // Tremor-compatible scope colors (for charts)
+        scope1: "hsl(var(--scope-1))",
+        scope2: "hsl(var(--scope-2))",
+        scope3: "hsl(var(--scope-3))",
         // Onboarding status colors
         status: {
           pending: "hsl(var(--status-pending))",
@@ -215,8 +241,8 @@ export default {
         "tremor-full": "9999px",
       },
       fontSize: {
-        // Override default xs from 12px to 10px
-        "xs": ["0.625rem", { lineHeight: "0.875rem" }],
+        // xs = 12px (Tailwind default)
+        "xs": ["0.75rem", { lineHeight: "1rem" }],
         // Tremor font sizes
         "tremor-label": ["0.75rem", { lineHeight: "1rem" }],
         "tremor-default": ["0.875rem", { lineHeight: "1.25rem" }],

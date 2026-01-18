@@ -10,26 +10,26 @@ import { getClusterInfo } from "@/config/clusters";
 type MetricType = 'total' | 'perRevenue' | 'perEmployee' | 'perArea';
 
 const metricConfig: Record<MetricType, { label: string; title: string; unit: string; tooltip: string }> = {
-  total: { 
-    label: 'Emissões totais', 
+  total: {
+    label: 'Emissões totais',
     title: 'Emissões totais por empresa',
     unit: 't CO₂e',
     tooltip: 'Emissões Totais'
   },
-  perRevenue: { 
-    label: 'Por faturação', 
+  perRevenue: {
+    label: 'Por faturação',
     title: 'Emissões por faturação',
     unit: 'kg CO₂e/€',
     tooltip: 'Emissões por €'
   },
-  perEmployee: { 
-    label: 'Por colaborador', 
+  perEmployee: {
+    label: 'Por colaborador',
     title: 'Emissões por colaborador',
     unit: 't CO₂e/colab',
     tooltip: 'Emissões por Colaborador'
   },
-  perArea: { 
-    label: 'Por área', 
+  perArea: {
+    label: 'Por área',
     title: 'Emissões por área',
     unit: 't CO₂e/m²',
     tooltip: 'Emissões por m²'
@@ -45,7 +45,7 @@ export const SupplierEmissionsChart = ({
 }: SupplierEmissionsChartProps) => {
   const { userType } = useUser();
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('total');
-  
+
   const getClusterDisplay = (cluster: string) => {
     const clusterId = cluster;
     const info = getClusterInfo(userType, clusterId);

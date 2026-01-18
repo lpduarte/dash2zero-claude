@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Palette, Type, Square, Layers, MousePointerClick, Tag, LayoutGrid,
   FormInput, ListFilter, BarChart3, AlertCircle, Activity, Columns,
-  Table2, PieChart, Star, Hash, Moon, Sun, Factory, Building2,
+  Table2, PieChart, Star, Moon, Sun, Factory, Building2,
   Zap, TrendingUp, TrendingDown, Download, Filter, Search, Settings,
   Info, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
   Eye, Mail, Users, Leaf, Copy, Monitor, Code
@@ -14,7 +14,7 @@ import {
 const STYLE_GUIDE_VERSION = {
   major: 1,
   minor: 4,
-  patch: 7,
+  patch: 8,
   date: "2026-01-18",
   changelog: [
     "Auto-update via commit",
@@ -24,9 +24,9 @@ const STYLE_GUIDE_VERSION = {
     "Auto-update via commit",
     "Auto-update via commit",
     "Auto-update via commit",
+    "Auto-update via commit",
     "Sistema de cores simplificado: 20 variáveis CSS (vs 35+), aliases Tailwind preservados",
-    "Adicionadas cores de Scope, Medalhas e Gráficos; Ícones oficiais das tecnologias",
-    "Automatismo de changelog implementado"
+    "Adicionadas cores de Scope, Medalhas e Gráficos; Ícones oficiais das tecnologias"
   ]
 };
 
@@ -51,16 +51,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { KPICard } from "@/components/ui/kpi-card";
-import { 
-  formatNumber, formatEmissions, formatPercentage, formatIntensity, 
-  formatCurrency, formatRevenue 
-} from "@/lib/formatters";
 import { riskColors, scopeColors, cardStyles, textStyles, spacing, iconSizes } from "@/lib/styles";
-// Tremor charts
+// Recharts
 import {
-  AreaChart as TremorAreaChart,
-  DonutChart as TremorDonutChart
-} from "@tremor/react";
+  AreaChart, Area, PieChart as RechartsPieChart, Pie, Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 
 // Technology brand icons (official SVG paths)
 const ReactIcon = ({ className }: { className?: string }) => (
@@ -106,7 +102,6 @@ const sections = [
   { id: 'tabelas', label: 'Tabelas', icon: Table2 },
   { id: 'graficos', label: 'Gráficos', icon: PieChart },
   { id: 'icones', label: 'Ícones', icon: Star },
-  { id: 'formatacao', label: 'Formatação', icon: Hash },
 ];
 
 // SIMPLIFIED COLOR SYSTEM - CSS variables reduced, Tailwind classes preserved via aliases
@@ -191,7 +186,135 @@ const chartData = [
   { name: 'Abr', value: 450 },
 ];
 
-// scopeChartData removed - Tremor donut uses inline data
+// scopeChartData is defined inline in the Pie chart
+
+// Mini Stacked Bar Chart with custom implementation
+const miniChartData = [
+  { month: 'Jan', s1: 180, s2: 120, s3: 380 },
+  { month: 'Fev', s1: 200, s2: 140, s3: 420 },
+  { month: 'Mar', s1: 160, s2: 110, s3: 360 },
+  { month: 'Abr', s1: 220, s2: 160, s3: 460 },
+  { month: 'Mai', s1: 190, s2: 130, s3: 400 },
+  { month: 'Jun', s1: 210, s2: 150, s3: 440 },
+  { month: 'Jul', s1: 240, s2: 170, s3: 490 },
+  { month: 'Ago', s1: 200, s2: 140, s3: 420 },
+  { month: 'Set', s1: 220, s2: 155, s3: 455 },
+  { month: 'Out', s1: 175, s2: 115, s3: 370 },
+  { month: 'Nov', s1: 230, s2: 165, s3: 475 },
+  { month: 'Dez', s1: 250, s2: 180, s3: 510 },
+];
+
+const MiniStackedBarChart = () => {
+  const [visibleScopes, setVisibleScopes] = useState({ s1: true, s2: true, s3: true });
+  const [hoveredBar, setHoveredBar] = useState<string | null>(null);
+
+  const toggleScope = (scope: 's1' | 's2' | 's3') => {
+    setVisibleScopes(prev => ({ ...prev, [scope]: !prev[scope] }));
+  };
+
+  // Ordem de stack: s1 (base), s2 (meio), s3 (topo)
+  const scopeConfig = [
+    { key: 's1' as const, label: 'Âmbito 1', colorClass: 'bg-scope-1', textClass: 'text-scope-1' },
+    { key: 's2' as const, label: 'Âmbito 2', colorClass: 'bg-scope-2', textClass: 'text-scope-2' },
+    { key: 's3' as const, label: 'Âmbito 3', colorClass: 'bg-scope-3', textClass: 'text-scope-3' },
+  ];
+
+  const maxTotal = Math.max(...miniChartData.map(d => {
+    let total = 0;
+    if (visibleScopes.s1) total += d.s1;
+    if (visibleScopes.s2) total += d.s2;
+    if (visibleScopes.s3) total += d.s3;
+    return total;
+  }));
+
+  // Determina qual é o scope do topo (para aplicar radius)
+  const getTopScope = () => {
+    if (visibleScopes.s3) return 's3';
+    if (visibleScopes.s2) return 's2';
+    if (visibleScopes.s1) return 's1';
+    return null;
+  };
+  const topScope = getTopScope();
+
+  return (
+    <div className="space-y-3">
+      {/* Chart */}
+      <div className="flex items-end gap-1.5 h-44 relative">
+        {miniChartData.map((bar) => {
+          const total = (visibleScopes.s1 ? bar.s1 : 0) + (visibleScopes.s2 ? bar.s2 : 0) + (visibleScopes.s3 ? bar.s3 : 0);
+          const heightPercent = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+
+          // Calcular alturas de cada segmento como percentagem do total da barra
+          const getSegmentHeight = (value: number) => total > 0 ? (value / total) * 100 : 0;
+
+          return (
+            <div
+              key={bar.month}
+              className="flex-1 flex flex-col justify-end h-full group relative"
+              onMouseEnter={() => setHoveredBar(bar.month)}
+              onMouseLeave={() => setHoveredBar(null)}
+            >
+              <div
+                className="flex flex-col-reverse transition-all duration-300 ease-out overflow-hidden"
+                style={{ height: `${heightPercent}%` }}
+              >
+                {/* Renderiza de baixo para cima: s1, s2, s3 */}
+                {visibleScopes.s1 && (
+                  <div
+                    className={`bg-scope-1 flex-shrink-0 transition-all duration-300 ${topScope === 's1' ? 'rounded-t' : ''}`}
+                    style={{
+                      height: `${getSegmentHeight(bar.s1)}%`,
+                      marginTop: (visibleScopes.s2 || visibleScopes.s3) ? '1px' : 0
+                    }}
+                  />
+                )}
+                {visibleScopes.s2 && (
+                  <div
+                    className={`bg-scope-2 flex-shrink-0 transition-all duration-300 ${topScope === 's2' ? 'rounded-t' : ''}`}
+                    style={{
+                      height: `${getSegmentHeight(bar.s2)}%`,
+                      marginTop: visibleScopes.s3 ? '1px' : 0
+                    }}
+                  />
+                )}
+                {visibleScopes.s3 && (
+                  <div
+                    className={`bg-scope-3 flex-shrink-0 transition-all duration-300 rounded-t`}
+                    style={{ height: `${getSegmentHeight(bar.s3)}%` }}
+                  />
+                )}
+              </div>
+              {/* Tooltip */}
+              {hoveredBar === bar.month && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-card border rounded-lg shadow-lg p-2 text-xs whitespace-nowrap pointer-events-none">
+                  <p className="font-medium mb-1">{bar.month}</p>
+                  {visibleScopes.s1 && <p className="text-scope-1">Âmbito 1: {bar.s1} t CO₂e</p>}
+                  {visibleScopes.s2 && <p className="text-scope-2">Âmbito 2: {bar.s2} t CO₂e</p>}
+                  {visibleScopes.s3 && <p className="text-scope-3">Âmbito 3: {bar.s3} t CO₂e</p>}
+                  <p className="font-medium mt-1 pt-1 border-t">Total: {total} t CO₂e</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Legend as filter */}
+      <div className="flex justify-center gap-4">
+        {scopeConfig.map(scope => (
+          <button
+            key={scope.key}
+            onClick={() => toggleScope(scope.key)}
+            className={`flex items-center gap-2 text-xs transition-opacity ${visibleScopes[scope.key] ? 'opacity-100' : 'opacity-40'}`}
+          >
+            <div className={`w-3 h-3 rounded ${scope.colorClass}`} />
+            <span className={visibleScopes[scope.key] ? scope.textClass : 'text-muted-foreground'}>{scope.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const ColorSwatch = ({
   label,
@@ -213,8 +336,8 @@ const ColorSwatch = ({
     />
     <div className="p-3">
       <p className="text-xs font-medium truncate">{note || label}</p>
-      <p className="text-[10px] text-muted-foreground font-mono truncate">{tailwind}</p>
-      <p className="text-[10px] text-muted-foreground/60 font-mono truncate">{hsl}{hex && ` · ${hex}`}</p>
+      <p className="text-[12px] text-muted-foreground font-mono truncate">{tailwind}</p>
+      <p className="text-[12px] text-muted-foreground/60 font-mono truncate">{hsl}{hex && ` · ${hex}`}</p>
     </div>
   </div>
 );
@@ -524,7 +647,7 @@ const StyleGuide = () => {
           <Card className={cardStyles.nested}>
             <h4 className="font-semibold mb-3">Outras dependências relevantes</h4>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline">Tremor</Badge>
+              <Badge variant="outline">Recharts</Badge>
               <Badge variant="outline">Lucide React</Badge>
               <Badge variant="outline">Radix UI</Badge>
               <Badge variant="outline">React Router</Badge>
@@ -727,7 +850,7 @@ const StyleGuide = () => {
             <h3 className="text-xl font-semibold mb-4">Escala de Tamanhos</h3>
             <div className="space-y-4 border rounded-lg p-4 bg-card">
               <div className="flex items-baseline gap-4">
-                <span className="text-xs w-24 text-muted-foreground">text-xs (10px)</span>
+                <span className="text-xs w-24 text-muted-foreground">text-xs (12px)</span>
                 <span className="text-xs">Labels e metadata</span>
               </div>
               <div className="flex items-baseline gap-4">
@@ -1424,34 +1547,25 @@ const StyleGuide = () => {
                     <p className="text-xl font-bold">8.245</p>
                     <p className="text-xs text-muted-foreground">t CO₂e</p>
                   </div>
-                  <div className="p-3 bg-card rounded-lg border">
+                  <div className="p-3 rounded-lg border border-scope-1/30 bg-scope-1/10">
                     <p className="text-xs text-muted-foreground">Âmbito 1</p>
-                    <p className="text-xl font-bold text-violet-600">2.156</p>
+                    <p className="text-xl font-bold text-scope-1">2.156</p>
                     <p className="text-xs text-muted-foreground">t CO₂e (26%)</p>
                   </div>
-                  <div className="p-3 bg-card rounded-lg border">
+                  <div className="p-3 rounded-lg border border-scope-2/30 bg-scope-2/10">
                     <p className="text-xs text-muted-foreground">Âmbito 2</p>
-                    <p className="text-xl font-bold text-primary">1.489</p>
+                    <p className="text-xl font-bold text-scope-2">1.489</p>
                     <p className="text-xs text-muted-foreground">t CO₂e (18%)</p>
                   </div>
-                  <div className="p-3 bg-card rounded-lg border">
+                  <div className="p-3 rounded-lg border border-scope-3/30 bg-scope-3/10">
                     <p className="text-xs text-muted-foreground">Âmbito 3</p>
                     <p className="text-xl font-bold text-scope-3">4.600</p>
                     <p className="text-xs text-muted-foreground">t CO₂e (56%)</p>
                   </div>
                 </div>
 
-                {/* Mini gráfico de barras */}
-                <div className="flex items-end gap-1 h-16">
-                  {[40, 65, 45, 80, 55, 70, 90, 60, 75, 50, 85, 95].map((h, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 bg-primary/60 hover:bg-primary transition-colors rounded-t"
-                      style={{ height: `${h}%` }}
-                    />
-                  ))}
-                </div>
-                <p className="text-xs text-center text-muted-foreground">Emissões mensais (Jan-Dez)</p>
+                {/* Mini gráfico de barras empilhadas (Custom) */}
+                <MiniStackedBarChart />
               </div>
             </Card>
             <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -1535,20 +1649,46 @@ const StyleGuide = () => {
         />
 
         <div>
-          <Tabs defaultValue="tab1">
+          <Tabs defaultValue="resumo">
             <TabsList>
-              <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-              <TabsTrigger value="tab2">Tab 2</TabsTrigger>
-              <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+              <TabsTrigger value="resumo">Resumo</TabsTrigger>
+              <TabsTrigger value="emissoes">Detalhes das Emissões</TabsTrigger>
             </TabsList>
-            <TabsContent value="tab1" className="p-4 border rounded-lg mt-2">
-              Conteúdo do Tab 1
+            <TabsContent value="resumo" className="p-4 border rounded-lg mt-2">
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Visão geral das métricas principais da empresa.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-card rounded-lg border">
+                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="text-xl font-bold">8.245</p>
+                    <p className="text-xs text-muted-foreground">t CO₂e</p>
+                  </div>
+                  <div className="p-3 bg-card rounded-lg border">
+                    <p className="text-xs text-muted-foreground">vs Média Setor</p>
+                    <p className="text-xl font-bold text-success">-12%</p>
+                    <p className="text-xs text-muted-foreground">abaixo</p>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
-            <TabsContent value="tab2" className="p-4 border rounded-lg mt-2">
-              Conteúdo do Tab 2
-            </TabsContent>
-            <TabsContent value="tab3" className="p-4 border rounded-lg mt-2">
-              Conteúdo do Tab 3
+            <TabsContent value="emissoes" className="p-4 border rounded-lg mt-2">
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-muted-foreground">Emissões por Âmbito</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-2 rounded border border-scope-1/30 bg-scope-1/10">
+                    <p className="text-xs text-muted-foreground mb-0.5">Âmbito 1</p>
+                    <p className="text-sm font-semibold text-scope-1">2.156 t CO₂e</p>
+                  </div>
+                  <div className="p-2 rounded border border-scope-2/30 bg-scope-2/10">
+                    <p className="text-xs text-muted-foreground mb-0.5">Âmbito 2</p>
+                    <p className="text-sm font-semibold text-scope-2">1.489 t CO₂e</p>
+                  </div>
+                  <div className="p-2 rounded border border-scope-3/30 bg-scope-3/10">
+                    <p className="text-xs text-muted-foreground mb-0.5">Âmbito 3</p>
+                    <p className="text-sm font-semibold text-scope-3">4.600 t CO₂e</p>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
@@ -1599,7 +1739,7 @@ const StyleGuide = () => {
           id="graficos"
           title="Gráficos"
           icon={PieChart}
-          description="Tremor - biblioteca moderna de visualização de dados"
+          description="Recharts - biblioteca de visualização de dados"
         />
 
         <div className="grid grid-cols-2 gap-6">
@@ -1607,37 +1747,68 @@ const StyleGuide = () => {
           <Card className="p-4">
             <h3 className="text-xl font-semibold mb-4">Area Chart</h3>
             <div className="h-48">
-              <TremorAreaChart
-                data={chartData}
-                index="name"
-                categories={["value"]}
-                colors={["teal"]}
-                showAnimation={true}
-                showLegend={false}
-                showGradient={true}
-                className="h-full"
-              />
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                  <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorValue)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </Card>
 
-          {/* Donut Chart */}
+          {/* Pie Chart */}
           <Card className="p-4">
-            <h3 className="text-xl font-semibold mb-4">Donut Chart</h3>
+            <h3 className="text-xl font-semibold mb-4">Pie Chart</h3>
             <div className="h-48 flex items-center justify-center">
-              <TremorDonutChart
-                data={[
-                  { name: 'Âmbito 1', value: 27 },
-                  { name: 'Âmbito 2', value: 18 },
-                  { name: 'Âmbito 3', value: 55 },
-                ]}
-                index="name"
-                category="value"
-                variant="donut"
-                colors={["rose", "amber", "cyan"]}
-                showAnimation={true}
-                showLabel={false}
-                className="h-44 w-44"
-              />
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={[
+                      { name: 'Âmbito 1', value: 27, color: 'hsl(var(--scope-1))' },
+                      { name: 'Âmbito 2', value: 18, color: 'hsl(var(--scope-2))' },
+                      { name: 'Âmbito 3', value: 55, color: 'hsl(var(--scope-3))' },
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={70}
+                    dataKey="value"
+                  >
+                    <Cell fill="hsl(var(--scope-1))" />
+                    <Cell fill="hsl(var(--scope-2))" />
+                    <Cell fill="hsl(var(--scope-3))" />
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) => `${value}%`}
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </RechartsPieChart>
+              </ResponsiveContainer>
             </div>
             <div className="flex justify-center gap-4 mt-2">
               <div className="flex items-center gap-2">
@@ -1693,65 +1864,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: FORMATAÇÃO === */}
-        <SectionHeader
-          id="formatacao"
-          title="Formatação de Dados"
-          icon={Hash}
-          description="Funções de formatação em lib/formatters.ts"
-        />
-
-        <div className="border rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Função</TableHead>
-                <TableHead>Input</TableHead>
-                <TableHead>Output</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatNumber(1234.5, 0)</TableCell>
-                <TableCell>1234.5</TableCell>
-                <TableCell className="font-medium">{formatNumber(1234.5, 0)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatNumber(1234.5, 2)</TableCell>
-                <TableCell>1234.5</TableCell>
-                <TableCell className="font-medium">{formatNumber(1234.5, 2)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatEmissions(1500)</TableCell>
-                <TableCell>1500</TableCell>
-                <TableCell className="font-medium">{formatEmissions(1500)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatPercentage(75.5)</TableCell>
-                <TableCell>75.5</TableCell>
-                <TableCell className="font-medium">{formatPercentage(75.5)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatIntensity(0.45)</TableCell>
-                <TableCell>0.45</TableCell>
-                <TableCell className="font-medium">{formatIntensity(0.45)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatCurrency(1500)</TableCell>
-                <TableCell>1500</TableCell>
-                <TableCell className="font-medium">{formatCurrency(1500)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-mono text-sm">formatRevenue(2.5)</TableCell>
-                <TableCell>2.5</TableCell>
-                <TableCell className="font-medium">{formatRevenue(2.5)}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-
-
-        </div>
+                </div>
       </main>
 
       {/* Footer with gradient */}
@@ -1760,7 +1873,7 @@ const StyleGuide = () => {
         <div className="relative z-10 max-w-5xl px-8 pt-16 pb-[40rem]">
           <div className="text-muted-foreground text-sm">
             <p className="text-foreground font-medium">Get2C Product Design System {getVersionString()} · {getVersionDate()}</p>
-            <p className="mt-2">Desenvolvido com React, TypeScript, Tailwind CSS e shadcn/ui</p>
+            <p className="mt-2">For a cooler world.</p>
           </div>
         </div>
       </footer>

@@ -129,49 +129,49 @@ export const ComparisonChart = ({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} barSize={8} barGap={0} barCategoryGap={3}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9, dx: -4 }} 
-              angle={-90} 
-              textAnchor="end" 
-              height={180} 
+            <XAxis
+              dataKey="name"
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9, dx: -4 }}
+              angle={-90}
+              textAnchor="end"
+              height={180}
               interval={0}
             />
-            <YAxis 
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} 
-              domain={[0, 'auto']} 
-              tickCount={8} 
-              width={40} 
+            <YAxis
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+              domain={[0, 'auto']}
+              tickCount={8}
+              width={40}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px'
-              }} 
+              }}
             />
             {visibleScopes.scope1 && (
-              <Bar 
-                dataKey="Âmbito 1" 
-                stackId="stack" 
-                fill={SCOPE_COLORS['Âmbito 1']} 
-                radius={!visibleScopes.scope2 && !visibleScopes.scope3 ? [2, 2, 0, 0] : [0, 0, 0, 0]} 
+              <Bar
+                dataKey="Âmbito 1"
+                stackId="stack"
+                fill={SCOPE_COLORS['Âmbito 1']}
+                radius={!visibleScopes.scope2 && !visibleScopes.scope3 ? [2, 2, 0, 0] : [0, 0, 0, 0]}
               />
             )}
             {visibleScopes.scope2 && (
-              <Bar 
-                dataKey="Âmbito 2" 
-                stackId="stack" 
-                fill={SCOPE_COLORS['Âmbito 2']} 
-                radius={!visibleScopes.scope3 ? [2, 2, 0, 0] : [0, 0, 0, 0]} 
+              <Bar
+                dataKey="Âmbito 2"
+                stackId="stack"
+                fill={SCOPE_COLORS['Âmbito 2']}
+                radius={!visibleScopes.scope3 ? [2, 2, 0, 0] : [0, 0, 0, 0]}
               />
             )}
             {visibleScopes.scope3 && (
-              <Bar 
-                dataKey="Âmbito 3" 
-                stackId="stack" 
-                fill={SCOPE_COLORS['Âmbito 3']} 
-                radius={[2, 2, 0, 0]} 
+              <Bar
+                dataKey="Âmbito 3"
+                stackId="stack"
+                fill={SCOPE_COLORS['Âmbito 3']}
+                radius={[2, 2, 0, 0]}
               />
             )}
           </BarChart>

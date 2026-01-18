@@ -284,22 +284,22 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
                       <div className={`text-center p-2 rounded-lg ${riskColors.baixo.bg} border ${riskColors.baixo.border}`}>
                         <div className="w-3 h-3 rounded-full bg-success mx-auto mb-1" />
                         <p className={`text-xs font-medium ${riskColors.baixo.text}`}>Baixo</p>
-                        <p className={`text-[10px] ${riskColors.baixo.text}`}>Abaixo da média</p>
+                        <p className={`text-[12px] ${riskColors.baixo.text}`}>Abaixo da média</p>
                       </div>
                       <div className={`text-center p-2 rounded-lg ${riskColors.medio.bg} border ${riskColors.medio.border}`}>
                         <div className="w-3 h-3 rounded-full bg-warning mx-auto mb-1" />
                         <p className={`text-xs font-medium ${riskColors.medio.text}`}>Médio</p>
-                        <p className={`text-[10px] ${riskColors.medio.text}`}>1-50% acima</p>
+                        <p className={`text-[12px] ${riskColors.medio.text}`}>1-50% acima</p>
                       </div>
                       <div className={`text-center p-2 rounded-lg ${riskColors.alto.bg} border ${riskColors.alto.border}`}>
                         <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-1" />
                         <p className={`text-xs font-medium ${riskColors.alto.text}`}>Alto</p>
-                        <p className={`text-[10px] ${riskColors.alto.text}`}>50-100% acima</p>
+                        <p className={`text-[12px] ${riskColors.alto.text}`}>50-100% acima</p>
                       </div>
                       <div className={`text-center p-2 rounded-lg ${riskColors.critico.bg} border ${riskColors.critico.border}`}>
                         <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-1" />
                         <p className={`text-xs font-medium ${riskColors.critico.text}`}>Crítico</p>
-                        <p className={`text-[10px] ${riskColors.critico.text}`}>+100% acima</p>
+                        <p className={`text-[12px] ${riskColors.critico.text}`}>+100% acima</p>
                       </div>
                     </div>
                   </div>
