@@ -27,7 +27,7 @@ export const FilterPanel = ({
     <Card className="p-6 shadow-sm mb-8">
       <div className="flex items-center gap-2 mb-4">
         <Filter className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold">Filtros</h2>
+        <h2 className="text-xl font-semibold">Filtros</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">

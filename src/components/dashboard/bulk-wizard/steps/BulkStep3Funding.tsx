@@ -6,7 +6,7 @@ export const BulkStep3Funding = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Definir Financiamento</h3>
+        <h3 className="text-xl font-semibold mb-1">Definir Financiamento</h3>
         <p className="text-sm text-muted-foreground">
           O sistema irá sugerir automaticamente os fundos elegíveis para cada empresa
           com base nas medidas selecionadas.

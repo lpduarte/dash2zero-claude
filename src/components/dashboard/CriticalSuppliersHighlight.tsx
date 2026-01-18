@@ -456,7 +456,7 @@ export const CriticalSuppliersHighlight = ({
                                 <TrendingUp className="h-3 w-3 text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground">Emissões</span>
                               </div>
-                              <p className="text-lg font-bold text-danger">{supplier.totalEmissions.toFixed(0)}</p>
+                              <p className="text-xl font-bold text-danger">{supplier.totalEmissions.toFixed(0)}</p>
                               <p className="text-xs text-muted-foreground">t CO₂e</p>
                             </div>
 
@@ -465,7 +465,7 @@ export const CriticalSuppliersHighlight = ({
                                 <Euro className="h-3 w-3 text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground">FE</span>
                               </div>
-                              <p className="text-lg font-bold text-warning">{supplier.emissionsPerRevenue.toFixed(1)}</p>
+                              <p className="text-xl font-bold text-warning">{supplier.emissionsPerRevenue.toFixed(1)}</p>
                               <p className="text-xs text-muted-foreground">kg CO₂e/€</p>
                             </div>
 
@@ -474,7 +474,7 @@ export const CriticalSuppliersHighlight = ({
                                 <BarChart3 className="h-3 w-3 text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground">vs Setor</span>
                               </div>
-                              <p className={`text-lg font-bold ${feDiff > 0 ? 'text-danger' : 'text-success'}`}>
+                              <p className={`text-xl font-bold ${feDiff > 0 ? 'text-danger' : 'text-success'}`}>
                                 {feDiff > 0 ? '+' : ''}{feDiff.toFixed(0)}%
                               </p>
                               <p className="text-xs text-muted-foreground">
@@ -500,7 +500,7 @@ export const CriticalSuppliersHighlight = ({
                                   </div>
                                   <div className="text-right shrink-0 flex items-center gap-2">
                                     <div className="flex items-baseline gap-1">
-                                      <p className="text-lg font-bold text-success">{alternative.totalEmissions.toFixed(0)}</p>
+                                      <p className="text-xl font-bold text-success">{alternative.totalEmissions.toFixed(0)}</p>
                                       <span className="text-xs text-muted-foreground">t CO₂e</span>
                                     </div>
                                     <Badge className="bg-success text-white text-xs font-bold">

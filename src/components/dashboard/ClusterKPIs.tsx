@@ -106,7 +106,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
                       <Badge className={colors.badge}>{count}</Badge>
                     </div>
                     
-                    <h3 className="font-bold text-lg mb-3">{getClusterLabel(cluster)}</h3>
+                    <h3 className="font-bold text-xl mb-3">{getClusterLabel(cluster)}</h3>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
@@ -165,7 +165,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
                           </div>
                           <span className="text-sm text-muted-foreground">Emissões Totais</span>
                         </div>
-                        <p className="text-3xl font-bold text-primary">{formatNumber(data.totalEmissions, 0)}</p>
+                        <p className="text-4xl font-bold text-primary">{formatNumber(data.totalEmissions, 0)}</p>
                         <p className="text-xs text-muted-foreground mt-1">t CO₂e</p>
                       </CardContent>
                     </Card>
@@ -178,7 +178,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
                           </div>
                           <span className="text-sm text-muted-foreground">Emissões/Funcionário</span>
                         </div>
-                        <p className="text-3xl font-bold text-warning">{formatNumber(data.avgEmissionsPerEmployee, 1)}</p>
+                        <p className="text-4xl font-bold text-warning">{formatNumber(data.avgEmissionsPerEmployee, 1)}</p>
                         <p className="text-xs text-muted-foreground mt-1">t CO₂e média</p>
                       </CardContent>
                     </Card>

@@ -119,7 +119,7 @@ export const TopSuppliersHighlight = ({
         <CardContent>
         <div className="grid gap-3">
           {topSuppliers.map((supplier, index) => <div key={supplier.id} className={`flex items-center gap-4 p-4 border rounded-lg transition-all hover:shadow-md ${getMedalBorder(index)}`}>
-              <Badge className={`w-10 h-10 flex items-center justify-center text-lg font-bold ${getMedalColor(index)}`}>
+              <Badge className={`w-10 h-10 flex items-center justify-center text-xl font-bold ${getMedalColor(index)}`}>
                 {index + 1}
               </Badge>
 
@@ -134,7 +134,7 @@ export const TopSuppliersHighlight = ({
                     <TrendingDown className="h-3 w-3 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Emissões</span>
                   </div>
-                  <p className="text-lg font-bold text-success">{formatNumber(supplier.totalEmissions, 0)}</p>
+                  <p className="text-xl font-bold text-success">{formatNumber(supplier.totalEmissions, 0)}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e</p>
                 </div>
 
@@ -143,7 +143,7 @@ export const TopSuppliersHighlight = ({
                     <Euro className="h-3 w-3 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">FE</span>
                   </div>
-                  <p className="text-lg font-bold text-warning">{formatNumber(supplier.emissionsPerRevenue, 1)}</p>
+                  <p className="text-xl font-bold text-warning">{formatNumber(supplier.emissionsPerRevenue, 1)}</p>
                   <p className="text-xs text-muted-foreground">t CO₂e/€</p>
                 </div>
 
@@ -155,7 +155,7 @@ export const TopSuppliersHighlight = ({
                   {(() => {
                 const comparison = getComparisonToAverage(supplier);
                 return <>
-                        <p className={`text-lg font-bold ${comparison.isBelow ? 'text-success' : 'text-destructive'}`}>
+                        <p className={`text-xl font-bold ${comparison.isBelow ? 'text-success' : 'text-destructive'}`}>
                           {comparison.isBelow ? '-' : '+'}{formatPercentage(comparison.percentage, 0)}
                         </p>
                         <p className="text-xs text-muted-foreground">

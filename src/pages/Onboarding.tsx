@@ -69,13 +69,13 @@ const Onboarding = () => {
               <span className="text-xl font-semibold">Dash2Zero</span>
             </div>
             
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            <h1 className="text-4xl md:text-4xl font-bold tracking-tight mb-4">
               Calcule a Pegada de Carbono
               <br />
               <span className="text-primary">da sua empresa</span>
             </h1>
             
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            <p className="text-xl text-muted-foreground max-w-md mx-auto">
               Escolha a opção que melhor se adequa à sua situação
             </p>
           </div>
@@ -197,7 +197,7 @@ const Onboarding = () => {
       <section id="vantagens" className="py-24 px-6 bg-muted/30 relative shadow-[0_-8px_20px_-8px_rgba(0,0,0,0.08)]">
         <div className="w-full max-w-[1000px] mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-4">
+            <h2 className="text-2xl md:text-4xl font-bold tracking-tight mb-4">
               Porquê calcular a pegada de carbono?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -227,7 +227,7 @@ const Onboarding = () => {
                   <div className="h-6 w-6 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <CheckCircle className="h-4 w-4 text-success" />
                   </div>
-                  <span className="text-base">{benefit}</span>
+                  <span className="text-sm">{benefit}</span>
                 </div>
               ))}
             </div>

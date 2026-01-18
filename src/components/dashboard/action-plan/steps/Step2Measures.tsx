@@ -271,7 +271,7 @@ export const Step2Measures = ({
                 <div className="p-2 rounded-lg bg-muted">
                   <TrendingDown className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <h4 className="font-medium text-lg">Impacto das Medidas Selecionadas</h4>
+                <h4 className="font-medium text-xl">Impacto das Medidas Selecionadas</h4>
               </div>
             </div>
             <div className="w-48 shrink-0 p-5 pl-6 border-l border-border">
@@ -327,14 +327,14 @@ export const Step2Measures = ({
               <div className="space-y-4">
                 <div>
                   <p className="text-xs text-muted-foreground">Redução Estimada</p>
-                  <p className={`font-semibold text-lg ${totalReduction > 0 ? 'text-success' : ''}`}>
+                  <p className={`font-semibold text-xl ${totalReduction > 0 ? 'text-success' : ''}`}>
                     -{totalReduction.toLocaleString('pt-PT')}t CO₂e
                     <span className="text-sm font-normal ml-1">({formatPercentage(reductionPct, 0)})</span>
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Investimento Total</p>
-                  <p className="font-semibold text-lg">{totalInvestment.toLocaleString('pt-PT')}€</p>
+                  <p className="font-semibold text-xl">{totalInvestment.toLocaleString('pt-PT')}€</p>
                 </div>
               </div>
             </div>

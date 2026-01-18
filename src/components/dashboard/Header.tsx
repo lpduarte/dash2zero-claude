@@ -39,7 +39,7 @@ export const Header = () => {
             <div className="flex items-center gap-3">
               <Leaf className="h-14 w-14 text-primary" />
               <div>
-                <h1 className="text-3xl font-bold text-foreground">dash2zero</h1>
+                <h1 className="text-4xl font-bold text-foreground">dash2zero</h1>
                 <p className="text-muted-foreground text-sm">Dashboard de Sustentabilidade</p>
               </div>
             </div>

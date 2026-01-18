@@ -117,7 +117,7 @@ export const SupplierSwitchModal = ({
               <div className="p-4 bg-danger/5 border-b border-border flex flex-col">
                 <Badge className="bg-danger mb-2 w-fit">Empresa atual</Badge>
                 <div className="flex-1 flex items-center">
-                  <h3 className="font-semibold text-lg">{criticalSupplier.name}</h3>
+                  <h3 className="font-semibold text-xl">{criticalSupplier.name}</h3>
                 </div>
               </div>
 

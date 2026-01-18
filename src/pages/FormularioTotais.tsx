@@ -643,10 +643,10 @@ const FormularioTotais = () => {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">
               <CheckCircle className="h-10 w-10 text-success" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-3">
+            <h1 className="text-4xl font-bold text-foreground mb-3">
               Dados submetidos com sucesso
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-xl">
               A pegada de carbono de {companyData?.name || "sua empresa"} foi registada
             </p>
           </div>
@@ -655,15 +655,15 @@ const FormularioTotais = () => {
           <Card className="p-6 mb-8">
             <div className="grid grid-cols-3 gap-6 text-center">
               <div>
-                <p className="text-3xl font-bold text-primary">{scope1Total || "0"}</p>
+                <p className="text-4xl font-bold text-primary">{scope1Total || "0"}</p>
                 <p className="text-sm text-muted-foreground">t CO₂e Âmbito 1</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-primary">{scope2Total || "0"}</p>
+                <p className="text-4xl font-bold text-primary">{scope2Total || "0"}</p>
                 <p className="text-sm text-muted-foreground">t CO₂e Âmbito 2</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-primary">{scope3Total || "—"}</p>
+                <p className="text-4xl font-bold text-primary">{scope3Total || "—"}</p>
                 <p className="text-sm text-muted-foreground">t CO₂e Âmbito 3</p>
               </div>
             </div>
@@ -672,7 +672,7 @@ const FormularioTotais = () => {
                 <Separator className="my-6" />
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground">Intensidade carbónica</p>
-                  <p className="text-2xl font-bold">{formatNumber(intensity, 4)} <span className="text-base font-normal text-muted-foreground">kg CO₂e/€</span></p>
+                  <p className="text-2xl font-bold">{formatNumber(intensity, 4)} <span className="text-sm font-normal text-muted-foreground">kg CO₂e/€</span></p>
                 </div>
               </>
             )}
@@ -769,7 +769,7 @@ const FormularioTotais = () => {
           
           {/* Title */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
               Submissão de Pegada de Carbono
             </h1>
             <p className="text-muted-foreground">
@@ -784,7 +784,7 @@ const FormularioTotais = () => {
               onClick={() => setImportMode("manual")}
             >
               <Edit3 className="h-10 w-10 text-primary mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Preencher manualmente</h3>
+              <h3 className="text-xl font-semibold mb-2">Preencher manualmente</h3>
               <p className="text-sm text-muted-foreground">
                 Introduza os dados da sua pegada de carbono passo a passo
               </p>
@@ -795,7 +795,7 @@ const FormularioTotais = () => {
               onClick={() => setShowImportDialog(true)}
             >
               <Upload className="h-10 w-10 text-primary mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Importar relatório</h3>
+              <h3 className="text-xl font-semibold mb-2">Importar relatório</h3>
               <p className="text-sm text-muted-foreground">
                 Carregue um PDF ou Excel com os dados de emissões
               </p>
@@ -1105,7 +1105,7 @@ const FormularioTotais = () => {
         {step === 3 && (
           <div className="space-y-6">
             <Card className="p-6 md:p-8">
-              <h2 className="text-lg font-semibold mb-6">Resumo da submissão</h2>
+              <h2 className="text-xl font-semibold mb-6">Resumo da submissão</h2>
               
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div className="space-y-1">
@@ -1148,7 +1148,7 @@ const FormularioTotais = () => {
                   <Separator className="my-6" />
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Intensidade carbónica</p>
-                    <p className="text-3xl font-bold text-primary">
+                    <p className="text-4xl font-bold text-primary">
                       {formatNumber(intensity, 4)}
                     </p>
                     <p className="text-sm text-muted-foreground">kg CO₂e / €</p>

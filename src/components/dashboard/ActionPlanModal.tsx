@@ -171,7 +171,7 @@ export const ActionPlanModal = ({ open, onOpenChange, suppliers }: ActionPlanMod
 
             {/* Substitution List */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
                 Lista de Substituições Recomendadas
               </h3>
@@ -240,7 +240,7 @@ export const ActionPlanModal = ({ open, onOpenChange, suppliers }: ActionPlanMod
 
             {/* Implementation Steps */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <TrendingDown className="h-5 w-5" />
                 Passos de Implementação
               </h3>
@@ -269,7 +269,7 @@ export const ActionPlanModal = ({ open, onOpenChange, suppliers }: ActionPlanMod
 
             {/* Financial Impact Details */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <Euro className="h-5 w-5" />
                 Análise de Impacto Financeiro
               </h3>
@@ -278,19 +278,19 @@ export const ActionPlanModal = ({ open, onOpenChange, suppliers }: ActionPlanMod
                 <div className="grid grid-cols-3 gap-6">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Volume atual (críticos)</p>
-                    <p className="text-lg font-bold">
+                    <p className="text-xl font-bold">
                       {(criticalSuppliers.reduce((sum, s) => sum + s.revenue, 0) / 1000000).toFixed(1)}M€
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Volume com alternativas</p>
-                    <p className="text-lg font-bold">
+                    <p className="text-xl font-bold">
                       {(substitutionPlans.reduce((sum, p) => sum + (p.alternative?.revenue || p.critical.revenue), 0) / 1000000).toFixed(1)}M€
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Diferença</p>
-                    <p className={`text-lg font-bold ${totalCostImpact >= 0 ? 'text-success' : 'text-warning'}`}>
+                    <p className={`text-xl font-bold ${totalCostImpact >= 0 ? 'text-success' : 'text-warning'}`}>
                       {totalCostImpact >= 0 ? '+' : ''}{(totalCostImpact / 1000000).toFixed(1)}M€
                     </p>
                   </div>

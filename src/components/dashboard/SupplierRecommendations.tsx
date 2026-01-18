@@ -138,7 +138,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                 <AlertTriangle className="h-5 w-5 text-danger" />
                 <span className="text-sm text-muted-foreground">Fornecedores Críticos</span>
               </div>
-              <p className="text-3xl font-bold text-danger">{criticalSuppliers.length}</p>
+              <p className="text-4xl font-bold text-danger">{criticalSuppliers.length}</p>
               <p className="text-xs text-muted-foreground mt-1">Requerem atenção</p>
             </div>
 
@@ -147,7 +147,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                 <TrendingDown className="h-5 w-5 text-success" />
                 <span className="text-sm text-muted-foreground">Poupança Potencial</span>
               </div>
-              <p className="text-3xl font-bold text-success">{formatNumber(totalPotentialSavings, 0)}</p>
+              <p className="text-4xl font-bold text-success">{formatNumber(totalPotentialSavings, 0)}</p>
               <p className="text-xs text-muted-foreground mt-1">t CO₂e (-{formatPercentage(totalSavingsPercent, 0)})</p>
             </div>
 
@@ -156,7 +156,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                 <Award className="h-5 w-5 text-primary" />
                 <span className="text-sm text-muted-foreground">Alternativas Disponíveis</span>
               </div>
-              <p className="text-3xl font-bold text-primary">{recommendations.length}</p>
+              <p className="text-4xl font-bold text-primary">{recommendations.length}</p>
               <p className="text-xs text-muted-foreground mt-1">Substituições recomendadas</p>
             </div>
           </div>
@@ -173,7 +173,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="h-8 w-8 flex items-center justify-center text-lg font-bold">
+                      <Badge variant="outline" className="h-8 w-8 flex items-center justify-center text-xl font-bold">
                         {index + 1}
                       </Badge>
                       <div>
@@ -333,7 +333,7 @@ export const SupplierRecommendations = ({ suppliers }: SupplierRecommendationsPr
         <Card className="border-success/30 bg-success/5">
           <CardContent className="pt-6 text-center">
             <CheckCircle className="h-12 w-12 text-success mx-auto mb-3" />
-            <h3 className="text-lg font-semibold mb-2">Excelente Performance!</h3>
+            <h3 className="text-xl font-semibold mb-2">Excelente Performance!</h3>
             <p className="text-muted-foreground">
               Não foram identificados fornecedores críticos que necessitem de substituição imediata.
               Todos os fornecedores atuais apresentam bom desempenho em sustentabilidade.

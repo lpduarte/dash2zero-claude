@@ -74,7 +74,7 @@ export const TopSuppliersByCAE = ({ suppliers }: TopSuppliersByCAEProps) => {
         {currentSectorData && (
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">{currentSectorData.sectorName}</h3>
+              <h3 className="font-semibold text-xl">{currentSectorData.sectorName}</h3>
               <Badge variant="secondary">{currentSectorData.totalInSector} empresas</Badge>
             </div>
             

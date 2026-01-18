@@ -28,7 +28,7 @@ export const AdvancedFilterPanel = ({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Filter className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">Filtros</h2>
+          <h2 className="text-xl font-semibold">Filtros</h2>
         </div>
         <Button 
           variant="outline" 

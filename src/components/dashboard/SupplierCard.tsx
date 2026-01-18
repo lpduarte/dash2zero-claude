@@ -58,7 +58,7 @@ export const SupplierCard = memo(({
   return <Card className="border border-border bg-card hover:shadow-lg transition-all">
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-semibold text-card-foreground">{supplier.name}</h3>
+          <h3 className="text-xl font-semibold text-card-foreground">{supplier.name}</h3>
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-border/60">
               {getSectorName(supplier.sector)}
@@ -109,7 +109,7 @@ export const SupplierCard = memo(({
               <UserRound className="h-3.5 w-3.5 text-primary" />
             </div>
             <p className="text-xs text-muted-foreground mb-1">Por colaborador</p>
-            <p className="text-lg font-semibold text-foreground">{supplier.emissionsPerEmployee.toFixed(1)}</p>
+            <p className="text-xl font-semibold text-foreground">{supplier.emissionsPerEmployee.toFixed(1)}</p>
             <p className="text-xs text-muted-foreground">t CO₂e/colab  </p>
           </div>
           <div className="p-3 rounded-lg border border-border bg-muted/30 relative">
@@ -117,7 +117,7 @@ export const SupplierCard = memo(({
               <Maximize2 className="h-3.5 w-3.5 text-primary" />
             </div>
             <p className="text-xs text-muted-foreground mb-1">Por área</p>
-            <p className="text-lg font-semibold text-foreground">{supplier.emissionsPerArea.toFixed(3)}</p>
+            <p className="text-xl font-semibold text-foreground">{supplier.emissionsPerArea.toFixed(3)}</p>
             <p className="text-xs text-muted-foreground">t CO₂e/m²</p>
           </div>
           <div className="p-3 rounded-lg border border-border bg-muted/30 relative">
@@ -125,7 +125,7 @@ export const SupplierCard = memo(({
               <Euro className="h-3.5 w-3.5 text-primary" />
             </div>
             <p className="text-xs text-muted-foreground mb-1">Por faturação</p>
-            <p className="text-lg font-semibold text-foreground">{supplier.emissionsPerRevenue.toFixed(1)}</p>
+            <p className="text-xl font-semibold text-foreground">{supplier.emissionsPerRevenue.toFixed(1)}</p>
             <p className="text-xs text-muted-foreground">kg CO₂e/€</p>
           </div>
         </div>

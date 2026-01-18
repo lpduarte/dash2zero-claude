@@ -50,7 +50,7 @@ const EmailTemplate = () => {
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
-            <h1 className="text-lg font-semibold">Pré-visualização do Email</h1>
+            <h1 className="text-xl font-semibold">Pré-visualização do Email</h1>
           </div>
           
           <div className="flex items-center gap-3">

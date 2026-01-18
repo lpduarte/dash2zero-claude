@@ -84,7 +84,7 @@ export const Step1Analysis = ({
 
         {/* SECÇÃO 1: Intensidade de Carbono */}
         <div>
-          <p className="text-lg font-medium text-foreground mb-4">
+          <p className="text-xl font-medium text-foreground mb-4">
             Intensidade de Carbono
           </p>
 
@@ -171,7 +171,7 @@ export const Step1Analysis = ({
 
         {/* SECÇÃO 3: Distribuição por Âmbito */}
         <div>
-          <p className="text-lg font-medium text-foreground mb-4">
+          <p className="text-xl font-medium text-foreground mb-4">
             Distribuição por Âmbito
           </p>
 
@@ -225,7 +225,7 @@ export const Step1Analysis = ({
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Search className="h-4 w-4 text-muted-foreground" />
-              <p className="text-lg font-medium text-foreground">
+              <p className="text-xl font-medium text-foreground">
                 Análise por Âmbito
               </p>
             </div>

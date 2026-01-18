@@ -56,7 +56,7 @@ export const BulkStep4Confirm = ({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Resumo e Confirmação</h3>
+        <h3 className="text-xl font-semibold mb-1">Resumo e Confirmação</h3>
         <p className="text-sm text-muted-foreground">
           Reveja os planos antes de gerar.
         </p>

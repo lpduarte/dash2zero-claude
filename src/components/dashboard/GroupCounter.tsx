@@ -32,7 +32,7 @@ export const GroupCounter = ({
                 {respondedCount.toLocaleString('pt-PT')}
               </span>
               <span className="text-2xl text-muted-foreground">/</span>
-              <span className="text-3xl font-semibold text-muted-foreground">
+              <span className="text-4xl font-semibold text-muted-foreground">
                 {totalCompaniesInGroup.toLocaleString('pt-PT')}
               </span>
             </div>

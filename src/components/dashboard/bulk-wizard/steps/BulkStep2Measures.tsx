@@ -15,7 +15,7 @@ export const BulkStep2Measures = ({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Definir Medidas</h3>
+        <h3 className="text-xl font-semibold mb-1">Definir Medidas</h3>
         <p className="text-sm text-muted-foreground">
           O sistema irá selecionar automaticamente as melhores medidas para cada empresa
           com base no seu perfil de emissões.

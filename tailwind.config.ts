@@ -215,6 +215,8 @@ export default {
         "tremor-full": "9999px",
       },
       fontSize: {
+        // Override default xs from 12px to 10px
+        "xs": ["0.625rem", { lineHeight: "0.875rem" }],
         // Tremor font sizes
         "tremor-label": ["0.75rem", { lineHeight: "1rem" }],
         "tremor-default": ["0.875rem", { lineHeight: "1.25rem" }],

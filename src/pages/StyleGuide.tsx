@@ -14,9 +14,10 @@ import {
 const STYLE_GUIDE_VERSION = {
   major: 1,
   minor: 4,
-  patch: 6,
-  date: "2026-01-17",
+  patch: 7,
+  date: "2026-01-18",
   changelog: [
+    "Auto-update via commit",
     "Auto-update via commit",
     "Auto-update via commit",
     "Auto-update via commit",
@@ -25,8 +26,7 @@ const STYLE_GUIDE_VERSION = {
     "Auto-update via commit",
     "Sistema de cores simplificado: 20 variáveis CSS (vs 35+), aliases Tailwind preservados",
     "Adicionadas cores de Scope, Medalhas e Gráficos; Ícones oficiais das tecnologias",
-    "Automatismo de changelog implementado",
-    "Header com fundo animado pulsante"
+    "Automatismo de changelog implementado"
   ]
 };
 
@@ -454,7 +454,7 @@ const StyleGuide = () => {
             <h1 className="text-4xl font-bold mb-4">
               <TextReveal>Get2C Product Design System</TextReveal>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-4xl">
+            <p className="text-xl text-muted-foreground max-w-4xl">
               O guia de referência visual para todas as plataformas Get2C.<br />
               Componentes, cores, tipografia e padrões que definem a linguagem visual.<br />
               Para a equipa e sistemas de IA.
@@ -547,7 +547,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Base */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Base</h3>
+            <h3 className="text-xl font-semibold mb-2">Base</h3>
             <p className="text-sm text-muted-foreground mb-4">Fundos, texto e bordas da aplicação</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.base.map((c) => (
@@ -565,7 +565,7 @@ const StyleGuide = () => {
 
           {/* Brand/Primary */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Marca / Primary</h3>
+            <h3 className="text-xl font-semibold mb-2">Marca / Primary</h3>
             <p className="text-sm text-muted-foreground mb-4">Cor principal da marca e variações</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.brand.map((c) => (
@@ -583,7 +583,7 @@ const StyleGuide = () => {
 
           {/* Status/Semantic */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Status</h3>
+            <h3 className="text-xl font-semibold mb-2">Status</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para feedback e estados</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.status.map((c) => (
@@ -601,7 +601,7 @@ const StyleGuide = () => {
 
           {/* Cores de Scope */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Âmbitos</h3>
+            <h3 className="text-xl font-semibold mb-2">Âmbitos</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para gráficos de emissões por âmbito</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.scope.map((c) => (
@@ -620,7 +620,7 @@ const StyleGuide = () => {
 
           {/* Cores de Onboarding Status */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Status de Onboarding</h3>
+            <h3 className="text-xl font-semibold mb-2">Status de Onboarding</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para os estados do funil de conversão</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.onboarding.map((c) => (
@@ -648,7 +648,7 @@ const StyleGuide = () => {
 
           {/* Cores de Medalhas */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Rankings</h3>
+            <h3 className="text-xl font-semibold mb-2">Rankings</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para destaques de ranking</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {allColors.medals.map((c) => (
@@ -677,7 +677,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Tipo de Letra */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Tipo de Letra</h3>
+            <h3 className="text-xl font-semibold mb-4">Tipo de Letra</h3>
             <Card className={cardStyles.section}>
               <h4 className="text-xl font-semibold mb-1">Plus Jakarta Sans</h4>
               <p className="text-sm text-muted-foreground mb-4">
@@ -689,7 +689,7 @@ const StyleGuide = () => {
               <div className="text-2xl tracking-wide text-foreground/80 mb-2">
                 Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz
               </div>
-              <div className="text-lg tracking-wide text-muted-foreground mb-4">
+              <div className="text-xl tracking-wide text-muted-foreground mb-4">
                 0 1 2 3 4 5 6 7 8 9 á é í ó ú ã õ ç € % @
               </div>
               <Separator className="my-4" />
@@ -724,35 +724,23 @@ const StyleGuide = () => {
 
           {/* Escala de Tamanhos */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Escala de Tamanhos</h3>
+            <h3 className="text-xl font-semibold mb-4">Escala de Tamanhos</h3>
             <div className="space-y-4 border rounded-lg p-4 bg-card">
               <div className="flex items-baseline gap-4">
-                <span className="text-xs w-24 text-muted-foreground">text-xs (12px)</span>
-                <span className="text-xs">Labels pequenos</span>
+                <span className="text-xs w-24 text-muted-foreground">text-xs (10px)</span>
+                <span className="text-xs">Labels e metadata</span>
               </div>
               <div className="flex items-baseline gap-4">
                 <span className="text-xs w-24 text-muted-foreground">text-sm (14px)</span>
-                <span className="text-sm">Texto secundário</span>
-              </div>
-              <div className="flex items-baseline gap-4">
-                <span className="text-xs w-24 text-muted-foreground">text-base (16px)</span>
-                <span className="text-base">Texto normal</span>
-              </div>
-              <div className="flex items-baseline gap-4">
-                <span className="text-xs w-24 text-muted-foreground">text-lg (18px)</span>
-                <span className="text-lg">Títulos de secção</span>
+                <span className="text-sm">Texto corpo</span>
               </div>
               <div className="flex items-baseline gap-4">
                 <span className="text-xs w-24 text-muted-foreground">text-xl (20px)</span>
-                <span className="text-xl">Títulos de cards</span>
+                <span className="text-xl">Títulos de cards e secções</span>
               </div>
               <div className="flex items-baseline gap-4">
                 <span className="text-xs w-24 text-muted-foreground">text-2xl (24px)</span>
                 <span className="text-2xl">Valores de KPI</span>
-              </div>
-              <div className="flex items-baseline gap-4">
-                <span className="text-xs w-24 text-muted-foreground">text-3xl (30px)</span>
-                <span className="text-3xl">Números em destaque</span>
               </div>
               <div className="flex items-baseline gap-4">
                 <span className="text-xs w-24 text-muted-foreground">text-4xl (36px)</span>
@@ -763,7 +751,7 @@ const StyleGuide = () => {
 
           {/* Pesos */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Pesos</h3>
+            <h3 className="text-xl font-semibold mb-4">Pesos</h3>
             <div className="grid grid-cols-4 gap-4">
               <div className="p-4 border rounded-lg text-center">
                 <p className="text-xl font-normal">Aa</p>
@@ -786,7 +774,7 @@ const StyleGuide = () => {
 
           {/* Padrões de Texto */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Padrões de Texto (textStyles)</h3>
+            <h3 className="text-xl font-semibold mb-4">Padrões de Texto (textStyles)</h3>
             <div className="space-y-3">
               <div className="p-4 border rounded-lg bg-card">
                 <p className={textStyles.kpiTitle}>Título de KPI</p>
@@ -819,7 +807,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Escala Visual */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Escala Visual</h3>
+            <h3 className="text-xl font-semibold mb-4">Escala Visual</h3>
             <div className="space-y-3">
               {[
                 { size: 1, px: 4 },
@@ -844,7 +832,7 @@ const StyleGuide = () => {
 
           {/* Padrões de Spacing */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Padrões de Spacing (lib/styles.ts)</h3>
+            <h3 className="text-xl font-semibold mb-4">Padrões de Spacing (lib/styles.ts)</h3>
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(spacing).map(([key, value]) => (
                 <div key={key} className="p-3 border rounded-lg bg-card flex justify-between items-center">
@@ -867,7 +855,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Breakpoints */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Breakpoints (Tailwind padrão)</h3>
+            <h3 className="text-xl font-semibold mb-4">Breakpoints (Tailwind padrão)</h3>
             <div className="border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
@@ -922,7 +910,7 @@ const StyleGuide = () => {
 
           {/* Grids de KPIs */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Padrão: Grid de KPIs</h3>
+            <h3 className="text-xl font-semibold mb-4">Padrão: Grid de KPIs</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Padrão recomendado: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">grid-cols-1 sm:grid-cols-2 lg:grid-cols-4</code>
             </p>
@@ -966,7 +954,7 @@ const StyleGuide = () => {
 
           {/* Grid de Cards */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Padrão: Grid de Cards</h3>
+            <h3 className="text-xl font-semibold mb-4">Padrão: Grid de Cards</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Padrão recomendado: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">grid-cols-1 md:grid-cols-2 xl:grid-cols-3</code>
             </p>
@@ -984,7 +972,7 @@ const StyleGuide = () => {
 
           {/* Layout Sidebar + Content */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Padrão: Sidebar + Conteúdo</h3>
+            <h3 className="text-xl font-semibold mb-4">Padrão: Sidebar + Conteúdo</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Padrão recomendado: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">flex flex-col lg:flex-row</code>
             </p>
@@ -1002,7 +990,7 @@ const StyleGuide = () => {
 
           {/* Visibilidade Condicional */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Visibilidade Condicional</h3>
+            <h3 className="text-xl font-semibold mb-4">Visibilidade Condicional</h3>
             <div className="space-y-3">
               <div className="p-4 border rounded-lg bg-card">
                 <div className="hidden sm:block">
@@ -1038,7 +1026,7 @@ const StyleGuide = () => {
 
           {/* Padrões Comuns */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Padrões Comuns</h3>
+            <h3 className="text-xl font-semibold mb-4">Padrões Comuns</h3>
             <div className="border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
@@ -1070,7 +1058,7 @@ const StyleGuide = () => {
                   </TableRow>
                   <TableRow>
                     <TableCell>Texto responsivo</TableCell>
-                    <TableCell className="font-mono text-xs">text-sm md:text-base lg:text-lg</TableCell>
+                    <TableCell className="font-mono text-xs">text-xs md:text-sm lg:text-xl</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Padding responsivo</TableCell>
@@ -1101,7 +1089,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Sombras */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Níveis de Sombra</h3>
+            <h3 className="text-xl font-semibold mb-4">Níveis de Sombra</h3>
             <div className="grid grid-cols-3 gap-6">
               <div className="p-6 border rounded-lg bg-card shadow-sm text-center">
                 <p className="font-medium">shadow-sm</p>
@@ -1120,7 +1108,7 @@ const StyleGuide = () => {
 
           {/* Shadow Glow */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Shadow Glow (Marca)</h3>
+            <h3 className="text-xl font-semibold mb-4">Shadow Glow (Marca)</h3>
             <div 
               className="p-6 border rounded-lg bg-card text-center"
               style={{ boxShadow: 'var(--shadow-glow)' }}
@@ -1132,7 +1120,7 @@ const StyleGuide = () => {
 
           {/* Border Radius */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Border Radius</h3>
+            <h3 className="text-xl font-semibold mb-4">Border Radius</h3>
             <div className="grid grid-cols-3 gap-6">
               <div className="p-6 border bg-card rounded-md text-center">
                 <p className="font-medium">rounded-md</p>
@@ -1161,7 +1149,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Variantes */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Variantes</h3>
+            <h3 className="text-xl font-semibold mb-4">Variantes</h3>
             <div className="flex flex-wrap gap-3">
               <Button>Default</Button>
               <Button variant="secondary">Secondary</Button>
@@ -1174,7 +1162,7 @@ const StyleGuide = () => {
 
           {/* Tamanhos */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Tamanhos</h3>
+            <h3 className="text-xl font-semibold mb-4">Tamanhos</h3>
             <div className="flex items-center gap-3">
               <Button size="sm">Small</Button>
               <Button size="default">Default</Button>
@@ -1184,7 +1172,7 @@ const StyleGuide = () => {
 
           {/* Estados */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Estados</h3>
+            <h3 className="text-xl font-semibold mb-4">Estados</h3>
             <div className="flex items-center gap-3">
               <Button>Normal</Button>
               <Button disabled>Disabled</Button>
@@ -1196,7 +1184,7 @@ const StyleGuide = () => {
 
           {/* Com Ícone */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Com Ícone</h3>
+            <h3 className="text-xl font-semibold mb-4">Com Ícone</h3>
             <div className="flex flex-wrap gap-3">
               <Button>
                 <Download className="h-4 w-4 mr-2" />
@@ -1224,7 +1212,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Variantes Padrão */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Variantes Padrão</h3>
+            <h3 className="text-xl font-semibold mb-4">Variantes Padrão</h3>
             <div className="flex flex-wrap gap-3">
               <Badge>Default</Badge>
               <Badge variant="secondary">Secondary</Badge>
@@ -1235,7 +1223,7 @@ const StyleGuide = () => {
 
           {/* Badges Semânticos (Risco) */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Badges de Risco (riskColors)</h3>
+            <h3 className="text-xl font-semibold mb-4">Badges de Risco (riskColors)</h3>
             <div className="flex flex-wrap gap-3">
               <Badge className={riskColors.baixo.badge}>Baixo</Badge>
               <Badge className={riskColors.medio.badge}>Médio</Badge>
@@ -1250,7 +1238,7 @@ const StyleGuide = () => {
 
           {/* Badges de Âmbito */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Badges de Âmbito (scopeColors)</h3>
+            <h3 className="text-xl font-semibold mb-4">Badges de Âmbito (scopeColors)</h3>
             <div className="flex flex-wrap gap-3">
               <Badge className={scopeColors[1].badge}>Âmbito 1</Badge>
               <Badge className={scopeColors[2].badge}>Âmbito 2</Badge>
@@ -1274,7 +1262,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Estilos de Card */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Estilos (cardStyles)</h3>
+            <h3 className="text-xl font-semibold mb-4">Estilos (cardStyles)</h3>
             <div className="grid grid-cols-2 gap-4">
               <Card className={cardStyles.kpi}>
                 <p className="font-medium">Card KPI</p>
@@ -1417,7 +1405,7 @@ const StyleGuide = () => {
 
           {/* Exemplo Real: Mini Dashboard */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Exemplo Real: Mini Dashboard</h3>
+            <h3 className="text-xl font-semibold mb-4">Exemplo Real: Mini Dashboard</h3>
             <Card className="p-6 bg-muted/30 border-dashed">
               <div className="space-y-4">
                 {/* Header do mini dashboard */}
@@ -1617,7 +1605,7 @@ const StyleGuide = () => {
         <div className="grid grid-cols-2 gap-6">
           {/* Area Chart */}
           <Card className="p-4">
-            <h3 className="text-lg font-semibold mb-4">Area Chart</h3>
+            <h3 className="text-xl font-semibold mb-4">Area Chart</h3>
             <div className="h-48">
               <TremorAreaChart
                 data={chartData}
@@ -1634,7 +1622,7 @@ const StyleGuide = () => {
 
           {/* Donut Chart */}
           <Card className="p-4">
-            <h3 className="text-lg font-semibold mb-4">Donut Chart</h3>
+            <h3 className="text-xl font-semibold mb-4">Donut Chart</h3>
             <div className="h-48 flex items-center justify-center">
               <TremorDonutChart
                 data={[
@@ -1679,7 +1667,7 @@ const StyleGuide = () => {
         <div className="space-y-8">
           {/* Grid de Ícones */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Ícones Mais Usados</h3>
+            <h3 className="text-xl font-semibold mb-4">Ícones Mais Usados</h3>
             <div className="grid grid-cols-6 gap-4">
               {commonIcons.map(({ icon: Icon, name }) => (
                 <div key={name} className="flex flex-col items-center gap-2 p-3 border rounded-lg">
@@ -1692,7 +1680,7 @@ const StyleGuide = () => {
 
           {/* Tamanhos de Ícone */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Tamanhos (iconSizes)</h3>
+            <h3 className="text-xl font-semibold mb-4">Tamanhos (iconSizes)</h3>
             <div className="flex items-end gap-6">
               {Object.entries(iconSizes).map(([size, classes]) => (
                 <div key={size} className="flex flex-col items-center gap-2">

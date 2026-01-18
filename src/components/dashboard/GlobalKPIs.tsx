@@ -117,7 +117,7 @@ export const GlobalKPIs = ({ suppliers }: GlobalKPIsProps) => {
                     </p>
                     
                     <div className="flex items-baseline gap-2">
-                      <span className={`text-3xl font-bold ${colors.icon}`}>
+                      <span className={`text-4xl font-bold ${colors.icon}`}>
                         {kpi.value}
                       </span>
                       <span className="text-sm text-muted-foreground">

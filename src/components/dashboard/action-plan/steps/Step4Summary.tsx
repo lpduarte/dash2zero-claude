@@ -244,7 +244,7 @@ export const Step4Summary = ({
                     <div className={`w-2 h-2 rounded-full ${scopeColors[1].bg}`} />
                     <p className={`text-xs ${scopeColors[1].textLight}`}>Âmbito 1 - Diretas</p>
                   </div>
-                  <p className={`font-semibold text-lg ${scopeColors[1].text}`}>
+                  <p className={`font-semibold text-xl ${scopeColors[1].text}`}>
                     {(supplier.scope1 || 0).toLocaleString('pt-PT')} t CO₂e
                   </p>
                   <p className={`text-xs ${scopeColors[1].textLight}`}>
@@ -259,7 +259,7 @@ export const Step4Summary = ({
                     <div className={`w-2 h-2 rounded-full ${scopeColors[2].bg}`} />
                     <p className={`text-xs ${scopeColors[2].textLight}`}>Âmbito 2 - Energia</p>
                   </div>
-                  <p className={`font-semibold text-lg ${scopeColors[2].text}`}>
+                  <p className={`font-semibold text-xl ${scopeColors[2].text}`}>
                     {(supplier.scope2 || 0).toLocaleString('pt-PT')} t CO₂e
                   </p>
                   <p className={`text-xs ${scopeColors[2].textLight}`}>
@@ -274,7 +274,7 @@ export const Step4Summary = ({
                     <div className={`w-2 h-2 rounded-full ${scopeColors[3].bg}`} />
                     <p className={`text-xs ${scopeColors[3].textLight}`}>Âmbito 3 - Indiretas</p>
                   </div>
-                  <p className={`font-semibold text-lg ${scopeColors[3].text}`}>
+                  <p className={`font-semibold text-xl ${scopeColors[3].text}`}>
                     {(supplier.scope3 || 0).toLocaleString('pt-PT')} t CO₂e
                   </p>
                   <p className={`text-xs ${scopeColors[3].textLight}`}>

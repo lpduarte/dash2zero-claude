@@ -249,7 +249,7 @@ export const textStyles = {
   /** Unidade/subtítulo de KPI */
   kpiUnit: 'text-xs text-muted-foreground',
   /** Título de secção */
-  sectionTitle: 'font-semibold text-lg',
+  sectionTitle: 'font-semibold text-xl',
 } as const;
 
 // ===========================================

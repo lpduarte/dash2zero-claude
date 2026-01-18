@@ -36,7 +36,7 @@ export const BulkStep1Selection = ({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Selecionar Empresas</h3>
+        <h3 className="text-xl font-semibold mb-1">Selecionar Empresas</h3>
         <p className="text-sm text-muted-foreground">
           Escolha as empresas que receberão planos de descarbonização automáticos.
         </p>

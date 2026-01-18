@@ -42,7 +42,7 @@ export const SectionHeader = ({
         <div className="p-2 rounded-lg bg-muted">
           <Icon className={cn("h-5 w-5 text-muted-foreground", iconClassName)} />
         </div>
-        <h3 className="font-semibold text-lg">{title}</h3>
+        <h3 className="font-semibold text-xl">{title}</h3>
       </div>
       
       <div className="flex items-center gap-2">

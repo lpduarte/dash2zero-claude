@@ -230,7 +230,7 @@ export const Step3Funding = ({
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground mb-1">Comparticipação Possível</p>
-            <p className="font-semibold text-lg text-success">
+            <p className="font-semibold text-xl text-success">
               Até {totalCoverage.toLocaleString('pt-PT')}€
               <span className="text-sm font-normal text-muted-foreground ml-1">
                 ({formatPercentage(coveragePercent, 0)})
@@ -239,7 +239,7 @@ export const Step3Funding = ({
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground mb-1">A cargo da empresa</p>
-            <p className={`font-semibold text-lg ${remaining === 0 ? 'text-success' : ''}`}>
+            <p className={`font-semibold text-xl ${remaining === 0 ? 'text-success' : ''}`}>
               {remaining.toLocaleString('pt-PT')}€
               <span className="text-sm font-normal text-muted-foreground ml-1">
                 ({formatPercentage(remainingPercent, 0)})
