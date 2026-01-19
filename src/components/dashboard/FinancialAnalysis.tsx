@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
 import { DollarSign, TrendingUp, Users, Building2, Target, Zap } from "lucide-react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { getSectorName } from "@/data/sectors";
 
 interface FinancialAnalysisProps {
   suppliers: Supplier[];
@@ -144,7 +145,7 @@ export const FinancialAnalysis = ({ suppliers }: FinancialAnalysisProps) => {
                           <span>{data.totalEmissions.toFixed(0)} t CO₂e</span>
                         </p>
                         <div className="flex gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">{data.sector}</Badge>
+                          <Badge variant="outline" className="text-xs">{getSectorName(data.sector)}</Badge>
                           <Badge variant="outline" className="text-xs">{data.cluster}</Badge>
                         </div>
                       </div>

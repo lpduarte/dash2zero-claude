@@ -119,7 +119,7 @@ const rawSuppliers = [
   {
     id: "micro-1",
     name: "EcoConsult Micro",
-    sector: "services",
+    sector: "servicos",
     region: "north",
     scope1: 3,
     scope2: 8,
@@ -146,7 +146,7 @@ const rawSuppliers = [
   {
     id: "micro-2",
     name: "Digital Spark Lda",
-    sector: "technology",
+    sector: "tecnologia",
     region: "center",
     scope1: 2,
     scope2: 12,
@@ -173,7 +173,7 @@ const rawSuppliers = [
   {
     id: "micro-3",
     name: "Verde Design Studio",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 1,
     scope2: 6,
@@ -200,8 +200,8 @@ const rawSuppliers = [
   {
     id: "micro-4",
     name: "ArteTêxtil Handcraft",
-    sector: "manufacturing",
-    subsector: "textile",
+    sector: "industria",
+    subsector: "textil",
     region: "north",
     scope1: 5,
     scope2: 10,
@@ -228,7 +228,7 @@ const rawSuppliers = [
   {
     id: "micro-5",
     name: "BioLab Análises",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 4,
     scope2: 14,
@@ -255,8 +255,8 @@ const rawSuppliers = [
   {
     id: "micro-6",
     name: "Cerâmica Artesanal Porto",
-    sector: "manufacturing",
-    subsector: "ceramics",
+    sector: "industria",
+    subsector: "ceramica",
     region: "north",
     scope1: 8,
     scope2: 6,
@@ -283,7 +283,7 @@ const rawSuppliers = [
   {
     id: "micro-7",
     name: "CodeCraft Studios",
-    sector: "technology",
+    sector: "tecnologia",
     region: "south",
     scope1: 1,
     scope2: 8,
@@ -310,7 +310,7 @@ const rawSuppliers = [
   {
     id: "micro-8",
     name: "Padaria Sustentável",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 12,
     scope2: 8,
@@ -337,7 +337,7 @@ const rawSuppliers = [
   {
     id: "micro-9",
     name: "TransExpress Courier",
-    sector: "logistics",
+    sector: "logistica",
     region: "north",
     scope1: 35,
     scope2: 5,
@@ -364,7 +364,7 @@ const rawSuppliers = [
   {
     id: "micro-10",
     name: "WebFlow Agency",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 1,
     scope2: 5,
@@ -391,7 +391,7 @@ const rawSuppliers = [
   {
     id: "micro-11",
     name: "EcoClean Serviços",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 8,
     scope2: 4,
@@ -418,7 +418,7 @@ const rawSuppliers = [
   {
     id: "micro-12",
     name: "Móveis Artesanais Braga",
-    sector: "manufacturing",
+    sector: "industria",
     region: "north",
     scope1: 15,
     scope2: 8,
@@ -445,7 +445,7 @@ const rawSuppliers = [
   {
     id: "micro-13",
     name: "GreenIT Solutions",
-    sector: "technology",
+    sector: "tecnologia",
     region: "center",
     scope1: 1,
     scope2: 10,
@@ -472,8 +472,8 @@ const rawSuppliers = [
   {
     id: "micro-14",
     name: "BioCosmetics Natural",
-    sector: "manufacturing",
-    subsector: "chemicals",
+    sector: "industria",
+    subsector: "quimica",
     region: "south",
     scope1: 6,
     scope2: 8,
@@ -500,7 +500,7 @@ const rawSuppliers = [
   {
     id: "micro-15",
     name: "DataMini Analytics",
-    sector: "technology",
+    sector: "tecnologia",
     region: "north",
     scope1: 1,
     scope2: 7,
@@ -527,7 +527,7 @@ const rawSuppliers = [
   {
     id: "micro-16",
     name: "Vinhos Artesanais Douro",
-    sector: "food",
+    sector: "alimentar",
     region: "north",
     scope1: 10,
     scope2: 5,
@@ -554,7 +554,7 @@ const rawSuppliers = [
   {
     id: "micro-17",
     name: "Repair Café Porto",
-    sector: "services",
+    sector: "servicos",
     region: "north",
     scope1: 2,
     scope2: 4,
@@ -581,7 +581,7 @@ const rawSuppliers = [
   {
     id: "micro-18",
     name: "Solar Micro Energia",
-    sector: "technology",
+    sector: "tecnologia",
     region: "south",
     scope1: 2,
     scope2: 3,
@@ -608,7 +608,7 @@ const rawSuppliers = [
   {
     id: "micro-19",
     name: "Flores Sustentáveis Lda",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 5,
     scope2: 3,
@@ -635,7 +635,7 @@ const rawSuppliers = [
   {
     id: "micro-20",
     name: "Carpintaria Eco",
-    sector: "manufacturing",
+    sector: "industria",
     region: "north",
     scope1: 12,
     scope2: 6,
@@ -662,7 +662,7 @@ const rawSuppliers = [
   {
     id: "micro-21",
     name: "Queijos Artesanais Serra",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 8,
     scope2: 4,
@@ -689,7 +689,7 @@ const rawSuppliers = [
   {
     id: "micro-22",
     name: "Contabilidade Verde",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 1,
     scope2: 6,
@@ -716,7 +716,7 @@ const rawSuppliers = [
   {
     id: "micro-23",
     name: "Impressão 3D Eco",
-    sector: "manufacturing",
+    sector: "industria",
     region: "center",
     scope1: 3,
     scope2: 12,
@@ -748,7 +748,7 @@ const rawSuppliers = [
   {
     id: "peq-1",
     name: "TechStart Innovation",
-    sector: "technology",
+    sector: "tecnologia",
     region: "north",
     scope1: 25,
     scope2: 45,
@@ -775,8 +775,8 @@ const rawSuppliers = [
   {
     id: "peq-2",
     name: "Metalúrgica Norte",
-    sector: "manufacturing",
-    subsector: "metallurgy",
+    sector: "industria",
+    subsector: "metalurgia",
     region: "north",
     scope1: 180,
     scope2: 85,
@@ -803,7 +803,7 @@ const rawSuppliers = [
   {
     id: "peq-3",
     name: "TransLog Regional",
-    sector: "logistics",
+    sector: "logistica",
     region: "center",
     scope1: 320,
     scope2: 40,
@@ -830,7 +830,7 @@ const rawSuppliers = [
   {
     id: "peq-4",
     name: "Alimentar Saudável Lda",
-    sector: "food",
+    sector: "alimentar",
     region: "south",
     scope1: 65,
     scope2: 35,
@@ -857,8 +857,8 @@ const rawSuppliers = [
   {
     id: "peq-5",
     name: "Plásticos Recicláveis Porto",
-    sector: "manufacturing",
-    subsector: "plastics",
+    sector: "industria",
+    subsector: "plasticos",
     region: "north",
     scope1: 95,
     scope2: 55,
@@ -885,7 +885,7 @@ const rawSuppliers = [
   {
     id: "peq-6",
     name: "Consultoria Ambiental SA",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 12,
     scope2: 28,
@@ -912,8 +912,8 @@ const rawSuppliers = [
   {
     id: "peq-7",
     name: "Têxteis Minho",
-    sector: "manufacturing",
-    subsector: "textile",
+    sector: "industria",
+    subsector: "textil",
     region: "north",
     scope1: 145,
     scope2: 80,
@@ -940,7 +940,7 @@ const rawSuppliers = [
   {
     id: "peq-8",
     name: "Digital Marketing Plus",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 8,
     scope2: 22,
@@ -967,7 +967,7 @@ const rawSuppliers = [
   {
     id: "peq-9",
     name: "Construção Sustentável Lda",
-    sector: "construction",
+    sector: "construcao",
     region: "center",
     scope1: 220,
     scope2: 65,
@@ -994,8 +994,8 @@ const rawSuppliers = [
   {
     id: "peq-10",
     name: "Vidros Artísticos Lisboa",
-    sector: "manufacturing",
-    subsector: "glass",
+    sector: "industria",
+    subsector: "ceramica",
     region: "center",
     scope1: 110,
     scope2: 55,
@@ -1022,8 +1022,8 @@ const rawSuppliers = [
   {
     id: "peq-11",
     name: "Embalagens Sustentáveis",
-    sector: "manufacturing",
-    subsector: "packaging",
+    sector: "industria",
+    subsector: "embalagens",
     region: "north",
     scope1: 85,
     scope2: 45,
@@ -1050,8 +1050,8 @@ const rawSuppliers = [
   {
     id: "peq-12",
     name: "Cerâmicas Tradicionais Alentejo",
-    sector: "manufacturing",
-    subsector: "ceramics",
+    sector: "industria",
+    subsector: "ceramica",
     region: "south",
     scope1: 125,
     scope2: 60,
@@ -1078,7 +1078,7 @@ const rawSuppliers = [
   {
     id: "peq-13",
     name: "Software Verde Lda",
-    sector: "technology",
+    sector: "tecnologia",
     region: "center",
     scope1: 5,
     scope2: 35,
@@ -1105,7 +1105,7 @@ const rawSuppliers = [
   {
     id: "peq-14",
     name: "Hotelaria Eco Algarve",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 85,
     scope2: 65,
@@ -1132,8 +1132,8 @@ const rawSuppliers = [
   {
     id: "peq-15",
     name: "Química Limpa Industrial",
-    sector: "manufacturing",
-    subsector: "chemicals",
+    sector: "industria",
+    subsector: "quimica",
     region: "north",
     scope1: 140,
     scope2: 70,
@@ -1160,8 +1160,8 @@ const rawSuppliers = [
   {
     id: "peq-16",
     name: "Papel Reciclado Norte",
-    sector: "manufacturing",
-    subsector: "paper",
+    sector: "industria",
+    subsector: "papel",
     region: "north",
     scope1: 90,
     scope2: 50,
@@ -1188,8 +1188,8 @@ const rawSuppliers = [
   {
     id: "peq-17",
     name: "Auto Peças Sustentáveis",
-    sector: "manufacturing",
-    subsector: "automotive",
+    sector: "industria",
+    subsector: "automovel",
     region: "center",
     scope1: 155,
     scope2: 75,
@@ -1250,7 +1250,7 @@ const rawSuppliers = [
   {
     id: "1",
     name: "EcoTech Solutions",
-    sector: "technology",
+    sector: "tecnologia",
     region: "north",
     scope1: 120,
     scope2: 85,
@@ -1283,7 +1283,7 @@ const rawSuppliers = [
   {
     id: "6",
     name: "Digital Solutions SA",
-    sector: "technology",
+    sector: "tecnologia",
     region: "south",
     scope1: 180,
     scope2: 120,
@@ -1315,7 +1315,7 @@ const rawSuppliers = [
   {
     id: "10",
     name: "TechNova Systems",
-    sector: "technology",
+    sector: "tecnologia",
     region: "north",
     scope1: 140,
     scope2: 95,
@@ -1342,7 +1342,7 @@ const rawSuppliers = [
   {
     id: "16",
     name: "DataCloud Solutions",
-    sector: "technology",
+    sector: "tecnologia",
     region: "center",
     scope1: 95,
     scope2: 65,
@@ -1369,7 +1369,7 @@ const rawSuppliers = [
   {
     id: "24",
     name: "GreenEnergy Solar",
-    sector: "technology",
+    sector: "tecnologia",
     region: "south",
     scope1: 45,
     scope2: 30,
@@ -1397,7 +1397,7 @@ const rawSuppliers = [
   {
     id: "2",
     name: "GreenBuild Construtores",
-    sector: "construction",
+    sector: "construcao",
     region: "center",
     scope1: 290,
     scope2: 160,
@@ -1428,7 +1428,7 @@ const rawSuppliers = [
   {
     id: "7",
     name: "ObrasMega Construção",
-    sector: "construction",
+    sector: "construcao",
     region: "islands",
     scope1: 1800,
     scope2: 850,
@@ -1459,7 +1459,7 @@ const rawSuppliers = [
   {
     id: "15",
     name: "BuildRight Construção",
-    sector: "construction",
+    sector: "construcao",
     region: "islands",
     scope1: 720,
     scope2: 380,
@@ -1487,7 +1487,7 @@ const rawSuppliers = [
   {
     id: "3",
     name: "TransporteVerde Logística",
-    sector: "logistics",
+    sector: "logistica",
     region: "south",
     scope1: 550,
     scope2: 180,
@@ -1518,7 +1518,7 @@ const rawSuppliers = [
   {
     id: "8",
     name: "FleetPro Transport",
-    sector: "logistics",
+    sector: "logistica",
     region: "north",
     scope1: 4400,
     scope2: 420,
@@ -1549,7 +1549,7 @@ const rawSuppliers = [
   {
     id: "12",
     name: "LogiExpress Transportes",
-    sector: "logistics",
+    sector: "logistica",
     region: "center",
     scope1: 2180,
     scope2: 420,
@@ -1576,7 +1576,7 @@ const rawSuppliers = [
   {
     id: "18",
     name: "MarLog Marítima",
-    sector: "logistics",
+    sector: "logistica",
     region: "south",
     scope1: 4900,
     scope2: 360,
@@ -1603,7 +1603,7 @@ const rawSuppliers = [
   {
     id: "29",
     name: "MoveRápido Couriers",
-    sector: "logistics",
+    sector: "logistica",
     region: "north",
     scope1: 1420,
     scope2: 165,
@@ -1631,8 +1631,8 @@ const rawSuppliers = [
   {
     id: "17",
     name: "QuimiVerde Chemicals",
-    sector: "manufacturing",
-    subsector: "chemicals",
+    sector: "industria",
+    subsector: "quimica",
     region: "north",
     scope1: 320,
     scope2: 220,
@@ -1659,8 +1659,8 @@ const rawSuppliers = [
   {
     id: "33",
     name: "ChemPro Portugal",
-    sector: "manufacturing",
-    subsector: "chemicals",
+    sector: "industria",
+    subsector: "quimica",
     region: "center",
     scope1: 2900,
     scope2: 1440,
@@ -1687,8 +1687,8 @@ const rawSuppliers = [
   {
     id: "34",
     name: "EcoQuímica Industrial",
-    sector: "manufacturing",
-    subsector: "chemicals",
+    sector: "industria",
+    subsector: "quimica",
     region: "south",
     scope1: 480,
     scope2: 320,
@@ -1716,8 +1716,8 @@ const rawSuppliers = [
   {
     id: "27",
     name: "VidroPT Glass",
-    sector: "manufacturing",
-    subsector: "glass",
+    sector: "industria",
+    subsector: "ceramica",
     region: "center",
     scope1: 320,
     scope2: 180,
@@ -1744,8 +1744,8 @@ const rawSuppliers = [
   {
     id: "35",
     name: "CrystalGlass Industries",
-    sector: "manufacturing",
-    subsector: "glass",
+    sector: "industria",
+    subsector: "ceramica",
     region: "north",
     scope1: 1280,
     scope2: 620,
@@ -1772,8 +1772,8 @@ const rawSuppliers = [
   {
     id: "36",
     name: "VidroSul Embalagens",
-    sector: "manufacturing",
-    subsector: "glass",
+    sector: "industria",
+    subsector: "ceramica",
     region: "south",
     scope1: 920,
     scope2: 480,
@@ -1801,8 +1801,8 @@ const rawSuppliers = [
   {
     id: "11",
     name: "MetalPro Indústrias",
-    sector: "manufacturing",
-    subsector: "metallurgy",
+    sector: "industria",
+    subsector: "metalurgia",
     region: "south",
     scope1: 1450,
     scope2: 680,
@@ -1829,8 +1829,8 @@ const rawSuppliers = [
   {
     id: "37",
     name: "AçoVerde Metalurgia",
-    sector: "manufacturing",
-    subsector: "metallurgy",
+    sector: "industria",
+    subsector: "metalurgia",
     region: "north",
     scope1: 1180,
     scope2: 540,
@@ -1857,8 +1857,8 @@ const rawSuppliers = [
   {
     id: "38",
     name: "FundoPT Fundição",
-    sector: "manufacturing",
-    subsector: "foundry",
+    sector: "industria",
+    subsector: "metalurgia",
     region: "center",
     scope1: 520,
     scope2: 220,
@@ -1886,8 +1886,8 @@ const rawSuppliers = [
   {
     id: "13",
     name: "EcoPlásticos SA",
-    sector: "manufacturing",
-    subsector: "plastics",
+    sector: "industria",
+    subsector: "plasticos",
     region: "north",
     scope1: 490,
     scope2: 220,
@@ -1914,8 +1914,8 @@ const rawSuppliers = [
   {
     id: "39",
     name: "PolyTech Polymers",
-    sector: "manufacturing",
-    subsector: "plastics",
+    sector: "industria",
+    subsector: "plasticos",
     region: "center",
     scope1: 1360,
     scope2: 640,
@@ -1942,8 +1942,8 @@ const rawSuppliers = [
   {
     id: "40",
     name: "RecyPlast Reciclagem",
-    sector: "manufacturing",
-    subsector: "plastics",
+    sector: "industria",
+    subsector: "plasticos",
     region: "south",
     scope1: 420,
     scope2: 220,
@@ -1971,8 +1971,8 @@ const rawSuppliers = [
   {
     id: "20",
     name: "TêxtilNorte Fabrics",
-    sector: "manufacturing",
-    subsector: "textile",
+    sector: "industria",
+    subsector: "textil",
     region: "north",
     scope1: 1360,
     scope2: 760,
@@ -1999,8 +1999,8 @@ const rawSuppliers = [
   {
     id: "41",
     name: "FashionGreen Textiles",
-    sector: "manufacturing",
-    subsector: "textile",
+    sector: "industria",
+    subsector: "textil",
     region: "center",
     scope1: 1040,
     scope2: 560,
@@ -2027,8 +2027,8 @@ const rawSuppliers = [
   {
     id: "42",
     name: "ConfecçõesSul Texteis",
-    sector: "manufacturing",
-    subsector: "textile",
+    sector: "industria",
+    subsector: "textil",
     region: "south",
     scope1: 780,
     scope2: 420,
@@ -2056,8 +2056,8 @@ const rawSuppliers = [
   {
     id: "21",
     name: "CerâmicaSul Tiles",
-    sector: "manufacturing",
-    subsector: "ceramics",
+    sector: "industria",
+    subsector: "ceramica",
     region: "south",
     scope1: 1650,
     scope2: 780,
@@ -2084,8 +2084,8 @@ const rawSuppliers = [
   {
     id: "43",
     name: "AzulejoPT Cerâmica",
-    sector: "manufacturing",
-    subsector: "ceramics",
+    sector: "industria",
+    subsector: "ceramica",
     region: "center",
     scope1: 480,
     scope2: 250,
@@ -2112,8 +2112,8 @@ const rawSuppliers = [
   {
     id: "44",
     name: "PorcelanaFina Industries",
-    sector: "manufacturing",
-    subsector: "ceramics",
+    sector: "industria",
+    subsector: "ceramica",
     region: "north",
     scope1: 720,
     scope2: 340,
@@ -2141,7 +2141,7 @@ const rawSuppliers = [
   {
     id: "9",
     name: "AgroVerde Alimentos",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 320,
     scope2: 180,
@@ -2168,7 +2168,7 @@ const rawSuppliers = [
   {
     id: "22",
     name: "FoodTech Alimentação",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 840,
     scope2: 440,
@@ -2195,7 +2195,7 @@ const rawSuppliers = [
   {
     id: "28",
     name: "BioFarm Agricultura",
-    sector: "food",
+    sector: "alimentar",
     region: "south",
     scope1: 560,
     scope2: 290,
@@ -2223,8 +2223,8 @@ const rawSuppliers = [
   {
     id: "23",
     name: "AutoPeças Express",
-    sector: "manufacturing",
-    subsector: "automotive",
+    sector: "industria",
+    subsector: "automovel",
     region: "north",
     scope1: 1560,
     scope2: 700,
@@ -2251,8 +2251,8 @@ const rawSuppliers = [
   {
     id: "45",
     name: "ComponentAuto Industrial",
-    sector: "manufacturing",
-    subsector: "automotive",
+    sector: "industria",
+    subsector: "automovel",
     region: "center",
     scope1: 420,
     scope2: 180,
@@ -2279,8 +2279,8 @@ const rawSuppliers = [
   {
     id: "46",
     name: "MoldAuto Precision",
-    sector: "manufacturing",
-    subsector: "automotive",
+    sector: "industria",
+    subsector: "automovel",
     region: "north",
     scope1: 920,
     scope2: 440,
@@ -2308,8 +2308,8 @@ const rawSuppliers = [
   {
     id: "25",
     name: "PackPro Embalagens",
-    sector: "manufacturing",
-    subsector: "packaging",
+    sector: "industria",
+    subsector: "embalagens",
     region: "center",
     scope1: 340,
     scope2: 180,
@@ -2336,8 +2336,8 @@ const rawSuppliers = [
   {
     id: "47",
     name: "EcoPack Solutions",
-    sector: "manufacturing",
-    subsector: "packaging",
+    sector: "industria",
+    subsector: "embalagens",
     region: "north",
     scope1: 380,
     scope2: 190,
@@ -2364,8 +2364,8 @@ const rawSuppliers = [
   {
     id: "48",
     name: "BoxMaster Packaging",
-    sector: "manufacturing",
-    subsector: "packaging",
+    sector: "industria",
+    subsector: "embalagens",
     region: "south",
     scope1: 1020,
     scope2: 520,
@@ -2393,8 +2393,8 @@ const rawSuppliers = [
   {
     id: "30",
     name: "PapelEco Paper",
-    sector: "manufacturing",
-    subsector: "paper",
+    sector: "industria",
+    subsector: "papel",
     region: "center",
     scope1: 420,
     scope2: 240,
@@ -2421,7 +2421,7 @@ const rawSuppliers = [
   {
     id: "49",
     name: "CeluloseVerde Industries",
-    sector: "manufacturing",
+    sector: "industria",
     region: "north",
     scope1: 480,
     scope2: 260,
@@ -2448,7 +2448,7 @@ const rawSuppliers = [
   {
     id: "50",
     name: "PapelSul Produções",
-    sector: "manufacturing",
+    sector: "industria",
     region: "south",
     scope1: 1020,
     scope2: 580,
@@ -2476,7 +2476,7 @@ const rawSuppliers = [
   {
     id: "5",
     name: "CleanServices Lda",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 45,
     scope2: 120,
@@ -2508,7 +2508,7 @@ const rawSuppliers = [
   {
     id: "14",
     name: "ConsultPT Serviços",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 28,
     scope2: 85,
@@ -2535,7 +2535,7 @@ const rawSuppliers = [
   {
     id: "19",
     name: "SmartOffice Lda",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 35,
     scope2: 92,
@@ -2562,7 +2562,7 @@ const rawSuppliers = [
   {
     id: "26",
     name: "InfoSec Consulting",
-    sector: "services",
+    sector: "servicos",
     region: "north",
     scope1: 420,
     scope2: 280,
@@ -2589,7 +2589,7 @@ const rawSuppliers = [
   {
     id: "31",
     name: "HotelVerde Hospitality",
-    sector: "services",
+    sector: "servicos",
     region: "islands",
     scope1: 785,
     scope2: 520,
@@ -2616,7 +2616,7 @@ const rawSuppliers = [
   {
     id: "32",
     name: "ElétricaPlus Energy",
-    sector: "services",
+    sector: "servicos",
     region: "south",
     scope1: 95,
     scope2: 180,
@@ -2644,7 +2644,7 @@ const rawSuppliers = [
   {
     id: "4",
     name: "Indústrias SustentaPT",
-    sector: "manufacturing",
+    sector: "industria",
     region: "north",
     scope1: 980,
     scope2: 450,
@@ -2678,8 +2678,8 @@ const rawSuppliers = [
   {
     id: "60",
     name: "GreenChem Soluções Químicas",
-    sector: "manufacturing",
-    subsector: "chemicals",
+    sector: "industria",
+    subsector: "quimica",
     region: "center",
     scope1: 420,
     scope2: 180,
@@ -2707,8 +2707,8 @@ const rawSuppliers = [
   {
     id: "61",
     name: "VitroEco Vidros Sustentáveis",
-    sector: "manufacturing",
-    subsector: "glass",
+    sector: "industria",
+    subsector: "ceramica",
     region: "north",
     scope1: 580,
     scope2: 290,
@@ -2736,8 +2736,8 @@ const rawSuppliers = [
   {
     id: "62",
     name: "EcoFibras Têxteis Verdes",
-    sector: "manufacturing",
-    subsector: "textile",
+    sector: "industria",
+    subsector: "textil",
     region: "center",
     scope1: 320,
     scope2: 180,
@@ -2765,8 +2765,8 @@ const rawSuppliers = [
   {
     id: "63",
     name: "CerâmicaVerde Tiles",
-    sector: "manufacturing",
-    subsector: "ceramics",
+    sector: "industria",
+    subsector: "ceramica",
     region: "south",
     scope1: 480,
     scope2: 240,
@@ -2794,8 +2794,8 @@ const rawSuppliers = [
   {
     id: "64",
     name: "AutoGreen Componentes",
-    sector: "manufacturing",
-    subsector: "automotive",
+    sector: "industria",
+    subsector: "automovel",
     region: "north",
     scope1: 380,
     scope2: 190,
@@ -2823,8 +2823,8 @@ const rawSuppliers = [
   {
     id: "65",
     name: "FundiçãoEco Metais",
-    sector: "manufacturing",
-    subsector: "foundry",
+    sector: "industria",
+    subsector: "metalurgia",
     region: "center",
     scope1: 620,
     scope2: 310,
@@ -2852,8 +2852,8 @@ const rawSuppliers = [
   {
     id: "66",
     name: "BioPlast Polímeros Verdes",
-    sector: "manufacturing",
-    subsector: "plastics",
+    sector: "industria",
+    subsector: "plasticos",
     region: "south",
     scope1: 280,
     scope2: 150,
@@ -2881,8 +2881,8 @@ const rawSuppliers = [
   {
     id: "67",
     name: "MetalGreen Siderurgia",
-    sector: "manufacturing",
-    subsector: "metallurgy",
+    sector: "industria",
+    subsector: "metalurgia",
     region: "north",
     scope1: 420,
     scope2: 280,
@@ -2915,7 +2915,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-1",
     name: "EcoTech Cascais",
-    sector: "technology",
+    sector: "tecnologia",
     region: "center",
     scope1: 25,
     scope2: 85,
@@ -2946,7 +2946,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-2",
     name: "Transportes Verdes Estoril",
-    sector: "logistics",
+    sector: "logistica",
     region: "center",
     scope1: 180,
     scope2: 45,
@@ -2977,7 +2977,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-3",
     name: "SolarTech Alcabideche",
-    sector: "energy",
+    sector: "energia",
     region: "center",
     scope1: 12,
     scope2: 35,
@@ -3008,7 +3008,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-4",
     name: "Restaurante Mar Azul",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 35,
     scope2: 25,
@@ -3039,7 +3039,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-5",
     name: "Consultoria Verde Parede",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 3,
     scope2: 18,
@@ -3070,7 +3070,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-6",
     name: "Construções São Domingos",
-    sector: "construction",
+    sector: "construcao",
     region: "center",
     scope1: 280,
     scope2: 95,
@@ -3101,7 +3101,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-7",
     name: "CleanTech Cascais",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 45,
     scope2: 22,
@@ -3132,7 +3132,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-8",
     name: "Hotel Estoril Verde",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 120,
     scope2: 185,
@@ -3163,7 +3163,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-9",
     name: "Farmácia Central Carcavelos",
-    sector: "retail",
+    sector: "comercio",
     region: "center",
     scope1: 8,
     scope2: 28,
@@ -3194,7 +3194,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-10",
     name: "Academia Fitness Parede",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 15,
     scope2: 65,
@@ -3225,7 +3225,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-11",
     name: "Imobiliária Costa Cascais",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 5,
     scope2: 12,
@@ -3256,7 +3256,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-12",
     name: "Padaria Artesanal Alcabideche",
-    sector: "food",
+    sector: "alimentar",
     region: "center",
     scope1: 28,
     scope2: 18,
@@ -3287,7 +3287,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-13",
     name: "Auto Reparações Estoril",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 42,
     scope2: 28,
@@ -3318,7 +3318,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-14",
     name: "Clínica Veterinária São Domingos",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 12,
     scope2: 35,
@@ -3349,7 +3349,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-15",
     name: "Escola de Surf Carcavelos",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 8,
     scope2: 12,
@@ -3380,7 +3380,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-16",
     name: "Supermercado Bio Parede",
-    sector: "retail",
+    sector: "comercio",
     region: "center",
     scope1: 45,
     scope2: 85,
@@ -3411,7 +3411,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-17",
     name: "Escritório Contabilidade Cascais",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 2,
     scope2: 15,
@@ -3442,7 +3442,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-18",
     name: "Marina Sports Cascais",
-    sector: "retail",
+    sector: "comercio",
     region: "center",
     scope1: 18,
     scope2: 42,
@@ -3473,7 +3473,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-19",
     name: "Jardins Sustentáveis Alcabideche",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 35,
     scope2: 8,
@@ -3504,7 +3504,7 @@ const cascaisSuppliers = [
   {
     id: "cascais-20",
     name: "Centro Médico Estoril",
-    sector: "services",
+    sector: "servicos",
     region: "center",
     scope1: 25,
     scope2: 95,

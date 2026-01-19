@@ -37,7 +37,7 @@ export interface Supplier {
   clusterId?: string; // Novo - ID do cluster dinâmico
 }
 
-export type SectorFilter = 'all' | 'manufacturing' | 'technology' | 'construction' | 'transport' | 'services';
+export type SectorFilter = 'all' | 'industria' | 'tecnologia' | 'construcao' | 'logistica' | 'servicos' | 'comercio' | 'alimentar' | 'energia';
 export type RegionFilter = 'all' | 'north' | 'center' | 'south' | 'islands';
 export type CompanySizeFilter = 'all' | 'micro' | 'pequena' | 'media' | 'grande';
 

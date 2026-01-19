@@ -5,6 +5,7 @@ import { Supplier } from "@/types/supplier";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { ArrowRightLeft, TrendingDown, AlertCircle, Lightbulb } from "lucide-react";
 import { useState } from "react";
+import { getSectorName } from "@/data/sectors";
 
 interface PartnerComparisonProps {
   suppliers: Supplier[];
@@ -14,18 +15,10 @@ export const PartnerComparison = ({ suppliers }: PartnerComparisonProps) => {
   const [selectedSector, setSelectedSector] = useState<string>("all");
 
   const sectors = [...new Set(suppliers.map(s => s.sector))];
-  
-  const filteredSuppliers = selectedSector === "all" 
-    ? suppliers 
-    : suppliers.filter(s => s.sector === selectedSector);
 
-  const sectorLabels: Record<string, string> = {
-    technology: 'Tecnologia',
-    construction: 'Construção',
-    transport: 'Transporte',
-    manufacturing: 'Indústria',
-    services: 'Serviços',
-  };
+  const filteredSuppliers = selectedSector === "all"
+    ? suppliers
+    : suppliers.filter(s => s.sector === selectedSector);
 
   // Prepare data for stacked bar chart (A1, A2, A3)
   const comparisonData = filteredSuppliers.map(s => ({
@@ -96,7 +89,7 @@ export const PartnerComparison = ({ suppliers }: PartnerComparisonProps) => {
                 size="sm"
                 onClick={() => setSelectedSector(sector)}
               >
-                {sectorLabels[sector] || sector}
+                {getSectorName(sector)}
               </Button>
             ))}
           </div>

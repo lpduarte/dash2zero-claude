@@ -38,11 +38,14 @@ export const FilterPanel = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os Setores</SelectItem>
-              <SelectItem value="manufacturing">Indústria</SelectItem>
-              <SelectItem value="technology">Tecnologia</SelectItem>
-              <SelectItem value="construction">Construção</SelectItem>
-              <SelectItem value="transport">Transporte</SelectItem>
-              <SelectItem value="services">Serviços</SelectItem>
+              <SelectItem value="industria">Indústria</SelectItem>
+              <SelectItem value="tecnologia">Tecnologia</SelectItem>
+              <SelectItem value="construcao">Construção</SelectItem>
+              <SelectItem value="logistica">Logística</SelectItem>
+              <SelectItem value="servicos">Serviços</SelectItem>
+              <SelectItem value="comercio">Comércio</SelectItem>
+              <SelectItem value="alimentar">Alimentar</SelectItem>
+              <SelectItem value="energia">Energia</SelectItem>
             </SelectContent>
           </Select>
         </div>

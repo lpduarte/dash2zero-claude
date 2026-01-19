@@ -1,16 +1,58 @@
-// Configuração centralizada de setores/atividades
-// Usado em toda a aplicação para garantir consistência
+// ============================================================================
+// CONFIGURAÇÃO CENTRALIZADA DE SETORES/ATIVIDADES
+// ============================================================================
+// NOTA: Este software é 100% em Português de Portugal.
+// Os setores seguem a Classificação Portuguesa de Atividades Económicas (CAE Rev.3)
+// Fonte: INE - Instituto Nacional de Estatística
+// ============================================================================
 
-// Mapeamento de setores (chave técnica -> nome em português)
+// Mapeamento de setores (chave -> nome em português)
+// As chaves são em português para consistência
 export const sectorLabels: Record<string, string> = {
+  // Valor especial para filtros
   all: "Todas as atividades",
-  technology: "Tecnologia",
-  construction: "Construção",
-  logistics: "Logística",
-  manufacturing: "Indústria",
-  food: "Alimentar",
-  services: "Serviços",
-  energia: "Energia"
+
+  // -------------------------------------------------------------------------
+  // SETORES PRINCIPAIS (baseados nas Secções CAE)
+  // -------------------------------------------------------------------------
+  agricultura: "Agricultura",                 // CAE A - Agricultura, produção animal, caça, floresta e pesca
+  extracao: "Indústrias Extrativas",          // CAE B - Indústrias extrativas
+  industria: "Indústria",                     // CAE C - Indústrias transformadoras
+  energia: "Energia",                         // CAE D - Eletricidade, gás, vapor, água quente e fria
+  agua: "Água e Saneamento",                  // CAE E - Captação, tratamento e distribuição de água
+  construcao: "Construção",                   // CAE F - Construção
+  comercio: "Comércio",                       // CAE G - Comércio por grosso e a retalho
+  logistica: "Logística",                     // CAE H - Transporte e armazenagem
+  hotelaria: "Hotelaria e Restauração",       // CAE I - Alojamento, restauração e similares
+  tecnologia: "Tecnologia",                   // CAE J - Informação e Comunicação
+  financas: "Banca e Seguros",                // CAE K - Atividades financeiras e de seguros
+  imobiliario: "Imobiliário",                 // CAE L - Atividades imobiliárias
+  consultoria: "Consultoria",                 // CAE M - Atividades de consultoria, científicas e técnicas
+  administrativo: "Serviços Administrativos", // CAE N - Atividades administrativas e dos serviços de apoio
+  educacao: "Educação",                       // CAE P - Educação
+  saude: "Saúde",                             // CAE Q - Atividades de saúde humana e apoio social
+  cultura: "Cultura e Lazer",                 // CAE R - Atividades artísticas, de espetáculos e recreativas
+  servicos: "Outros Serviços",                // CAE S - Outras atividades de serviços
+
+  // -------------------------------------------------------------------------
+  // SUBSETORES DA INDÚSTRIA (Divisões CAE dentro da Secção C)
+  // Usados no campo 'subsector' para detalhe adicional
+  // -------------------------------------------------------------------------
+  alimentar: "Indústria Alimentar",           // CAE 10-12
+  textil: "Têxtil e Vestuário",               // CAE 13-14
+  madeira: "Madeira e Cortiça",               // CAE 16
+  papel: "Papel e Cartão",                    // CAE 17
+  quimica: "Química",                         // CAE 20
+  farmaceutica: "Farmacêutica",               // CAE 21
+  plasticos: "Borracha e Plásticos",          // CAE 22
+  ceramica: "Cerâmica e Vidro",               // CAE 23
+  metalurgia: "Metalurgia",                   // CAE 24
+  metalomecanica: "Metalomecânica",           // CAE 25
+  eletronica: "Eletrónica",                   // CAE 26-27
+  automovel: "Automóvel",                     // CAE 29
+  mobiliario: "Mobiliário",                   // CAE 31
+  embalagens: "Embalagens",                   // Transversal
+
 };
 
 // Função helper para obter nome do setor em português

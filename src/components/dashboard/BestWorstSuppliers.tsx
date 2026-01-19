@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
 import { TrendingDown, TrendingUp, Award, AlertTriangle } from "lucide-react";
 import { formatNumber, formatPercentage } from "@/lib/formatters";
+import { getSectorName } from "@/data/sectors";
 
 interface BestWorstSuppliersProps {
   suppliers: Supplier[];
@@ -34,7 +35,7 @@ export const BestWorstSuppliers = ({ suppliers }: BestWorstSuppliersProps) => {
           <div className="space-y-3">
             <div>
               <h3 className="font-bold text-xl text-foreground">{best.name}</h3>
-              <p className="text-sm text-muted-foreground">{best.sector}</p>
+              <p className="text-sm text-muted-foreground">{getSectorName(best.sector)}</p>
             </div>
             
             <div className="grid grid-cols-2 gap-3 pt-2">
@@ -81,7 +82,7 @@ export const BestWorstSuppliers = ({ suppliers }: BestWorstSuppliersProps) => {
           <div className="space-y-3">
             <div>
               <h3 className="font-bold text-xl text-foreground">{worst.name}</h3>
-              <p className="text-sm text-muted-foreground">{worst.sector}</p>
+              <p className="text-sm text-muted-foreground">{getSectorName(worst.sector)}</p>
             </div>
             
             <div className="grid grid-cols-2 gap-3 pt-2">

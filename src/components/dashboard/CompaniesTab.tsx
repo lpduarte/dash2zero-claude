@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Search, MapPin, ArrowUpDown, LayoutGrid, List, Info } from "lucide-react";
 import { formatPercentage } from "@/lib/formatters";
+import { getSectorName } from "@/data/sectors";
 
 type SortOption = 'name-asc' | 'name-desc' | 'emissions-asc' | 'emissions-desc' | 'region-asc' | 'region-desc' | 'sector-asc' | 'sector-desc' | 'sector-diff-asc' | 'sector-diff-desc';
 type ViewMode = 'cards' | 'table';
@@ -16,20 +17,6 @@ type ViewMode = 'cards' | 'table';
 interface CompaniesTabProps {
   suppliers: Supplier[];
 }
-
-const getSectorLabel = (sector: string) => {
-  const labels: Record<string, string> = {
-    manufacturing: 'Indústria',
-    technology: 'Tecnologia',
-    construction: 'Construção',
-    transport: 'Transporte',
-    logistics: 'Logística',
-    services: 'Serviços',
-    food: 'Alimentar',
-    energia: 'Energia',
-  };
-  return labels[sector] || sector;
-};
 
 const getRegionLabel = (region: string) => {
   const labels: Record<string, string> = {
@@ -117,9 +104,9 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
         case 'region-desc':
           return getRegionLabel(b.region).localeCompare(getRegionLabel(a.region));
         case 'sector-asc':
-          return getSectorLabel(a.sector).localeCompare(getSectorLabel(b.sector));
+          return getSectorName(a.sector).localeCompare(getSectorName(b.sector));
         case 'sector-desc':
-          return getSectorLabel(b.sector).localeCompare(getSectorLabel(a.sector));
+          return getSectorName(b.sector).localeCompare(getSectorName(a.sector));
         case 'sector-diff-asc': {
           const diffA = ((a.totalEmissions - sectorAverages[a.sector]) / sectorAverages[a.sector]) * 100;
           const diffB = ((b.totalEmissions - sectorAverages[b.sector]) / sectorAverages[b.sector]) * 100;
@@ -280,7 +267,7 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
                   >
                     <TableCell className="font-normal">{supplier.name}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">{supplier.contact.nif}</TableCell>
-                    <TableCell>{getSectorLabel(supplier.sector)}</TableCell>
+                    <TableCell>{getSectorName(supplier.sector)}</TableCell>
                     <TableCell>{getRegionLabel(supplier.region)}</TableCell>
                     <TableCell className="text-right">
                       {supplier.totalEmissions.toLocaleString('pt-PT')} t CO₂e

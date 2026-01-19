@@ -4,18 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingDown, Award } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { getSectorName } from "@/data/sectors";
 
 interface TopSuppliersByCAEProps {
   suppliers: Supplier[];
 }
-
-const sectorNames: Record<string, string> = {
-  technology: "Tecnologia",
-  construction: "Construção",
-  manufacturing: "Indústria",
-  transport: "Transporte",
-  services: "Serviços"
-};
 
 export const TopSuppliersByCAE = ({ suppliers }: TopSuppliersByCAEProps) => {
   // Group suppliers by sector
@@ -37,7 +30,7 @@ export const TopSuppliersByCAE = ({ suppliers }: TopSuppliersByCAEProps) => {
     const sorted = [...sectorSuppliers].sort((a, b) => a.totalEmissions - b.totalEmissions);
     return {
       sector,
-      sectorName: sectorNames[sector] || sector,
+      sectorName: getSectorName(sector) || sector,
       top3: sorted.slice(0, 3),
       totalInSector: sectorSuppliers.length
     };
@@ -62,7 +55,7 @@ export const TopSuppliersByCAE = ({ suppliers }: TopSuppliersByCAEProps) => {
               <SelectContent>
                 {availableSectors.map(sector => (
                   <SelectItem key={sector} value={sector}>
-                    {sectorNames[sector] || sector}
+                    {getSectorName(sector) || sector}
                   </SelectItem>
                 ))}
               </SelectContent>
