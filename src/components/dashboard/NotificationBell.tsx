@@ -127,20 +127,16 @@ export const NotificationBell = ({ suppliers }: NotificationBellProps) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative bg-background/40 backdrop-blur-md rounded-lg border border-primary/20 text-foreground/70 hover:text-foreground hover:bg-primary/10"
-        >
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <Badge 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-danger text-[12px]"
-            >
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </Badge>
-          )}
-        </Button>
+        <div className="liquid-glass-container flex p-1.5 rounded-full backdrop-blur-xl">
+          <button className="liquid-glass-btn inactive relative flex items-center justify-center w-9 h-9 rounded-full text-sm transition-all duration-300 border border-transparent">
+            <Bell className="h-4 w-4 relative z-10" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-danger text-white text-[10px] font-medium rounded-full flex items-center justify-center z-20">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="end">
         <div className="p-4 border-b">

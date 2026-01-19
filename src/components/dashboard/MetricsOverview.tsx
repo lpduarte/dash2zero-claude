@@ -151,14 +151,14 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
               expanded={isEmissionsExpanded}
               onToggle={() => setIsEmissionsExpanded(!isEmissionsExpanded)}
               actions={
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowMethodologyModal(true)}
-                  className="p-1.5 bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
-                  title="Guia metodológico"
                 >
                   <Info className="h-4 w-4" />
-                </button>
+                  Como funcionam estes dados?
+                </Button>
               }
             />
           </CardHeader>

@@ -411,3 +411,67 @@ export const collapsible = {
   /** Conteúdo highlighted */
   contentHighlighted: 'border-primary/20',
 } as const;
+
+// ===========================================
+// HEADER (para testes)
+// ===========================================
+
+export const header = {
+  /** Container principal */
+  container: 'relative overflow-x-clip',
+  /** Wrapper com padding */
+  wrapper: 'relative py-6 px-8',
+  /** Content wrapper centrado */
+  content: 'relative max-w-[1400px] mx-auto',
+  /** Layout flex principal */
+  layout: 'flex items-center justify-between',
+
+  /** Logo área */
+  logoArea: 'flex items-center gap-3',
+  /** Ícone do logo */
+  logoIcon: 'h-14 w-14 text-primary',
+  /** Título principal */
+  title: 'text-4xl font-bold text-foreground',
+  /** Subtítulo */
+  subtitle: 'text-muted-foreground text-sm',
+
+  /** Área de ações (direita) */
+  actionsArea: 'flex items-center gap-4',
+
+  /** Container de navegação/toggle */
+  navContainer: 'flex gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20',
+  /** Link/botão ativo */
+  navItemActive: 'flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all duration-200 bg-primary text-primary-foreground shadow-md',
+  /** Link/botão inativo */
+  navItemInactive: 'flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all duration-200 text-foreground/70 hover:text-foreground hover:bg-primary/10',
+  /** Botão quadrado (ícone só) ativo */
+  navButtonActive: 'flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200 bg-primary text-primary-foreground shadow-md',
+  /** Botão quadrado (ícone só) inativo */
+  navButtonInactive: 'flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200 text-foreground/70 hover:text-foreground hover:bg-primary/10',
+
+  /** Container dos elementos pulsantes */
+  pulseContainer: 'absolute inset-0 pointer-events-none',
+  /** Elemento pulsante base */
+  pulseElement: 'absolute rounded-full blur-3xl',
+
+  /** Linha brilhante inferior */
+  glowLine: 'relative w-full flex items-center justify-center',
+} as const;
+
+/** Configuração dos elementos pulsantes do header */
+export const headerPulseElements = [
+  { className: 'top-0 right-0 w-72 h-72 bg-primary/50 animate-pulse-slow', transform: 'translate(20%, -70%)' },
+  { className: 'top-0 right-20 w-56 h-56 bg-primary/40 animate-pulse-slower', transform: 'translateY(-60%)', delay: '1s' },
+  { className: 'top-0 right-1/4 w-48 h-48 bg-primary/35 animate-pulse-slower', transform: 'translateY(-50%)', delay: '0.5s' },
+  { className: 'top-0 left-0 w-40 h-40 bg-primary/25 animate-pulse-slower', transform: 'translate(-30%, -70%)', delay: '2s' },
+  { className: 'top-0 left-10 w-36 h-36 bg-primary/20 animate-pulse-slow', transform: 'translateY(-50%)', delay: '1.5s' },
+] as const;
+
+/** Estilo da linha brilhante */
+export const headerGlowLineStyle = {
+  width: '100%',
+  height: '2px',
+  background: 'linear-gradient(90deg, transparent 0%, hsl(175 66% 38%) 20%, hsl(175 66% 38%) 80%, transparent 100%)',
+  opacity: 0.65,
+  boxShadow: '0 0 8px hsl(175 66% 38% / 0.4)',
+} as const;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
@@ -6,6 +6,8 @@ import { Supplier } from "@/types/supplier";
 import { getSectorName } from "@/data/sectors";
 import { useUser } from "@/contexts/UserContext";
 import { getClusterInfo } from "@/config/clusters";
+
+const MAX_VISIBLE_ITEMS = 30;
 
 type MetricType = 'total' | 'perRevenue' | 'perEmployee' | 'perArea';
 
@@ -45,51 +47,56 @@ export const SupplierEmissionsChart = ({
 }: SupplierEmissionsChartProps) => {
   const { userType } = useUser();
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('total');
+  const [showAll, setShowAll] = useState(false);
 
-  const getClusterDisplay = (cluster: string) => {
-    const clusterId = cluster;
-    const info = getClusterInfo(userType, clusterId);
+  const getClusterDisplay = useCallback((cluster: string) => {
+    const info = getClusterInfo(userType, cluster);
     const Icon = info?.icon;
     return {
       label: info?.label || cluster,
       icon: Icon ? <Icon className="h-3 w-3" /> : null
     };
-  };
+  }, [userType]);
 
-  const getMetricValue = (supplier: Supplier): number => {
-    switch (selectedMetric) {
-      case 'total': return supplier.totalEmissions;
-      case 'perRevenue': return supplier.emissionsPerRevenue;
-      case 'perEmployee': return supplier.emissionsPerEmployee;
-      case 'perArea': return supplier.emissionsPerArea;
-      default: return supplier.totalEmissions;
-    }
-  };
+  const { emissionsData, avgValue, totalCount } = useMemo(() => {
+    const getMetricValue = (supplier: Supplier): number => {
+      switch (selectedMetric) {
+        case 'total': return supplier.totalEmissions;
+        case 'perRevenue': return supplier.emissionsPerRevenue;
+        case 'perEmployee': return supplier.emissionsPerEmployee;
+        case 'perArea': return supplier.emissionsPerArea;
+        default: return supplier.totalEmissions;
+      }
+    };
 
-  const emissionsData = suppliers.map(s => ({
-    name: s.name,
-    fullName: s.name,
-    value: getMetricValue(s),
-    totalEmissions: s.totalEmissions,
-    emissionsPerRevenue: s.emissionsPerRevenue,
-    emissionsPerEmployee: s.emissionsPerEmployee,
-    emissionsPerArea: s.emissionsPerArea,
-    sector: s.sector,
-    cluster: s.clusterId || s.cluster
-  })).sort((a, b) => b.value - a.value);
+    const allData = suppliers.map(s => ({
+      name: s.name.length > 35 ? s.name.substring(0, 35) + '...' : s.name,
+      fullName: s.name,
+      value: getMetricValue(s),
+      totalEmissions: s.totalEmissions,
+      emissionsPerRevenue: s.emissionsPerRevenue,
+      emissionsPerEmployee: s.emissionsPerEmployee,
+      emissionsPerArea: s.emissionsPerArea,
+      sector: s.sector,
+      cluster: s.clusterId || s.cluster
+    })).sort((a, b) => b.value - a.value);
 
-  const avgValue = emissionsData.reduce((sum, s) => sum + s.value, 0) / emissionsData.length;
+    const avg = allData.length > 0 ? allData.reduce((sum, s) => sum + s.value, 0) / allData.length : 0;
+    const displayData = showAll ? allData : allData.slice(0, MAX_VISIBLE_ITEMS);
 
-  const getBarColor = (value: number) => {
+    return { emissionsData: displayData, avgValue: avg, totalCount: allData.length };
+  }, [suppliers, selectedMetric, showAll]);
+
+  const getBarColor = useCallback((value: number) => {
     if (value < avgValue * 0.5) return "hsl(var(--success))";
     if (value < avgValue) return "hsl(var(--primary))";
     if (value < avgValue * 1.5) return "hsl(var(--warning))";
     return "hsl(var(--danger))";
-  };
+  }, [avgValue]);
 
   const config = metricConfig[selectedMetric];
 
-  const formatValue = (value: number): string => {
+  const formatValue = useCallback((value: number): string => {
     if (selectedMetric === 'perRevenue') {
       return value.toFixed(3);
     }
@@ -97,7 +104,7 @@ export const SupplierEmissionsChart = ({
       return value.toFixed(2);
     }
     return value.toFixed(0);
-  };
+  }, [selectedMetric]);
 
   return (
     <Card>
@@ -106,23 +113,33 @@ export const SupplierEmissionsChart = ({
           <div>
             <h2 className="text-xl font-bold">{config.title}</h2>
             <p className="text-sm text-muted-foreground">
-              Emissões ({config.unit})
+              Emissões ({config.unit}) · {showAll ? totalCount : Math.min(MAX_VISIBLE_ITEMS, totalCount)} de {totalCount} empresas
             </p>
           </div>
-          <div className="flex gap-1 bg-muted/50 p-1 rounded-lg">
-            {(Object.keys(metricConfig) as MetricType[]).map((key) => (
+          <div className="flex items-center gap-3">
+            {totalCount > MAX_VISIBLE_ITEMS && (
               <button
-                key={key}
-                onClick={() => setSelectedMetric(key)}
-                className={`px-4 py-2 text-sm font-normal rounded-md transition-all ${
-                  selectedMetric === key
-                    ? 'bg-background text-primary shadow-md border border-primary/20'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                onClick={() => setShowAll(!showAll)}
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
               >
-                {metricConfig[key].label}
+                {showAll ? 'Mostrar menos' : `Ver todas (${totalCount})`}
               </button>
-            ))}
+            )}
+            <div className="flex gap-1 bg-muted/50 p-1 rounded-lg" style={{ boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.15)" }}>
+              {(Object.keys(metricConfig) as MetricType[]).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedMetric(key)}
+                  className={`px-4 py-2 text-sm font-normal rounded-md transition-all ${
+                    selectedMetric === key
+                      ? 'bg-background text-primary shadow-md border border-primary/20'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {metricConfig[key].label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </CardHeader>

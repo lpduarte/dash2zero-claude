@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Leaf, LayoutDashboard, CircleDot, Moon, Sun } from "lucide-react";
+import { Leaf, BarChart3, CircleDot, Moon, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
@@ -47,53 +47,45 @@ export const Header = () => {
             <div className="flex items-center gap-4">
               <UserTypeToggle currentType={userType} onTypeChange={setUserType} />
 
-              <nav className="flex gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20">
+              <nav className="liquid-glass-container flex gap-2 p-2 rounded-full backdrop-blur-xl">
                 <Link to="/" className={cn(
-                  "flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all duration-200",
-                  location.pathname === "/"
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
+                  "liquid-glass-btn relative flex items-center justify-center gap-2 h-9 px-5 rounded-full text-sm font-medium overflow-hidden border border-transparent",
+                  location.pathname === "/" ? "active border-primary/25" : "inactive"
                 )}>
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
+                  <BarChart3 className="h-4 w-4 relative z-10" />
+                  <span className="relative z-10">Dashboard</span>
                 </Link>
                 <Link to="/clusters" className={cn(
-                  "flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all duration-200",
-                  location.pathname === "/clusters"
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
+                  "liquid-glass-btn relative flex items-center justify-center gap-2 h-9 px-5 rounded-full text-sm font-medium overflow-hidden border border-transparent",
+                  location.pathname === "/clusters" ? "active border-primary/25" : "inactive"
                 )}>
-                  <CircleDot className="h-4 w-4" />
-                  Gerir clusters
+                  <CircleDot className="h-4 w-4 relative z-10" />
+                  <span className="relative z-10">Gerir clusters</span>
                 </Link>
               </nav>
 
               <NotificationBell suppliers={userType === 'municipio' ? allMunicipioSuppliers as any : allEmpresaSuppliers as any} />
 
-              <div className="flex gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20">
+              <div className="liquid-glass-container flex gap-1 p-1.5 rounded-full backdrop-blur-xl">
                 <button
                   onClick={() => setDarkMode(false)}
                   className={cn(
-                    "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
-                    !darkMode
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
+                    "liquid-glass-btn relative flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium overflow-hidden border border-transparent",
+                    !darkMode ? "active border-primary/25" : "inactive"
                   )}
                   title="Light mode"
                 >
-                  <Sun className="h-4 w-4" />
+                  <Sun className="h-4 w-4 relative z-10" />
                 </button>
                 <button
                   onClick={() => setDarkMode(true)}
                   className={cn(
-                    "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
-                    darkMode
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
+                    "liquid-glass-btn relative flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium overflow-hidden border border-transparent",
+                    darkMode ? "active border-primary/25" : "inactive"
                   )}
                   title="Dark mode"
                 >
-                  <Moon className="h-4 w-4" />
+                  <Moon className="h-4 w-4 relative z-10" />
                 </button>
               </div>
             </div>

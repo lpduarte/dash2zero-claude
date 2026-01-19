@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Supplier } from "@/types/supplier";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,13 +44,16 @@ export const ComparisonChart = ({
     setVisibleScopes(prev => ({ ...prev, [scope]: !prev[scope] }));
   };
 
-  const topSuppliers = suppliers;
-  const chartData = topSuppliers.map(supplier => ({
-    name: supplier.name,
-    ...(visibleScopes.scope1 && { 'Âmbito 1': supplier.scope1 }),
-    ...(visibleScopes.scope2 && { 'Âmbito 2': supplier.scope2 }),
-    ...(visibleScopes.scope3 && { 'Âmbito 3': supplier.scope3 }),
-  }));
+  const chartData = useMemo(() => {
+    // Sort by total emissions and limit to top 40 for performance
+    const sorted = [...suppliers].sort((a, b) => b.totalEmissions - a.totalEmissions).slice(0, 40);
+    return sorted.map(supplier => ({
+      name: supplier.name.length > 20 ? supplier.name.substring(0, 20) + '...' : supplier.name,
+      ...(visibleScopes.scope1 && { 'Âmbito 1': supplier.scope1 }),
+      ...(visibleScopes.scope2 && { 'Âmbito 2': supplier.scope2 }),
+      ...(visibleScopes.scope3 && { 'Âmbito 3': supplier.scope3 }),
+    }));
+  }, [suppliers, visibleScopes]);
 
   return (
     <Card className="p-6 shadow-md h-full flex flex-col">
@@ -135,7 +138,7 @@ export const ComparisonChart = ({
               angle={-90}
               textAnchor="end"
               height={180}
-              interval={0}
+              interval={chartData.length > 20 ? Math.floor(chartData.length / 20) : 0}
             />
             <YAxis
               tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}

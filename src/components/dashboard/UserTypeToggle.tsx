@@ -11,19 +11,17 @@ interface UserTypeToggleProps {
 export const UserTypeToggle = ({ currentType, onTypeChange }: UserTypeToggleProps) => {
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-1 bg-background/40 backdrop-blur-md rounded-lg p-1 border border-primary/20">
+      <div className="liquid-glass-container flex items-center gap-1 p-1.5 rounded-full backdrop-blur-xl">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               onClick={() => onTypeChange('empresa')}
               className={cn(
-                "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
-                currentType === 'empresa'
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
+                "liquid-glass-btn relative flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium overflow-hidden border border-transparent",
+                currentType === 'empresa' ? "active border-primary/25" : "inactive"
               )}
             >
-              <Building2 className="h-4 w-4" />
+              <Building2 className="h-4 w-4 relative z-10" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -36,13 +34,11 @@ export const UserTypeToggle = ({ currentType, onTypeChange }: UserTypeToggleProp
             <button
               onClick={() => onTypeChange('municipio')}
               className={cn(
-                "flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200",
-                currentType === 'municipio'
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-foreground/70 hover:text-foreground hover:bg-primary/10"
+                "liquid-glass-btn relative flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium overflow-hidden border border-transparent",
+                currentType === 'municipio' ? "active border-primary/25" : "inactive"
               )}
             >
-              <Landmark className="h-4 w-4" />
+              <Landmark className="h-4 w-4 relative z-10" />
             </button>
           </TooltipTrigger>
           <TooltipContent>

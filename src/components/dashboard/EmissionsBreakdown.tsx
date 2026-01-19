@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Supplier } from "@/types/supplier";
@@ -7,16 +8,20 @@ interface EmissionsBreakdownProps {
 }
 
 export const EmissionsBreakdown = ({ suppliers }: EmissionsBreakdownProps) => {
-  const totalScope1 = suppliers.reduce((sum, s) => sum + s.scope1, 0);
-  const totalScope2 = suppliers.reduce((sum, s) => sum + s.scope2, 0);
-  const totalScope3 = suppliers.reduce((sum, s) => sum + s.scope3, 0);
-  const total = totalScope1 + totalScope2 + totalScope3;
+  const { data, total } = useMemo(() => {
+    const totalScope1 = suppliers.reduce((sum, s) => sum + s.scope1, 0);
+    const totalScope2 = suppliers.reduce((sum, s) => sum + s.scope2, 0);
+    const totalScope3 = suppliers.reduce((sum, s) => sum + s.scope3, 0);
+    const total = totalScope1 + totalScope2 + totalScope3;
 
-  const data = [
-    { name: "Âmbito 1", value: totalScope1, color: "hsl(var(--scope-1))" },
-    { name: "Âmbito 2", value: totalScope2, color: "hsl(var(--scope-2))" },
-    { name: "Âmbito 3", value: totalScope3, color: "hsl(var(--scope-3))" },
-  ];
+    const data = [
+      { name: "Âmbito 1", value: totalScope1, color: "hsl(var(--scope-1))" },
+      { name: "Âmbito 2", value: totalScope2, color: "hsl(var(--scope-2))" },
+      { name: "Âmbito 3", value: totalScope3, color: "hsl(var(--scope-3))" },
+    ];
+
+    return { data, total };
+  }, [suppliers]);
 
   return (
     <div className="flex flex-col h-full">
