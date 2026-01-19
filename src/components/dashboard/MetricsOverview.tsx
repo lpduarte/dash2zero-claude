@@ -42,44 +42,78 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
   const avgEmissionsPerArea = suppliers.reduce((acc, s) => acc + s.emissionsPerArea, 0) / suppliers.length;
   const avgEmissionsPerRevenue = suppliers.reduce((acc, s) => acc + s.emissionsPerRevenue, 0) / suppliers.length;
 
-  // Cálculo do potencial de melhoria baseado apenas em emissões acima da média
-  const avgEmissions = totalEmissions / suppliers.length;
-  const criticalSuppliers = suppliers.filter(s => 
-    s.totalEmissions > avgEmissions * 1.2
-  );
-  const percentageCritical = (criticalSuppliers.length / suppliers.length) * 100;
+  // ============================================================
+  // CÁLCULO DO POTENCIAL DE MELHORIA
+  // Lógica diferenciada para Empresa vs Município
+  // ============================================================
 
-  // Calcular emissões potenciais se trocar para alternativas
-  const calculatePotentialEmissions = () => {
+  // Calcular média de emissões por setor
+  const sectorAverages = suppliers.reduce((acc, s) => {
+    if (!acc[s.sector]) {
+      acc[s.sector] = { total: 0, count: 0 };
+    }
+    acc[s.sector].total += s.totalEmissions;
+    acc[s.sector].count += 1;
+    return acc;
+  }, {} as Record<string, { total: number; count: number }>);
+
+  const getSectorAverage = (sector: string) => {
+    const data = sectorAverages[sector];
+    return data ? data.total / data.count : 0;
+  };
+
+  // EMPRESA: Potencial de substituição
+  // Se trocar fornecedores com altas emissões por melhores alternativas do mesmo setor
+  const calculateEmpresaPotential = () => {
     let potentialTotal = totalEmissions;
-    
-    criticalSuppliers.forEach(critical => {
-      const alternatives = suppliers.filter(s => 
-        s.id !== critical.id && 
-        s.sector === critical.sector &&
-        s.totalEmissions < critical.totalEmissions
+
+    suppliers.forEach(supplier => {
+      const alternatives = suppliers.filter(s =>
+        s.id !== supplier.id &&
+        s.sector === supplier.sector &&
+        s.totalEmissions < supplier.totalEmissions
       );
-      
+
       if (alternatives.length > 0) {
         const bestAlternative = alternatives.sort((a, b) => a.totalEmissions - b.totalEmissions)[0];
-        potentialTotal -= (critical.totalEmissions - bestAlternative.totalEmissions);
+        potentialTotal -= (supplier.totalEmissions - bestAlternative.totalEmissions);
       }
     });
-    
+
     return potentialTotal;
   };
 
-  const potentialEmissions = calculatePotentialEmissions();
+  // MUNICÍPIO: Potencial de melhoria
+  // Se empresas acima da média setorial chegassem à média do seu setor
+  const calculateMunicipioPotential = () => {
+    let potentialTotal = totalEmissions;
+
+    suppliers.forEach(supplier => {
+      const sectorAvg = getSectorAverage(supplier.sector);
+      if (supplier.totalEmissions > sectorAvg) {
+        // Redução potencial: diferença até à média do setor
+        potentialTotal -= (supplier.totalEmissions - sectorAvg);
+      }
+    });
+
+    return potentialTotal;
+  };
+
+  // Selecionar cálculo baseado no tipo de utilizador
+  const potentialEmissions = isMunicipio
+    ? calculateMunicipioPotential()
+    : calculateEmpresaPotential();
+
   const emissionsSavings = totalEmissions - potentialEmissions;
   const savingsPercentage = totalEmissions > 0 ? ((emissionsSavings / totalEmissions) * 100) : 0;
-  
-  // Determinar nível de potencial de melhoria
+
+  // Determinar nível de potencial de melhoria baseado na % de redução possível
   const getImprovementPotential = () => {
-    if (percentageCritical > 30) return { level: "Alto", color: "text-danger", bgColor: "bg-danger/10", icon: TrendingDown };
-    if (percentageCritical > 15) return { level: "Médio", color: "text-warning", bgColor: "bg-warning/10", icon: TrendingDown };
-    return { level: "Baixo", color: "text-success", bgColor: "bg-success/10", icon: TrendingDown };
+    if (savingsPercentage > 20) return { level: "Alto", color: "text-danger", bgColor: "bg-danger/10", barColor: "bg-danger", icon: TrendingDown };
+    if (savingsPercentage > 10) return { level: "Médio", color: "text-warning", bgColor: "bg-warning/10", barColor: "bg-warning", icon: TrendingDown };
+    return { level: "Baixo", color: "text-success", bgColor: "bg-success/10", barColor: "bg-success", icon: TrendingDown };
   };
-  
+
   const improvementPotential = getImprovementPotential();
 
   // Cálculos para Pegadas calculadas e Origem dos dados
@@ -106,7 +140,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
     {
       title: "Potencial de melhoria",
       value: improvementPotential.level,
-      unit: `${formatPercentage(percentageCritical, 0)} das empresas`,
+      unit: `redução potencial de ${formatPercentage(savingsPercentage, 0)}`,
       icon: improvementPotential.icon,
       iconColor: improvementPotential.color,
       iconBgColor: improvementPotential.bgColor,
@@ -154,9 +188,10 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="text-xs"
                   onClick={() => setShowMethodologyModal(true)}
                 >
-                  <Info className="h-4 w-4" />
+                  <Info className="h-3 w-3" />
                   Como funcionam estes dados?
                 </Button>
               }
@@ -181,43 +216,48 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
                   extra={metric.isImprovement ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <button className="absolute bottom-4 right-4 bg-muted text-muted-foreground p-1.5 rounded transition-opacity hover:opacity-80">
-                          <Info className="h-4 w-4" />
-                        </button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute bottom-3 right-3 h-auto p-1.5"
+                        >
+                          <Info className="h-3 w-3" />
+                        </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="right" className="p-0 w-56">
+                      <TooltipContent side="right" className="p-0 w-72">
                         <div className="p-3 space-y-3">
-                          <p className="text-xs font-normal text-muted-foreground">Cenário de substituição</p>
-                          
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-muted-foreground">Atual</span>
-                              <span className="text-sm font-bold">{Math.round(totalEmissions).toLocaleString('pt-PT')} t CO₂e</span>
+                              <span className={`text-xs ${improvementPotential.color}`}>Atual</span>
+                              <span className={`text-sm font-bold ${improvementPotential.color}`}>{Math.round(totalEmissions).toLocaleString('pt-PT')} t CO₂e</span>
                             </div>
-                            
+
                             <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-                              <div 
-                                className="absolute inset-y-0 left-0 bg-primary/30 rounded-full"
+                              <div
+                                className={`absolute inset-y-0 left-0 ${improvementPotential.barColor} rounded-full`}
                                 style={{ width: '100%' }}
                               />
-                              <div 
-                                className="absolute inset-y-0 left-0 bg-success rounded-full transition-all"
+                              <div
+                                className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all"
                                 style={{ width: `${100 - savingsPercentage}%` }}
                               />
                             </div>
-                            
+
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-muted-foreground">Potencial</span>
-                              <span className="text-sm font-bold text-success">{Math.round(potentialEmissions).toLocaleString('pt-PT')} t CO₂e</span>
+                              <span className="text-xs text-primary">Potencial</span>
+                              <span className="text-sm font-bold text-primary">
+                                {Math.round(potentialEmissions).toLocaleString('pt-PT')} t CO₂e
+                                <span className="text-xs font-normal text-primary ml-1">(-{formatPercentage(savingsPercentage, 1)})</span>
+                              </span>
                             </div>
                           </div>
-                          
-                          <div className="pt-2 border-t border-border">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-normal">Redução</span>
-                              <span className="text-sm font-bold text-success">-{formatPercentage(savingsPercentage, 1)}</span>
-                            </div>
-                          </div>
+
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {isMunicipio
+                              ? "Potencial calculado se as empresas acima da média setorial implementassem medidas para atingir essa média."
+                              : "Potencial calculado se substituísse fornecedores por alternativas com menor pegada no mesmo setor."
+                            }
+                          </p>
                         </div>
                       </TooltipContent>
                     </Tooltip>

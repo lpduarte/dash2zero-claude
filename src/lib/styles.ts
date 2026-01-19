@@ -402,7 +402,7 @@ export const collapsible = {
   triggerHighlighted: 'bg-primary/10 hover:bg-primary/20',
 
   /** Trigger circular (SectionHeader) */
-  triggerCircular: 'w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0',
+  triggerCircular: 'w-9 h-9 rounded-full border border-input bg-background hover:bg-primary/25 hover:border-primary/25 flex items-center justify-center transition-colors shrink-0',
 
   /** Container do collapsible */
   container: 'border rounded-lg overflow-hidden',

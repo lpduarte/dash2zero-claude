@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
-import { 
-  Zap, 
-  Recycle, 
-  Bike, 
-  Leaf, 
-  Route, 
-  Bus, 
+import {
+  Zap,
+  Recycle,
+  Bike,
+  Leaf,
+  Route,
+  Bus,
   Wind,
   Settings,
-  Building
+  Landmark
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import { mockInfrastructure } from '@/data/mockInfrastructure';
 import { KPICard } from '@/components/ui/kpi-card';
@@ -95,20 +96,21 @@ export const InfrastructureKPIs = () => {
         <Card className="shadow-md">
           <CardHeader className={cn("transition-all duration-[400ms]", isInfrastructureExpanded ? "pb-3" : "pb-6")}>
             <SectionHeader
-              icon={Building}
+              icon={Landmark}
               title="Infraestruturas Sustentáveis do Município"
               collapsible
               expanded={isInfrastructureExpanded}
               onToggle={() => setIsInfrastructureExpanded(!isInfrastructureExpanded)}
               actions={
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs"
                   onClick={() => setShowInfrastructureModal(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-3 w-3" />
                   Gerir infraestruturas
-                </button>
+                </Button>
               }
             />
           </CardHeader>

@@ -13,6 +13,7 @@ import Onboarding from "./pages/Onboarding";
 import FormularioTotais from "./pages/FormularioTotais";
 import EmailTemplate from "./pages/EmailTemplate";
 import StyleGuide from "./pages/StyleGuide";
+import Methodology from "./pages/Methodology";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/formulario-totais" element={<FormularioTotais />} />
               <Route path="/email-template" element={<EmailTemplate />} />
               <Route path="/style-guide" element={<StyleGuide />} />
+              <Route path="/metodologia" element={<Methodology />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
