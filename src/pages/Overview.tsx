@@ -29,35 +29,70 @@ import { Supplier, UniversalFilterState } from "@/types/supplier";
 import { useUser } from "@/contexts/UserContext";
 
 // Função para calcular potencial de melhoria de um conjunto de fornecedores
-// Usa média global (não por setor) para consistência com o KPI card
-const calculateImprovementPotential = (suppliers: Supplier[]): ImprovementPotential => {
+// Lógica diferenciada: Empresa usa substituição, Município usa média setorial
+const calculateImprovementPotential = (suppliers: Supplier[], isMunicipio: boolean): ImprovementPotential => {
   if (suppliers.length === 0) return 'low';
-  
-  // Calculate overall average emissions
+
   const totalEmissions = suppliers.reduce((acc, s) => acc + s.totalEmissions, 0);
-  const avgEmissions = totalEmissions / suppliers.length;
-  
-  // Count critical suppliers (emissions > 1.2x overall average)
-  const criticalCount = suppliers.filter(s => 
-    s.totalEmissions > avgEmissions * 1.2
-  ).length;
-  
-  const criticalPercentage = (criticalCount / suppliers.length) * 100;
-  
-  if (criticalPercentage > 30) return 'high';
-  if (criticalPercentage > 15) return 'medium';
+
+  // Calcular média de emissões por setor
+  const sectorAverages: Record<string, { total: number; count: number }> = {};
+  suppliers.forEach(s => {
+    if (!sectorAverages[s.sector]) {
+      sectorAverages[s.sector] = { total: 0, count: 0 };
+    }
+    sectorAverages[s.sector].total += s.totalEmissions;
+    sectorAverages[s.sector].count += 1;
+  });
+
+  const getSectorAverage = (sector: string) => {
+    const data = sectorAverages[sector];
+    return data ? data.total / data.count : 0;
+  };
+
+  let potentialEmissions: number;
+
+  if (isMunicipio) {
+    // MUNICÍPIO: Se empresas acima da média setorial chegassem à média
+    potentialEmissions = totalEmissions;
+    suppliers.forEach(supplier => {
+      const sectorAvg = getSectorAverage(supplier.sector);
+      if (supplier.totalEmissions > sectorAvg) {
+        potentialEmissions -= (supplier.totalEmissions - sectorAvg);
+      }
+    });
+  } else {
+    // EMPRESA: Substituição por melhores alternativas do mesmo setor
+    potentialEmissions = totalEmissions;
+    suppliers.forEach(supplier => {
+      const alternatives = suppliers.filter(s =>
+        s.id !== supplier.id &&
+        s.sector === supplier.sector &&
+        s.totalEmissions < supplier.totalEmissions
+      );
+      if (alternatives.length > 0) {
+        const bestAlternative = alternatives.sort((a, b) => a.totalEmissions - b.totalEmissions)[0];
+        potentialEmissions -= (supplier.totalEmissions - bestAlternative.totalEmissions);
+      }
+    });
+  }
+
+  const savingsPercentage = totalEmissions > 0 ? ((totalEmissions - potentialEmissions) / totalEmissions) * 100 : 0;
+
+  if (savingsPercentage > 20) return 'high';
+  if (savingsPercentage > 10) return 'medium';
   return 'low';
 };
 
 const Overview = () => {
   const { user, isMunicipio } = useUser();
   const [selectedCluster, setSelectedCluster] = useState<string>('all');
-  const [selectedSector, setSelectedSector] = useState<string>('all');
   const [universalFilters, setUniversalFilters] = useState<UniversalFilterState>({
     companySize: [],
     district: [],
     municipality: [],
     parish: [],
+    sector: [],
   });
 
   // Base suppliers - usa dados dinâmicos baseado no tipo de utilizador
@@ -85,15 +120,16 @@ const Overview = () => {
 
   const clusterPotentials = useMemo(() => {
     const potentials: Record<string, ImprovementPotential> = {
-      all: calculateImprovementPotential(baseSuppliers),
+      all: calculateImprovementPotential(baseSuppliers, isMunicipio),
     };
     clusters.forEach(cluster => {
       potentials[cluster.id] = calculateImprovementPotential(
-        baseSuppliers.filter(s => (s as any).clusterId === cluster.id)
+        baseSuppliers.filter(s => (s as any).clusterId === cluster.id),
+        isMunicipio
       );
     });
     return potentials;
-  }, [baseSuppliers, clusters]);
+  }, [baseSuppliers, clusters, isMunicipio]);
 
   // Total de empresas por cluster (universo total do grupo)
   const clusterTotals = useMemo(() => {
@@ -107,17 +143,22 @@ const Overview = () => {
 
   const filteredSuppliers = useMemo(() => {
     let filtered = baseSuppliers;
-    
+
     // Filtro de cluster
     if (selectedCluster !== 'all') {
       filtered = filtered.filter(supplier => (supplier as any).clusterId === selectedCluster);
     }
-    
+
     // Filtro de dimensão (multiselect)
     if (universalFilters.companySize.length > 0) {
       filtered = filtered.filter(s => universalFilters.companySize.includes(s.companySize));
     }
-    
+
+    // Filtro de setor/atividade
+    if (universalFilters.sector.length > 0) {
+      filtered = filtered.filter(s => universalFilters.sector.includes(s.sector));
+    }
+
     // Filtros de localização - apenas para empresa
     if (!isMunicipio) {
       if (universalFilters.district.length > 0) {
@@ -127,25 +168,14 @@ const Overview = () => {
         filtered = filtered.filter(s => universalFilters.municipality.includes(s.municipality));
       }
     }
-    
+
     // Filtro freguesia (ambos os tipos)
     if (universalFilters.parish.length > 0) {
       filtered = filtered.filter(s => universalFilters.parish.includes(s.parish));
     }
-    
+
     return filtered.sort((a, b) => a.totalEmissions - b.totalEmissions);
   }, [selectedCluster, universalFilters, baseSuppliers, isMunicipio]);
-
-  // Suppliers filtered by both cluster and sector (for charts)
-  const chartFilteredSuppliers = useMemo(() => {
-    let filtered = filteredSuppliers;
-    
-    if (selectedSector !== 'all') {
-      filtered = filtered.filter((s) => s.sector === selectedSector);
-    }
-
-    return filtered;
-  }, [filteredSuppliers, selectedSector]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -192,19 +222,17 @@ const Overview = () => {
           <TabsContent value="overview" className="space-y-6" forceMount={false}>
             <div className="grid grid-cols-4 gap-6 items-stretch">
               <div className="col-span-1 flex flex-col">
-                <EmissionsBreakdown suppliers={chartFilteredSuppliers} />
+                <EmissionsBreakdown suppliers={filteredSuppliers} />
               </div>
               <div className="col-span-3 flex flex-col">
                 <ComparisonChart
-                  suppliers={chartFilteredSuppliers}
+                  suppliers={filteredSuppliers}
                   sectors={sectorsWithCounts}
-                  selectedSector={selectedSector}
-                  onSectorChange={setSelectedSector}
                 />
               </div>
             </div>
 
-            <SupplierEmissionsChart suppliers={chartFilteredSuppliers} />
+            <SupplierEmissionsChart suppliers={filteredSuppliers} />
           </TabsContent>
 
           <TabsContent value="environmental" className="space-y-6" forceMount={false}>

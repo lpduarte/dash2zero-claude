@@ -1,6 +1,7 @@
-import { X, Building2, MapPin, Landmark } from "lucide-react";
+import { X, Building2, MapPin, Landmark, Briefcase } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { UniversalFilterState } from "@/types/supplier";
+import { getSectorName } from "@/data/sectors";
 
 interface ActiveFiltersDisplayProps {
   filters: UniversalFilterState;
@@ -15,8 +16,9 @@ const companySizeLabels: Record<string, string> = {
 };
 
 export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersDisplayProps) {
-  const hasActiveFilters = 
+  const hasActiveFilters =
     filters.companySize.length > 0 ||
+    filters.sector.length > 0 ||
     filters.district.length > 0 ||
     filters.municipality.length > 0 ||
     filters.parish.length > 0;
@@ -39,7 +41,20 @@ export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersD
           <X className="h-3 w-3" />
         </Badge>
       ))}
-      
+
+      {filters.sector.map(sector => (
+        <Badge
+          key={`sector-${sector}`}
+          variant="secondary"
+          className="gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+          onClick={() => onRemoveFilter('sector', sector)}
+        >
+          <Briefcase className="h-3 w-3" />
+          {getSectorName(sector)}
+          <X className="h-3 w-3" />
+        </Badge>
+      ))}
+
       {filters.district.map(district => (
         <Badge
           key={`district-${district}`}

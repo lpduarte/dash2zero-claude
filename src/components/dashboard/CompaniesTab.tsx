@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Search, MapPin, Factory, ArrowUpDown, LayoutGrid, List, Info } from "lucide-react";
+import { Search, MapPin, ArrowUpDown, LayoutGrid, List, Info } from "lucide-react";
 import { formatPercentage } from "@/lib/formatters";
 
 type SortOption = 'name-asc' | 'name-desc' | 'emissions-asc' | 'emissions-desc' | 'region-asc' | 'region-desc' | 'sector-asc' | 'sector-desc' | 'sector-diff-asc' | 'sector-diff-desc';
@@ -43,7 +43,6 @@ const getRegionLabel = (region: string) => {
 
 export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
-  const [selectedSector, setSelectedSector] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
@@ -53,7 +52,7 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
   // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(12);
-  }, [selectedRegion, selectedSector, searchTerm, sortBy, suppliers]);
+  }, [selectedRegion, searchTerm, sortBy, suppliers]);
 
   // Get unique regions and sectors with counts
   const regions = useMemo(() => {
@@ -64,18 +63,6 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
     return Object.entries(regionCounts).map(([region, count]) => ({
       value: region,
       label: getRegionLabel(region),
-      count
-    }));
-  }, [suppliers]);
-
-  const sectors = useMemo(() => {
-    const sectorCounts: Record<string, number> = {};
-    suppliers.forEach(s => {
-      sectorCounts[s.sector] = (sectorCounts[s.sector] || 0) + 1;
-    });
-    return Object.entries(sectorCounts).map(([sector, count]) => ({
-      value: sector,
-      label: getSectorLabel(sector),
       count
     }));
   }, [suppliers]);
@@ -104,11 +91,7 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
     if (selectedRegion !== 'all') {
       filtered = filtered.filter(s => s.region === selectedRegion);
     }
-    
-    if (selectedSector !== 'all') {
-      filtered = filtered.filter(s => s.sector === selectedSector);
-    }
-    
+
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       filtered = filtered.filter(s => 
@@ -151,7 +134,7 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
           return 0;
       }
     });
-  }, [suppliers, selectedRegion, selectedSector, searchTerm, sortBy, sectorAverages]);
+  }, [suppliers, selectedRegion, searchTerm, sortBy, sectorAverages]);
 
   return (
     <div className="space-y-6">
@@ -216,33 +199,6 @@ export const CompaniesTab = ({ suppliers }: CompaniesTabProps) => {
           </Select>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Select value={selectedSector} onValueChange={setSelectedSector}>
-            <SelectTrigger className="w-[250px]">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Factory className="h-4 w-4 text-muted-foreground shrink-0" />
-                <SelectValue placeholder="Atividade" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="w-[250px]">
-              <SelectItem value="all">
-                <div className="flex items-center justify-between w-[180px]">
-                  <span>Todas as atividades</span>
-                  <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">{suppliers.length}</span>
-                </div>
-              </SelectItem>
-              {sectors.map(s => (
-                <SelectItem key={s.value} value={s.value}>
-                  <div className="flex items-center justify-between w-[180px]">
-                    <span>{s.label}</span>
-                    <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">{s.count}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="flex items-center gap-2">
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
             <SelectTrigger className="w-[230px]">

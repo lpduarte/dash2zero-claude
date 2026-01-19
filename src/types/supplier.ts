@@ -46,6 +46,7 @@ export interface UniversalFilterState {
   district: string[]; // array de distritos selecionados
   municipality: string[]; // array de municípios selecionados
   parish: string[]; // array de freguesias selecionadas
+  sector: string[]; // array de setores/atividades selecionados
 }
 
 export interface AdvancedFilters {

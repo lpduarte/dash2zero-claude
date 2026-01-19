@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Supplier } from "@/types/supplier";
 import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown, Euro, BarChart3, Info, ChevronDown, FileText, ArrowUpDown, Target, Plus, Eye, Rocket, RotateCcw } from "lucide-react";
 import { useState, useMemo } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupplierLabel, sectorLabels } from "./SupplierLabel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -70,7 +69,6 @@ export const CriticalSuppliersHighlight = ({
 
   // Top 5 para ambos os tipos
   const limit = 5;
-  const [selectedSector, setSelectedSector] = useState<string>("all");
   const [isOpen, setIsOpen] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [actionPlanOpen, setActionPlanOpen] = useState(false);
@@ -98,18 +96,17 @@ export const CriticalSuppliersHighlight = ({
     const total = suppliers.reduce((sum, s) => sum + s.emissionsPerRevenue, 0);
     return suppliers.length > 0 ? total / suppliers.length : 0;
   }, [suppliers]);
-  const filteredSuppliers = selectedSector === "all" ? suppliers : suppliers.filter(s => s.sector === selectedSector);
-  const avgEmissions = filteredSuppliers.reduce((sum, s) => sum + s.totalEmissions, 0) / filteredSuppliers.length;
+  const avgEmissions = suppliers.reduce((sum, s) => sum + s.totalEmissions, 0) / suppliers.length;
 
   // Calcular todos os fornecedores críticos primeiro (para a percentagem)
-  const allCriticalSuppliers = filteredSuppliers.filter(s => s.totalEmissions > avgEmissions * 1.2);
+  const allCriticalSuppliers = suppliers.filter(s => s.totalEmissions > avgEmissions * 1.2);
 
   // Calcular risco para municípios
   const suppliersWithRisk = useMemo(() => {
     if (!isMunicipio) return [];
     const baseSuppliers = allSuppliers || suppliers;
-    return calculateSuppliersRisk(filteredSuppliers, baseSuppliers);
-  }, [filteredSuppliers, allSuppliers, suppliers, isMunicipio]);
+    return calculateSuppliersRisk(suppliers, baseSuppliers);
+  }, [suppliers, allSuppliers, isMunicipio]);
 
   // Ordenação para municípios
   const sortedMunicipioSuppliers = useMemo(() => {
@@ -212,11 +209,6 @@ export const CriticalSuppliersHighlight = ({
     setSelectedAlternative(alternative);
     setModalOpen(true);
   };
-  const uniqueSectors = [...new Set(suppliers.map(s => s.sector))];
-  const sectorCounts = suppliers.reduce((acc, s) => {
-    acc[s.sector] = (acc[s.sector] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
 
   // Dimensão label helper
   const getDimensionLabel = (size: string) => {
@@ -265,25 +257,6 @@ export const CriticalSuppliersHighlight = ({
                     <FileText className="h-4 w-4" />
                     Gerar plano de ação
                   </Button>}
-                  <Select value={selectedSector} onValueChange={setSelectedSector}>
-                    <SelectTrigger className="w-[280px]">
-                      <SelectValue placeholder="Filtrar por atividade" />
-                    </SelectTrigger>
-                    <SelectContent className="w-[280px]">
-                      <SelectItem value="all">
-                        <div className="flex items-center justify-between w-[230px]">
-                          <span>{sectorLabels.all}</span>
-                          <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">{suppliers.length}</span>
-                        </div>
-                      </SelectItem>
-                      {uniqueSectors.map(sector => <SelectItem key={sector} value={sector}>
-                        <div className="flex items-center justify-between w-[230px]">
-                          <span>{sectorLabels[sector] || sector}</span>
-                          <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">{sectorCounts[sector]}</span>
-                        </div>
-                      </SelectItem>)}
-                    </SelectContent>
-                  </Select>
                 </>
               }
             />

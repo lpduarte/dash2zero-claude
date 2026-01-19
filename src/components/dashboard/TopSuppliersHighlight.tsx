@@ -1,11 +1,10 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Supplier } from "@/types/supplier";
-import { Trophy, TrendingDown, Euro, BarChart3, ChevronDown } from "lucide-react";
+import { Trophy, TrendingDown, Euro, BarChart3 } from "lucide-react";
 import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SupplierLabel, sectorLabels } from "./SupplierLabel";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { SupplierLabel } from "./SupplierLabel";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { SectionHeader } from "@/components/ui/section-header";
 import { cn } from "@/lib/utils";
 import { formatNumber, formatPercentage } from "@/lib/formatters";
@@ -42,47 +41,31 @@ const getMedalBorder = (index: number) => {
 export const TopSuppliersHighlight = ({
   suppliers
 }: TopSuppliersHighlightProps) => {
-  const [selectedSector, setSelectedSector] = useState<string>("all");
   const [isOpen, setIsOpen] = useState(true);
 
   // Calculate sector averages
   const sectorAverages = suppliers.reduce((acc, s) => {
     if (!acc[s.sector]) {
-      acc[s.sector] = {
-        total: 0,
-        count: 0
-      };
+      acc[s.sector] = { total: 0, count: 0 };
     }
     acc[s.sector].total += s.totalEmissions;
     acc[s.sector].count += 1;
     return acc;
-  }, {} as Record<string, {
-    total: number;
-    count: number;
-  }>);
+  }, {} as Record<string, { total: number; count: number }>);
+
   const getSectorAverage = (sector: string) => {
     const data = sectorAverages[sector];
     return data ? data.total / data.count : 0;
   };
+
   const getComparisonToAverage = (supplier: Supplier) => {
     const avg = getSectorAverage(supplier.sector);
-    if (avg === 0) return {
-      percentage: 0,
-      isBelow: true
-    };
+    if (avg === 0) return { percentage: 0, isBelow: true };
     const diff = (supplier.totalEmissions - avg) / avg * 100;
-    return {
-      percentage: Math.abs(diff),
-      isBelow: diff < 0
-    };
+    return { percentage: Math.abs(diff), isBelow: diff < 0 };
   };
-  const filteredSuppliers = selectedSector === "all" ? suppliers : suppliers.filter(s => s.sector === selectedSector);
-  const topSuppliers = [...filteredSuppliers].sort((a, b) => a.totalEmissions - b.totalEmissions).slice(0, 3);
-  const uniqueSectors = [...new Set(suppliers.map(s => s.sector))];
-  const sectorCounts = suppliers.reduce((acc, s) => {
-    acc[s.sector] = (acc[s.sector] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+
+  const topSuppliers = [...suppliers].sort((a, b) => a.totalEmissions - b.totalEmissions).slice(0, 3);
   return <Collapsible open={isOpen} onOpenChange={setIsOpen}>
     <Card className="border-success/50 bg-gradient-to-br from-success/10 via-primary/5 to-accent/10 shadow-md">
       <CardHeader className={cn("transition-all duration-[400ms]", isOpen ? "pb-3" : "pb-6")}>
@@ -92,27 +75,6 @@ export const TopSuppliersHighlight = ({
           collapsible
           expanded={isOpen}
           onToggle={() => setIsOpen(!isOpen)}
-          actions={
-            <Select value={selectedSector} onValueChange={setSelectedSector}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Filtrar por atividade" />
-              </SelectTrigger>
-              <SelectContent className="w-[280px]">
-                <SelectItem value="all">
-                  <div className="flex items-center justify-between w-[230px]">
-                    <span>{sectorLabels.all}</span>
-                    <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">{suppliers.length}</span>
-                  </div>
-                </SelectItem>
-                {uniqueSectors.map(sector => <SelectItem key={sector} value={sector}>
-                    <div className="flex items-center justify-between w-[230px]">
-                      <span>{sectorLabels[sector] || sector}</span>
-                      <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">{sectorCounts[sector]}</span>
-                    </div>
-                  </SelectItem>)}
-              </SelectContent>
-            </Select>
-          }
         />
       </CardHeader>
       <CollapsibleContent>

@@ -22,20 +22,20 @@ interface ClusterSelectorProps {
 
 const getPotentialConfig = (potential: ImprovementPotential, isSelected: boolean) => {
   const configs = {
-    high: { 
-      icon: TrendingDown, 
-      color: isSelected ? 'text-danger/70' : 'text-danger',
-      bgColor: isSelected ? 'bg-danger/30' : 'bg-danger/15'
+    high: {
+      icon: TrendingDown,
+      color: isSelected ? '!text-red-300' : '!text-danger group-hover:!text-red-300',
+      bgColor: isSelected ? 'bg-white/15' : 'bg-danger/15 group-hover:bg-white/15'
     },
-    medium: { 
-      icon: TrendingDown, 
-      color: isSelected ? 'text-warning/70' : 'text-warning',
-      bgColor: isSelected ? 'bg-warning/30' : 'bg-warning/15'
+    medium: {
+      icon: TrendingDown,
+      color: isSelected ? '!text-yellow-300' : '!text-warning group-hover:!text-yellow-300',
+      bgColor: isSelected ? 'bg-white/15' : 'bg-warning/15 group-hover:bg-white/15'
     },
-    low: { 
-      icon: TrendingDown, 
-      color: isSelected ? 'text-success/70' : 'text-success',
-      bgColor: isSelected ? 'bg-success/30' : 'bg-success/15'
+    low: {
+      icon: TrendingDown,
+      color: isSelected ? '!text-green-300' : '!text-success group-hover:!text-green-300',
+      bgColor: isSelected ? 'bg-white/15' : 'bg-success/15 group-hover:bg-white/15'
     },
   };
   return configs[potential];
@@ -88,6 +88,7 @@ export function ClusterSelector({
   const activeFiltersCount = useMemo(() => {
     return (
       universalFilters.companySize.length +
+      universalFilters.sector.length +
       universalFilters.district.length +
       universalFilters.municipality.length +
       universalFilters.parish.length
@@ -141,7 +142,7 @@ export function ClusterSelector({
                 key={option.value}
                 onClick={() => onClusterChange(option.value)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all duration-200",
+                  "group flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all duration-200",
                   "[&_svg]:text-current",
                   selectedCluster === option.value
                     ? "bg-primary text-primary-foreground border-primary shadow-md"
