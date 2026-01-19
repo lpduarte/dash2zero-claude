@@ -20,7 +20,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useUser } from "@/contexts/UserContext";
-import { getPercentageColors } from "@/lib/styles";
+import { getPercentageColors, elements } from "@/lib/styles";
 import { formatNumber, formatPercentage } from "@/lib/formatters";
 
 interface MetricsOverviewProps {
@@ -255,9 +255,9 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
                     )}
                   </div>
                   <div className="mt-1">
-                    <Progress 
-                      value={percentageCalculated} 
-                      className="h-2 bg-white/50"
+                    <Progress
+                      value={percentageCalculated}
+                      className={`h-2 ${percentageColors.bg}/25`}
                       indicatorClassName={percentageColors.bg}
                     />
                   </div>
@@ -265,7 +265,7 @@ export const MetricsOverview = ({ suppliers, totalCompanies }: MetricsOverviewPr
               </div>
 
               {/* Origem dos dados */}
-              <div className="p-4 border rounded-lg shadow-md">
+              <div className={elements.kpiCard}>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-normal text-muted-foreground">Origem dos dados</p>

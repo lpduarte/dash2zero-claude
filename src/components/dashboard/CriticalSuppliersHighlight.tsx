@@ -316,8 +316,7 @@ export const CriticalSuppliersHighlight = ({
                                   <div className="space-y-2 text-xs">
                                     <p className="font-normal">Intensidade de carbono vs média do setor.</p>
                                     <div className="space-y-1">
-                                      <p><span className={`${riskColors.critico.text} font-normal`}>Crítico:</span> ≥100% acima da média</p>
-                                      <p><span className={`${riskColors.alto.text} font-normal`}>Alto:</span> 50-100% acima da média</p>
+                                      <p><span className={`${riskColors.alto.text} font-normal`}>Alto:</span> ≥50% acima da média</p>
                                       <p><span className={`${riskColors.medio.text} font-normal`}>Médio:</span> 1-50% acima da média</p>
                                       <p><span className={`${riskColors.baixo.text} font-normal`}>Baixo:</span> abaixo da média</p>
                                     </div>

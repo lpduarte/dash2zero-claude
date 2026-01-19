@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import {
-  Palette, Type, Layers, MousePointerClick, Tag, LayoutGrid,
-  FormInput, ListFilter, BarChart3, AlertCircle, Activity, Columns,
+  Palette, Type, Layers, MousePointerClick, Tag,
+  FormInput, ListFilter, BarChart3, AlertCircle, Columns,
   Table2, PieChart, Star, Moon, Sun, Factory, Building2,
   Zap, TrendingUp, TrendingDown, Download, Filter, Search, Settings,
   Info, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
-  Eye, Mail, Users, Leaf, Copy, Code
+  Eye, Mail, Users, Leaf, Copy, Code, Truck
 } from "lucide-react";
 
 // ============================================
@@ -14,8 +14,8 @@ import {
 const STYLE_GUIDE_VERSION = {
   major: 1,
   minor: 4,
-  patch: 9,
-  date: "2026-01-18",
+  patch: 10,
+  date: "2026-01-19",
   changelog: [
     "Auto-update via commit",
     "Auto-update via commit",
@@ -26,7 +26,7 @@ const STYLE_GUIDE_VERSION = {
     "Auto-update via commit",
     "Auto-update via commit",
     "Auto-update via commit",
-    "Sistema de cores simplificado: 20 variáveis CSS (vs 35+), aliases Tailwind preservados"
+    "Auto-update via commit"
   ]
 };
 
@@ -46,12 +46,11 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { KPICard } from "@/components/ui/kpi-card";
-import { riskColors, scopeColors, cardStyles, iconSizes } from "@/lib/styles";
+import { riskColors, scopeColors, iconSizes } from "@/lib/styles";
 // Recharts
 import {
   AreaChart, Area, PieChart as RechartsPieChart, Pie, Cell,
@@ -90,12 +89,9 @@ const sections = [
   { id: 'sombras', label: 'Sombras', icon: Layers },
   { id: 'botoes', label: 'Botões', icon: MousePointerClick },
   { id: 'badges', label: 'Badges', icon: Tag },
-  { id: 'cards', label: 'Cards', icon: LayoutGrid },
   { id: 'inputs', label: 'Inputs', icon: FormInput },
   { id: 'select', label: 'Select', icon: ListFilter },
   { id: 'kpi-cards', label: 'KPI Cards', icon: BarChart3 },
-  { id: 'alerts', label: 'Alerts', icon: AlertCircle },
-  { id: 'progress', label: 'Progress', icon: Activity },
   { id: 'tabs', label: 'Tabs', icon: Columns },
   { id: 'tabelas', label: 'Tabelas', icon: Table2 },
   { id: 'graficos', label: 'Gráficos', icon: PieChart },
@@ -235,70 +231,74 @@ const MiniStackedBarChart = () => {
   const topScope = getTopScope();
 
   return (
-    <div className="space-y-3">
-      {/* Chart */}
-      <div className="flex items-end gap-1.5 h-44 relative">
-        {miniChartData.map((bar) => {
-          const total = (visibleScopes.s1 ? bar.s1 : 0) + (visibleScopes.s2 ? bar.s2 : 0) + (visibleScopes.s3 ? bar.s3 : 0);
-          const heightPercent = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+    <div className="space-y-4">
+      {/* Chart with X axis */}
+      <div>
+        <div className="flex items-end gap-1.5 h-44 relative border-b border-border">
+          {miniChartData.map((bar) => {
+            const total = (visibleScopes.s1 ? bar.s1 : 0) + (visibleScopes.s2 ? bar.s2 : 0) + (visibleScopes.s3 ? bar.s3 : 0);
+            const heightPercent = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
 
-          // Calcular alturas de cada segmento como percentagem do total da barra
-          const getSegmentHeight = (value: number) => total > 0 ? (value / total) * 100 : 0;
+            // Calcular alturas de cada segmento como percentagem do total da barra
+            const getSegmentHeight = (value: number) => total > 0 ? (value / total) * 100 : 0;
 
-          return (
-            <div
-              key={bar.month}
-              className="flex-1 flex flex-col justify-end h-full group relative"
-              onMouseEnter={() => setHoveredBar(bar.month)}
-              onMouseLeave={() => setHoveredBar(null)}
-            >
+            return (
               <div
-                className="flex flex-col-reverse transition-all duration-300 ease-out overflow-hidden"
-                style={{ height: `${heightPercent}%` }}
+                key={bar.month}
+                className="flex-1 flex flex-col justify-end h-full group relative"
+                onMouseEnter={() => setHoveredBar(bar.month)}
+                onMouseLeave={() => setHoveredBar(null)}
               >
-                {/* Renderiza de baixo para cima: s1, s2, s3 */}
-                {visibleScopes.s1 && (
-                  <div
-                    className={`bg-scope-1 flex-shrink-0 transition-all duration-300 ${topScope === 's1' ? 'rounded-t' : ''}`}
-                    style={{
-                      height: `${getSegmentHeight(bar.s1)}%`,
-                      marginTop: (visibleScopes.s2 || visibleScopes.s3) ? '1px' : 0
-                    }}
-                  />
-                )}
-                {visibleScopes.s2 && (
-                  <div
-                    className={`bg-scope-2 flex-shrink-0 transition-all duration-300 ${topScope === 's2' ? 'rounded-t' : ''}`}
-                    style={{
-                      height: `${getSegmentHeight(bar.s2)}%`,
-                      marginTop: visibleScopes.s3 ? '1px' : 0
-                    }}
-                  />
-                )}
-                {visibleScopes.s3 && (
-                  <div
-                    className={`bg-scope-3 flex-shrink-0 transition-all duration-300 rounded-t`}
-                    style={{ height: `${getSegmentHeight(bar.s3)}%` }}
-                  />
+                <div
+                  className="flex flex-col-reverse transition-all duration-300 ease-out overflow-hidden"
+                  style={{ height: `${heightPercent}%` }}
+                >
+                  {/* Renderiza de baixo para cima: s1, s2, s3 */}
+                  {visibleScopes.s1 && (
+                    <div
+                      className={`bg-scope-1 flex-shrink-0 transition-all duration-300 ${topScope === 's1' ? 'rounded-t' : ''}`}
+                      style={{ height: `${getSegmentHeight(bar.s1)}%` }}
+                    />
+                  )}
+                  {visibleScopes.s2 && (
+                    <div
+                      className={`bg-scope-2 flex-shrink-0 transition-all duration-300 ${topScope === 's2' ? 'rounded-t' : ''}`}
+                      style={{ height: `${getSegmentHeight(bar.s2)}%` }}
+                    />
+                  )}
+                  {visibleScopes.s3 && (
+                    <div
+                      className="bg-scope-3 flex-shrink-0 transition-all duration-300 rounded-t"
+                      style={{ height: `${getSegmentHeight(bar.s3)}%` }}
+                    />
+                  )}
+                </div>
+                {/* Tooltip */}
+                {hoveredBar === bar.month && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-card border rounded-lg shadow-lg p-2 text-xs whitespace-nowrap pointer-events-none">
+                    <p className="font-normal mb-1">{bar.month}</p>
+                    {visibleScopes.s1 && <p className="text-scope-1">Âmbito 1: {bar.s1} t CO₂e</p>}
+                    {visibleScopes.s2 && <p className="text-scope-2">Âmbito 2: {bar.s2} t CO₂e</p>}
+                    {visibleScopes.s3 && <p className="text-scope-3">Âmbito 3: {bar.s3} t CO₂e</p>}
+                    <p className="font-normal mt-1 pt-1 border-t">Total: {total} t CO₂e</p>
+                  </div>
                 )}
               </div>
-              {/* Tooltip */}
-              {hoveredBar === bar.month && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-card border rounded-lg shadow-lg p-2 text-xs whitespace-nowrap pointer-events-none">
-                  <p className="font-normal mb-1">{bar.month}</p>
-                  {visibleScopes.s1 && <p className="text-scope-1">Âmbito 1: {bar.s1} t CO₂e</p>}
-                  {visibleScopes.s2 && <p className="text-scope-2">Âmbito 2: {bar.s2} t CO₂e</p>}
-                  {visibleScopes.s3 && <p className="text-scope-3">Âmbito 3: {bar.s3} t CO₂e</p>}
-                  <p className="font-normal mt-1 pt-1 border-t">Total: {total} t CO₂e</p>
-                </div>
-              )}
+            );
+          })}
+        </div>
+        {/* X axis labels */}
+        <div className="flex gap-1.5 mt-1">
+          {miniChartData.map((bar) => (
+            <div key={bar.month} className="flex-1 text-center">
+              <span className="text-xs text-muted-foreground lowercase">{bar.month.toLowerCase().slice(0, 3)}</span>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
 
       {/* Legend as filter */}
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-4 pt-2">
         {scopeConfig.map(scope => (
           <button
             key={scope.key}
@@ -567,7 +567,7 @@ const StyleGuide = () => {
 
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className={cardStyles.kpi}>
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-[#61DAFB]/10">
                   <ReactIcon className="h-5 w-5 text-[#61DAFB]" />
@@ -578,7 +578,7 @@ const StyleGuide = () => {
                 Biblioteca principal para construção de interfaces
               </p>
             </Card>
-            <Card className={cardStyles.kpi}>
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-[#3178C6]/10">
                   <TypeScriptIcon className="h-5 w-5 text-[#3178C6]" />
@@ -589,7 +589,7 @@ const StyleGuide = () => {
                 Tipagem estática para código mais robusto
               </p>
             </Card>
-            <Card className={cardStyles.kpi}>
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-[#06B6D4]/10">
                   <TailwindIcon className="h-5 w-5 text-[#06B6D4]" />
@@ -600,7 +600,7 @@ const StyleGuide = () => {
                 Framework de utility classes para estilos
               </p>
             </Card>
-            <Card className={cardStyles.kpi}>
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-foreground/10">
                   <ShadcnIcon className="h-5 w-5" />
@@ -613,7 +613,7 @@ const StyleGuide = () => {
             </Card>
           </div>
 
-          <Card className={cardStyles.nested}>
+          <Card className="p-4">
             <h4 className="font-bold mb-3">Outras dependências relevantes</h4>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline">Recharts</Badge>
@@ -770,7 +770,7 @@ const StyleGuide = () => {
           {/* Tipo de Letra */}
           <div>
             <h3 className="text-xl font-bold mb-4">Tipo de Letra</h3>
-            <Card className={cardStyles.section}>
+            <Card className="p-4">
               <h4 className="text-xl font-bold mb-1">Plus Jakarta Sans</h4>
               <p className="text-sm text-muted-foreground mb-4">
                 Font principal para toda a interface
@@ -991,7 +991,6 @@ const StyleGuide = () => {
               <Badge className={riskColors.baixo.badge}>Baixo</Badge>
               <Badge className={riskColors.medio.badge}>Médio</Badge>
               <Badge className={riskColors.alto.badge}>Alto</Badge>
-              <Badge className={riskColors.critico.badge}>Crítico</Badge>
             </div>
           </div>
 
@@ -1002,48 +1001,6 @@ const StyleGuide = () => {
               <Badge className={scopeColors[1].badge}>Âmbito 1</Badge>
               <Badge className={scopeColors[2].badge}>Âmbito 2</Badge>
               <Badge className={scopeColors[3].badge}>Âmbito 3</Badge>
-            </div>
-          </div>
-        </div>
-
-        {/* === SECÇÃO: CARDS === */}
-        <SectionHeader
-          id="cards"
-          title="Cards"
-          icon={LayoutGrid}
-          description="Estilos de contentor"
-        />
-
-        <div className="space-y-8">
-          {/* Estilos de Card */}
-          <div>
-            <h3 className="text-xl font-bold mb-4">Estilos</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <Card className={cardStyles.kpi}>
-                <p className="font-normal">Card KPI</p>
-                <p className="text-xs text-muted-foreground mt-1">cardStyles.kpi</p>
-                <p className="font-mono text-xs text-muted-foreground/70">{cardStyles.kpi}</p>
-              </Card>
-              <Card className={cardStyles.section}>
-                <p className="font-normal">Card Secção</p>
-                <p className="text-xs text-muted-foreground mt-1">cardStyles.section</p>
-                <p className="font-mono text-xs text-muted-foreground/70">{cardStyles.section}</p>
-              </Card>
-              <Card className={cardStyles.nested}>
-                <p className="font-normal">Card Nested</p>
-                <p className="text-xs text-muted-foreground mt-1">cardStyles.nested</p>
-                <p className="font-mono text-xs text-muted-foreground/70">{cardStyles.nested}</p>
-              </Card>
-              <Card className={`${cardStyles.kpi} ${cardStyles.clickable}`}>
-                <p className="font-normal">Card Clicável</p>
-                <p className="text-xs text-muted-foreground mt-1">cardStyles.clickable</p>
-                <p className="font-mono text-xs text-muted-foreground/70">{cardStyles.clickable}</p>
-              </Card>
-              <Card className={`${cardStyles.kpi} ${cardStyles.selected}`}>
-                <p className="font-normal">Card Seleccionado</p>
-                <p className="text-xs text-muted-foreground mt-1">cardStyles.selected</p>
-                <p className="font-mono text-xs text-muted-foreground/70">{cardStyles.selected}</p>
-              </Card>
             </div>
           </div>
         </div>
@@ -1146,117 +1103,102 @@ const StyleGuide = () => {
             />
           </div>
 
-          {/* Exemplo Real: Mini Dashboard */}
+          {/* Mini Dashboard (exemplo) */}
           <div>
-            <h3 className="text-xl font-bold mb-4">Exemplo Real: Mini Dashboard</h3>
+            <h3 className="text-xl font-bold mb-4">Mini Dashboard (exemplo)</h3>
             <Card className="p-6 bg-muted/30 border-dashed">
               <div className="space-y-4">
                 {/* Header do mini dashboard */}
-                <div className="flex items-center justify-between pb-4 border-b">
+                <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-bold">Empresa ABC, Lda.</h4>
                     <p className="text-sm text-muted-foreground">Resumo de emissões 2025</p>
                   </div>
-                  <Badge className={scopeColors[1].badge}>Indústria</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">Indústria</Badge>
+                    <Badge variant="outline">Fornecedores</Badge>
+                  </div>
                 </div>
+
+                <div className="border-b" />
 
                 {/* KPIs em grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                  <div className="p-3 bg-card rounded-lg border">
-                    <p className="text-xs text-muted-foreground">Total</p>
-                    <p className="text-xl font-bold">8.245</p>
-                    <p className="text-xs text-muted-foreground">t CO₂e</p>
+                  <div className="p-4 bg-card rounded-md border shadow-md">
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">Total</p>
+                        <div className="p-1.5 rounded bg-primary/10">
+                          <Factory className="h-4 w-4 text-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">8.245</p>
+                        <p className="text-xs text-muted-foreground mt-1">t CO₂e</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-3 rounded-lg border border-scope-1/30 bg-scope-1/10">
-                    <p className="text-xs text-muted-foreground">Âmbito 1</p>
-                    <p className="text-xl font-bold text-scope-1">2.156</p>
-                    <p className="text-xs text-muted-foreground">t CO₂e (26%)</p>
+                  <div className="p-4 rounded-md border border-scope-1/30 bg-scope-1/10 shadow-md">
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">Âmbito 1</p>
+                        <div className="p-1.5 rounded bg-scope-1/20">
+                          <Factory className="h-4 w-4 text-scope-1" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold text-scope-1">2.156</p>
+                        <p className="text-xs text-muted-foreground mt-1">t CO₂e (26%)</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-3 rounded-lg border border-scope-2/30 bg-scope-2/10">
-                    <p className="text-xs text-muted-foreground">Âmbito 2</p>
-                    <p className="text-xl font-bold text-scope-2">1.489</p>
-                    <p className="text-xs text-muted-foreground">t CO₂e (18%)</p>
+                  <div className="p-4 rounded-md border border-scope-2/30 bg-scope-2/10 shadow-md">
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">Âmbito 2</p>
+                        <div className="p-1.5 rounded bg-scope-2/20">
+                          <Zap className="h-4 w-4 text-scope-2" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold text-scope-2">1.489</p>
+                        <p className="text-xs text-muted-foreground mt-1">t CO₂e (18%)</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-3 rounded-lg border border-scope-3/30 bg-scope-3/10">
-                    <p className="text-xs text-muted-foreground">Âmbito 3</p>
-                    <p className="text-xl font-bold text-scope-3">4.600</p>
-                    <p className="text-xs text-muted-foreground">t CO₂e (56%)</p>
+                  <div className="p-4 rounded-md border border-scope-3/30 bg-scope-3/10 shadow-md">
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">Âmbito 3</p>
+                        <div className="p-1.5 rounded bg-scope-3/20">
+                          <Truck className="h-4 w-4 text-scope-3" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold text-scope-3">4.600</p>
+                        <p className="text-xs text-muted-foreground mt-1">t CO₂e (56%)</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
+                <div className="border-b" />
+
                 {/* Mini gráfico de barras empilhadas (Custom) */}
                 <MiniStackedBarChart />
+
+                <div className="border-b" />
+
+                {/* Progress bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Meta de redução</span>
+                    <span>25%</span>
+                  </div>
+                  <Progress value={25} />
+                </div>
               </div>
             </Card>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Este exemplo mostra como combinar KPIs, badges e elementos visuais num layout coeso
-            </p>
-          </div>
-        </div>
-
-        {/* === SECÇÃO: ALERTS === */}
-        <SectionHeader
-          id="alerts"
-          title="Alerts"
-          icon={AlertCircle}
-          description="Mensagens de feedback"
-        />
-
-        <div className="space-y-4">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>Informação</AlertTitle>
-            <AlertDescription>Mensagem informativa neutra.</AlertDescription>
-          </Alert>
-          <Alert className="border-success/30 bg-success/10">
-            <CheckCircle className="h-4 w-4 text-success" />
-            <AlertTitle className="text-success">Sucesso</AlertTitle>
-            <AlertDescription>Operação concluída com êxito.</AlertDescription>
-          </Alert>
-          <Alert className="border-warning/30 bg-warning/10">
-            <AlertTriangle className="h-4 w-4 text-warning" />
-            <AlertTitle className="text-warning">Atenção</AlertTitle>
-            <AlertDescription>Verifique os dados antes de continuar.</AlertDescription>
-          </Alert>
-          <Alert variant="destructive">
-            <XCircle className="h-4 w-4" />
-            <AlertTitle>Erro</AlertTitle>
-            <AlertDescription>Ocorreu um problema.</AlertDescription>
-          </Alert>
-        </div>
-
-        {/* === SECÇÃO: PROGRESS === */}
-        <SectionHeader
-          id="progress"
-          title="Progress"
-          icon={Activity}
-          description="Indicadores de progresso"
-        />
-
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>25%</span>
-            </div>
-            <Progress value={25} />
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>50%</span>
-            </div>
-            <Progress value={50} />
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>75%</span>
-            </div>
-            <Progress value={75} />
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>100%</span>
-            </div>
-            <Progress value={100} />
           </div>
         </div>
 

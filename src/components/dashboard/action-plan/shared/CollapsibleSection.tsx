@@ -1,5 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { collapsible as collapsibleStyles } from '@/lib/styles';
+import { cn } from '@/lib/utils';
 
 interface CollapsibleSectionProps {
   id: string;
@@ -24,23 +26,22 @@ export const CollapsibleSection = ({
 }: CollapsibleSectionProps) => {
   return (
     <Collapsible open={isExpanded} onOpenChange={() => onToggle(id)}>
-      <div className={`border rounded-lg overflow-hidden ${highlighted ? 'border-2 border-primary/30 bg-primary/5' : ''}`}>
+      <div className={cn(collapsibleStyles.container, highlighted && collapsibleStyles.containerHighlighted)}>
         <CollapsibleTrigger asChild>
           <button
             type="button"
-            className={`w-full flex items-center justify-between p-4 transition-colors ${
-              highlighted
-                ? 'bg-primary/10 hover:bg-primary/20'
-                : 'bg-muted/30 hover:bg-muted/50'
-            }`}
+            className={cn(
+              collapsibleStyles.triggerFullWidth,
+              highlighted ? collapsibleStyles.triggerHighlighted : collapsibleStyles.triggerDefault
+            )}
           >
             <div className="flex items-center gap-3">
               {highlighted ? (
                 <div className="p-2 rounded-lg bg-primary/20">
-                  <Icon className="h-5 w-5 text-primary" />
+                  <Icon className="h-4 w-4 text-primary" />
                 </div>
               ) : (
-                <Icon className="h-5 w-5 text-muted-foreground" />
+                <Icon className="h-4 w-4 text-muted-foreground" />
               )}
               <span className={`font-normal ${highlighted ? 'font-bold text-primary' : ''}`}>{title}</span>
               {badge !== undefined && (
@@ -50,15 +51,17 @@ export const CollapsibleSection = ({
               )}
             </div>
             <ChevronDown
-              className={`h-5 w-5 transition-transform duration-[400ms] ${
-                highlighted ? 'text-primary' : 'text-muted-foreground'
-              } ${isExpanded ? 'rotate-180' : ''}`}
+              className={cn(
+                collapsibleStyles.icon,
+                highlighted ? 'text-primary' : 'text-muted-foreground',
+                isExpanded && collapsibleStyles.iconExpanded
+              )}
             />
           </button>
         </CollapsibleTrigger>
 
         <CollapsibleContent>
-          <div className={`p-4 border-t ${highlighted ? 'border-primary/20' : ''}`}>
+          <div className={cn(collapsibleStyles.content, highlighted && collapsibleStyles.contentHighlighted)}>
             {children}
           </div>
         </CollapsibleContent>

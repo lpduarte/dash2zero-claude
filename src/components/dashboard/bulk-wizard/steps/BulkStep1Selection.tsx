@@ -82,7 +82,7 @@ export const BulkStep1Selection = ({
             onChange={() => onSelectionModeChange('risco_alto')}
             className="text-primary"
           />
-          <span>Todas com risco Alto ou Crítico</span>
+          <span>Todas com risco Alto</span>
           <span className="ml-auto text-sm text-muted-foreground">
             ({empresasRiscoAlto.length} empresas)
           </span>
@@ -114,7 +114,6 @@ export const BulkStep1Selection = ({
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos</SelectItem>
-                    <SelectItem value="crítico">Crítico</SelectItem>
                     <SelectItem value="alto">Alto</SelectItem>
                     <SelectItem value="médio">Médio</SelectItem>
                     <SelectItem value="baixo">Baixo</SelectItem>

@@ -109,6 +109,16 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     @apply bg-background text-foreground;
     font-family: "Plus Jakarta Sans", sans-serif;
   }
+
+  /* Label appears disabled when sibling input is disabled */
+  label:has(~ input:disabled),
+  label:has(~ textarea:disabled),
+  label:has(~ select:disabled),
+  *:has(> input:disabled) > label,
+  *:has(> textarea:disabled) > label,
+  *:has(> select:disabled) > label {
+    @apply opacity-50 cursor-not-allowed;
+  }
 }
 
 /* Fade-in animation for header pulsing elements */

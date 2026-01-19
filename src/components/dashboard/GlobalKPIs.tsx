@@ -103,7 +103,7 @@ export const GlobalKPIs = ({ suppliers }: GlobalKPIsProps) => {
             const colors = colorClasses[kpi.color as keyof typeof colorClasses];
 
             return (
-              <Card key={index} className={`border ${colors.border} bg-card hover:shadow-lg transition-shadow`}>
+              <Card key={index} className={`border ${colors.border} bg-card hover:shadow-lg transition-all`}>
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between mb-3">
                     <div className={`${colors.bg} p-3 rounded-lg`}>

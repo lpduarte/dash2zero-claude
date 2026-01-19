@@ -1,5 +1,6 @@
 import { LucideIcon, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { collapsible as collapsibleStyles } from '@/lib/styles';
 
 interface SectionHeaderProps {
   /** Ícone do header */
@@ -52,12 +53,13 @@ export const SectionHeader = ({
           <button
             type="button"
             onClick={onToggle}
-            className="w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0"
+            className={collapsibleStyles.triggerCircular}
           >
-            <ChevronDown 
+            <ChevronDown
               className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform duration-[400ms]",
-                !expanded && "-rotate-90"
+                collapsibleStyles.icon,
+                "text-muted-foreground",
+                expanded && collapsibleStyles.iconExpanded
               )}
             />
           </button>

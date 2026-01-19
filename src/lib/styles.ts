@@ -25,21 +25,13 @@ export const shadows = {
 // ===========================================
 
 export const riskColors = {
-  critico: {
-    text: 'text-danger',
-    textDark: 'dark:text-danger',
-    bg: 'bg-danger/10',
-    bgDark: 'dark:bg-danger/20',
-    border: 'border-danger/30',
-    badge: 'bg-destructive text-destructive-foreground border-transparent hover:bg-destructive/80 transition-colors',
-  },
   alto: {
     text: 'text-danger',
     textDark: 'dark:text-danger',
     bg: 'bg-danger/10',
     bgDark: 'dark:bg-danger/20',
     border: 'border-danger/30',
-    badge: 'bg-danger/10 text-danger border-danger/30 hover:bg-danger/20 transition-colors',
+    badge: 'bg-danger text-white border-transparent hover:bg-danger/80 transition-colors',
   },
   medio: {
     text: 'text-warning',
@@ -47,7 +39,7 @@ export const riskColors = {
     bg: 'bg-warning/10',
     bgDark: 'dark:bg-warning/20',
     border: 'border-warning/30',
-    badge: 'bg-warning/15 text-amber-700 dark:text-warning dark:bg-warning/20 border-warning/30 hover:bg-warning/25 transition-colors',
+    badge: 'bg-warning text-white border-transparent hover:bg-warning/80 transition-colors',
   },
   baixo: {
     text: 'text-success',
@@ -55,7 +47,7 @@ export const riskColors = {
     bg: 'bg-success/10',
     bgDark: 'dark:bg-success/20',
     border: 'border-success/30',
-    badge: 'bg-success/10 text-success border-success/30 hover:bg-success/20 transition-colors',
+    badge: 'bg-success text-white border-transparent hover:bg-success/80 transition-colors',
   },
 } as const;
 
@@ -181,48 +173,25 @@ export type FundingType = keyof typeof fundingColors;
 // ===========================================
 
 export const getPercentageColors = (percentage: number) => {
-  if (percentage >= 75) return { 
-    text: 'text-success', 
-    bg: 'bg-success', 
-    bgLight: 'bg-success/10', 
-    border: 'border-success/30' 
+  if (percentage >= 50) return {
+    text: 'text-success',
+    bg: 'bg-success',
+    bgLight: 'bg-success/10',
+    border: 'border-success/30'
   };
-  if (percentage >= 50) return { 
-    text: 'text-lime-600 dark:text-lime-400', 
-    bg: 'bg-lime-500', 
-    bgLight: 'bg-lime-100 dark:bg-lime-900/30', 
-    border: 'border-lime-200 dark:border-lime-800' 
+  if (percentage >= 25) return {
+    text: 'text-warning',
+    bg: 'bg-warning',
+    bgLight: 'bg-warning/10',
+    border: 'border-warning/30'
   };
-  if (percentage >= 25) return { 
-    text: 'text-warning', 
-    bg: 'bg-warning', 
-    bgLight: 'bg-warning/10', 
-    border: 'border-warning/30' 
-  };
-  return { 
-    text: 'text-danger', 
-    bg: 'bg-danger', 
-    bgLight: 'bg-danger/10', 
-    border: 'border-danger/30' 
+  return {
+    text: 'text-danger',
+    bg: 'bg-danger',
+    bgLight: 'bg-danger/10',
+    border: 'border-danger/30'
   };
 };
-
-// ===========================================
-// ESTILOS DE CARDS
-// ===========================================
-
-export const cardStyles = {
-  /** Card de KPI pequeno */
-  kpi: 'p-4 border rounded-lg shadow-md transition-all duration-200 hover:shadow-md hover:border-primary/30',
-  /** Card de secção principal */
-  section: 'p-6 border rounded-lg shadow-md transition-all duration-200 hover:shadow-lg',
-  /** Card dentro de outro card (sem shadow) */
-  nested: 'p-4 border rounded-lg transition-all duration-200 hover:bg-muted/30',
-  /** Card clicável */
-  clickable: 'cursor-pointer hover:bg-muted/50 hover:shadow-md transition-all duration-200',
-  /** Card seleccionado */
-  selected: 'border-primary bg-primary/5 border-2',
-} as const;
 
 // ===========================================
 // ESTILOS DE BOTÕES COMUNS
@@ -378,7 +347,7 @@ export const elements = {
   /** Card principal de secção */
   sectionCard: 'p-6 border rounded-lg shadow-md',
   /** Card de KPI */
-  kpiCard: 'p-4 border rounded-lg shadow-md',
+  kpiCard: 'p-4 border rounded-md shadow-md bg-card hover:shadow-lg hover:border-primary/25 transition-all duration-200',
   /** Card dentro de outro card */
   nestedCard: 'p-3 border rounded-lg',
   /** Card clicável */
@@ -405,4 +374,40 @@ export const elements = {
   input: 'px-3 py-1.5 text-sm border rounded-lg bg-background',
   /** Input pequeno (números) */
   inputSmall: 'w-24 px-3 py-1.5 text-sm border rounded-lg bg-background',
+} as const;
+
+// ===========================================
+// COLLAPSIBLE / EXPANSÃO
+// ===========================================
+
+export const collapsible = {
+  /** Duração padrão da animação (400ms) */
+  duration: 'duration-[400ms]',
+
+  /** Ícone de collapse - tamanho e transição */
+  icon: 'h-4 w-4 transition-transform duration-[400ms]',
+  /** Ícone quando expandido (rotate-180) */
+  iconExpanded: 'rotate-180',
+
+  /** Trigger full-width (CollapsibleSection) */
+  triggerFullWidth: 'w-full flex items-center justify-between p-4 transition-colors',
+  /** Trigger full-width compacto (modais) */
+  triggerCompact: 'w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors',
+  /** Trigger full-width - estado default */
+  triggerDefault: 'bg-muted/30 hover:bg-muted/50',
+  /** Trigger full-width - estado highlighted */
+  triggerHighlighted: 'bg-primary/10 hover:bg-primary/20',
+
+  /** Trigger circular (SectionHeader) */
+  triggerCircular: 'w-9 h-9 rounded-full border border-input bg-background hover:bg-muted/50 flex items-center justify-center transition-colors shrink-0',
+
+  /** Container do collapsible */
+  container: 'border rounded-lg overflow-hidden',
+  /** Container highlighted */
+  containerHighlighted: 'border-2 border-primary/30 bg-primary/5',
+
+  /** Conteúdo expandido */
+  content: 'p-4 border-t',
+  /** Conteúdo highlighted */
+  contentHighlighted: 'border-primary/20',
 } as const;

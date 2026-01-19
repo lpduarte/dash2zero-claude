@@ -118,7 +118,7 @@ export const BulkPlanWizard = ({
   const empresasRiscoAlto = useMemo(() => 
     suppliers.filter(s => {
       const risk = getRiskLevel(s.emissionsPerRevenue, avgSectorIntensity);
-      return risk === 'Alto' || risk === 'Crítico';
+      return risk === 'Alto';
     }),
     [suppliers, avgSectorIntensity]
   );

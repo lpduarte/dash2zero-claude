@@ -1,5 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { elements } from '@/lib/styles';
 
 interface KPICardProps {
   /** Título do KPI (ex: "Emissões totais") */
@@ -44,8 +45,9 @@ export const KPICard = ({
   return (
     <Component
       className={cn(
-        "p-4 border rounded-lg shadow-md bg-card text-left relative",
-        onClick && "cursor-pointer hover:bg-muted/50 transition-colors",
+        elements.kpiCard,
+        "text-left relative",
+        onClick && "cursor-pointer",
         className
       )}
       onClick={onClick}

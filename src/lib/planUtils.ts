@@ -92,7 +92,6 @@ export const clearAllPlans = (): number => {
 export const getRiskLevel = (intensity: number, avgSector: number): string => {
   if (avgSector === 0) return 'N/A';
   const percentAbove = ((intensity - avgSector) / avgSector) * 100;
-  if (percentAbove >= 100) return 'Crítico';
   if (percentAbove >= 50) return 'Alto';
   if (percentAbove > 0) return 'Médio';
   return 'Baixo';
@@ -119,16 +118,7 @@ export const getRiskInfo = (intensity: number, avgSector: number): {
   }
   
   const percentAbove = (intensity - avgSector) / avgSector * 100;
-  
-  if (percentAbove >= 100) {
-    return {
-      level: 'Crítico',
-      color: riskColors.critico.text,
-      percentAbove,
-      comparisonText: `${Math.round(percentAbove)}% acima da média`,
-      isAbove: true
-    };
-  }
+
   if (percentAbove >= 50) {
     return {
       level: 'Alto',

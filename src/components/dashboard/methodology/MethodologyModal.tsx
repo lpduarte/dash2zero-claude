@@ -18,7 +18,7 @@ import {
   Euro, Users, Maximize2, BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { riskColors } from "@/lib/styles";
+import { riskColors, collapsible as collapsibleStyles } from "@/lib/styles";
 
 interface MethodologyModalProps {
   open: boolean;
@@ -99,14 +99,14 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             {/* Secção: Origem dos dados */}
             <Collapsible open={expandedSections.origem} onOpenChange={() => toggleSection('origem')}>
               <div className="border rounded-lg overflow-hidden">
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 transition-colors">
+                <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
                   <div className="flex items-center gap-2">
                     <Database className="h-4 w-4 text-primary" />
                     <span className="font-normal text-sm">De onde vêm os dados?</span>
                   </div>
                   <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform duration-[400ms]",
-                    expandedSections.origem && "rotate-180"
+                    collapsibleStyles.icon, "text-muted-foreground",
+                    expandedSections.origem && collapsibleStyles.iconExpanded
                   )} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -141,14 +141,14 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             {/* Secção: Âmbitos de emissões */}
             <Collapsible open={expandedSections.ambitos} onOpenChange={() => toggleSection('ambitos')}>
               <div className="border rounded-lg overflow-hidden">
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 transition-colors">
+                <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
                   <div className="flex items-center gap-2">
                     <Layers className="h-4 w-4 text-primary" />
                     <span className="font-normal text-sm">Como são calculadas as emissões?</span>
                   </div>
                   <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform duration-[400ms]",
-                    expandedSections.ambitos && "rotate-180"
+                    collapsibleStyles.icon, "text-muted-foreground",
+                    expandedSections.ambitos && collapsibleStyles.iconExpanded
                   )} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -200,14 +200,14 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             {/* Secção: Métricas */}
             <Collapsible open={expandedSections.metricas} onOpenChange={() => toggleSection('metricas')}>
               <div className="border rounded-lg overflow-hidden">
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 transition-colors">
+                <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
                   <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-primary" />
                     <span className="font-normal text-sm">O que significa cada métrica?</span>
                   </div>
                   <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform duration-[400ms]",
-                    expandedSections.metricas && "rotate-180"
+                    collapsibleStyles.icon, "text-muted-foreground",
+                    expandedSections.metricas && collapsibleStyles.iconExpanded
                   )} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -265,14 +265,14 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
             {/* Secção: Análise de risco */}
             <Collapsible open={expandedSections.risco} onOpenChange={() => toggleSection('risco')}>
               <div className="border rounded-lg overflow-hidden">
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 transition-colors">
+                <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
                   <div className="flex items-center gap-2">
                     <Target className="h-4 w-4 text-primary" />
                     <span className="font-normal text-sm">Como funciona a análise de risco?</span>
                   </div>
                   <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform duration-[400ms]",
-                    expandedSections.risco && "rotate-180"
+                    collapsibleStyles.icon, "text-muted-foreground",
+                    expandedSections.risco && collapsibleStyles.iconExpanded
                   )} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -294,12 +294,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
                       <div className={`text-center p-2 rounded-lg ${riskColors.alto.bg} border ${riskColors.alto.border}`}>
                         <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-1" />
                         <p className={`text-xs font-normal ${riskColors.alto.text}`}>Alto</p>
-                        <p className={`text-[12px] ${riskColors.alto.text}`}>50-100% acima</p>
-                      </div>
-                      <div className={`text-center p-2 rounded-lg ${riskColors.critico.bg} border ${riskColors.critico.border}`}>
-                        <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-1" />
-                        <p className={`text-xs font-normal ${riskColors.critico.text}`}>Crítico</p>
-                        <p className={`text-[12px] ${riskColors.critico.text}`}>+100% acima</p>
+                        <p className={`text-[12px] ${riskColors.alto.text}`}>≥50% acima</p>
                       </div>
                     </div>
                   </div>
