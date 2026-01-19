@@ -1,4 +1,50 @@
 import { Supplier } from "@/types/supplier";
+import { getBestEmissionIntensity } from "./emissionIntensity";
+
+// ============================================================================
+// BENCHMARKS DE INTENSIDADE CARBÓNICA POR SETOR (INE 2022)
+// Usados para gerar emissões realistas nos mock data
+// Unidade: kg CO₂eq por € de VAB
+// ============================================================================
+const sectorBenchmarks: Record<string, number> = {
+  energia: 2.8,
+  agua: 2.8,
+  agricultura: 2.1,
+  extracao: 1.8,
+  logistica: 0.95,
+  industria: 0.85,
+  alimentar: 0.65,
+  construcao: 0.45,
+  hotelaria: 0.18,
+  comercio: 0.15,
+  tecnologia: 0.08,
+  servicos: 0.029,
+  consultoria: 0.025,
+  administrativo: 0.03,
+  educacao: 0.02,
+  saude: 0.035,
+  cultura: 0.028,
+  financas: 0.002,
+  imobiliario: 0.003,
+};
+
+// Benchmarks específicos para subsetores da indústria
+const subsectorBenchmarks: Record<string, number> = {
+  ceramica: 3.7,
+  metalurgia: 2.5,
+  quimica: 1.8,
+  papel: 1.5,
+  plasticos: 0.9,
+  metalomecanica: 0.7,
+  alimentar: 0.65,
+  madeira: 0.55,
+  automovel: 0.5,
+  textil: 0.45,
+  mobiliario: 0.4,
+  eletronica: 0.35,
+  farmaceutica: 0.25,
+  embalagens: 0.6,
+};
 
 // Helper function to generate mock Portuguese NIFs (starting with 5 for companies)
 const generateNIF = (id: string): string => {
@@ -14,6 +60,89 @@ const calculateCompanySize = (employees: number, revenue: number): 'micro' | 'pe
   if (employees >= 50 || revenue > 10) return 'media';
   if (employees >= 10 || revenue > 2) return 'pequena';
   return 'micro';
+};
+
+// ============================================================================
+// GERADOR DE EMISSÕES REALISTAS COM VARIAÇÃO DE RISCO
+// ============================================================================
+// Usa os benchmarks INE e adiciona variação para criar diferentes níveis de risco
+// - riskFactor < 0.8: Baixo risco (empresa eficiente)
+// - riskFactor 0.8-1.2: Risco normal (na média do setor)
+// - riskFactor 1.2-1.5: Risco médio (acima da média)
+// - riskFactor > 1.5: Risco alto (muito acima da média)
+// ============================================================================
+
+/**
+ * Recalcula emissões realistas para um fornecedor com base nos benchmarks INE
+ * @param supplier Dados originais do fornecedor
+ * @param index Índice usado para criar variação determinística
+ * @returns Fornecedor com emissões recalculadas
+ */
+const recalculateRealisticEmissions = (supplier: any, index: number): any => {
+  // Obter benchmark do setor (ou subsector se aplicável)
+  let benchmark: number;
+  if (supplier.subsector && subsectorBenchmarks[supplier.subsector]) {
+    benchmark = subsectorBenchmarks[supplier.subsector];
+  } else {
+    benchmark = sectorBenchmarks[supplier.sector] || 0.5; // fallback
+  }
+
+  // Gerar fator de risco determinístico baseado no índice
+  // Distribuição: ~30% baixo, ~40% normal, ~20% médio, ~10% alto
+  const riskDistribution = [
+    0.5, 0.6, 0.7, // baixo risco (30%)
+    0.8, 0.9, 1.0, 1.1, // normal (40%)
+    1.3, 1.4, // médio (20%)
+    1.8, // alto (10%)
+  ];
+  const riskFactor = riskDistribution[index % riskDistribution.length];
+
+  // Calcular intensidade ajustada (kg CO₂e/€)
+  const adjustedIntensity = benchmark * riskFactor;
+
+  // revenue está em M€, converter para € e calcular emissões
+  // emissões (tons) = intensity (kg/€) * revenue (M€) * 1_000_000 / 1000
+  // = intensity * revenue * 1000
+  const revenueEuros = supplier.revenue * 1_000_000; // converter M€ para €
+  const totalEmissionsKg = adjustedIntensity * revenueEuros;
+  const totalEmissionsTons = totalEmissionsKg / 1000;
+
+  // Distribuir entre scopes (aproximação típica)
+  // Scope 1: ~20%, Scope 2: ~30%, Scope 3: ~50%
+  const scope1 = Math.round(totalEmissionsTons * 0.2);
+  const scope2 = Math.round(totalEmissionsTons * 0.3);
+  const scope3 = Math.round(totalEmissionsTons * 0.5);
+  const totalEmissions = scope1 + scope2 + scope3;
+
+  // Recalcular métricas derivadas
+  const emissionsPerRevenue = totalEmissions > 0 && supplier.revenue > 0
+    ? (totalEmissions * 1000) / (supplier.revenue * 1_000_000) // tons * 1000 / € = kg/€
+    : 0;
+  const emissionsPerEmployee = supplier.employees > 0
+    ? totalEmissions / supplier.employees
+    : 0;
+  const emissionsPerArea = supplier.area > 0
+    ? totalEmissions / supplier.area
+    : 0;
+
+  // Atualizar yearlyProgress com tendência realista
+  const yearlyProgress = [
+    { year: 2021, emissions: Math.round(totalEmissions * 1.15) },
+    { year: 2022, emissions: Math.round(totalEmissions * 1.07) },
+    { year: 2023, emissions: totalEmissions },
+  ];
+
+  return {
+    ...supplier,
+    scope1,
+    scope2,
+    scope3,
+    totalEmissions,
+    emissionsPerRevenue: Math.round(emissionsPerRevenue * 1000) / 1000, // 3 casas decimais
+    emissionsPerEmployee: Math.round(emissionsPerEmployee * 100) / 100,
+    emissionsPerArea: Math.round(emissionsPerArea * 1000) / 1000,
+    yearlyProgress,
+  };
 };
 
 // Location data for Portugal
@@ -92,13 +221,16 @@ const getLocation = (index: number) => {
   return { district, municipality, parish };
 };
 
-// Process suppliers to ensure all have NIFs and location data
+// Process suppliers to ensure all have NIFs, location data, and realistic emissions
 const addFieldsToSupplier = (supplier: any, index: number): Supplier => {
   const location = getLocation(index);
   const companySize = calculateCompanySize(supplier.employees, supplier.revenue);
-  
+
+  // Recalcular emissões com valores realistas baseados nos benchmarks INE
+  const withRealisticEmissions = recalculateRealisticEmissions(supplier, index);
+
   return {
-    ...supplier,
+    ...withRealisticEmissions,
     district: location.district,
     municipality: location.municipality,
     parish: location.parish,

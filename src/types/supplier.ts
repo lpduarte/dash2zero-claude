@@ -1,8 +1,12 @@
 export interface Supplier {
   id: string;
   name: string;
-  sector: string;
-  subsector?: string; // Sub-tipo para melhor matching de alternativas (química, vidro, têxtil, etc.)
+  // ---------------------------------------------------------------------------
+  // CLASSIFICAÇÃO DE ATIVIDADE (baseada em CAE)
+  // ---------------------------------------------------------------------------
+  sector: string;              // CAE Principal - atividade económica principal (obrigatório)
+  subsector?: string;          // Divisão CAE dentro da Indústria (química, vidro, têxtil, etc.)
+  secondarySectors?: string[]; // CAEs Secundários - atividades adicionais (opcional, para referência)
   region: string;
   district: string; // Distrito (ex: "Porto", "Lisboa", "Faro")
   municipality: string; // Município (ex: "Portimão", "Matosinhos")
