@@ -14,8 +14,9 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Search,
   Send,
@@ -31,22 +32,30 @@ import {
   ChevronRight,
   Archive,
   CheckCircle2,
-  Calculator,
   Clock,
   Star,
   Lightbulb,
-  Zap
+  Zap,
+  Settings2,
+  Plus,
+  Pencil,
+  Trash2,
+  MailOpen,
+  MousePointerClick,
+  Circle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { getClustersByOwnerType } from "@/data/clusters";
-import { 
+import {
   getSuppliersWithoutFootprintByOwnerType,
 } from "@/data/suppliers";
-import { emailTemplates, getCompanyEmailTracking, EmailRecord } from "@/data/emailTracking";
+import { ClusterSelector } from "@/components/dashboard/ClusterSelector";
+import { UniversalFilterState, Supplier } from "@/types/supplier";
+import { emailTemplates as defaultEmailTemplates, getCompanyEmailTracking, EmailRecord, EmailTemplate } from "@/data/emailTracking";
 import { SupplierWithoutFootprint } from "@/types/supplierNew";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
 import { pt } from "date-fns/locale";
 import { IncentiveFiltersDialog, IncentiveFilters } from "@/components/dashboard/IncentiveFiltersDialog";
@@ -58,50 +67,59 @@ interface CompanyWithTracking extends SupplierWithoutFootprint {
   completedVia?: 'simple' | 'formulario';
 }
 
-const onboardingStatusConfig: Record<string, { label: string; color: string; tooltip: string }> = {
+const onboardingStatusConfig: Record<string, { label: string; color: string; borderColor: string; tooltip: string }> = {
   por_contactar: {
     label: 'Por contactar',
     color: 'bg-status-pending/15 text-status-pending border border-status-pending/30 hover:bg-status-pending/25 transition-colors',
+    borderColor: 'border-status-pending',
     tooltip: 'Ainda não recebeu nenhum email'
   },
   sem_interacao: {
     label: 'Sem interação',
     color: 'bg-status-contacted/15 text-status-contacted border border-status-contacted/30 hover:bg-status-contacted/25 transition-colors',
+    borderColor: 'border-status-contacted',
     tooltip: 'Recebeu email mas não clicou no link'
   },
   interessada: {
     label: 'Interessada',
     color: 'bg-status-interested/15 text-status-interested border border-status-interested/30 hover:bg-status-interested/25 transition-colors',
+    borderColor: 'border-status-interested',
     tooltip: 'Clicou no link do email'
   },
   interessada_simple: {
     label: 'Interessada / Simple',
     color: 'bg-status-interested/15 text-status-interested border border-status-interested/30 hover:bg-status-interested/25 transition-colors',
+    borderColor: 'border-status-interested',
     tooltip: 'Escolheu o caminho Simple na landing page'
   },
   interessada_formulario: {
     label: 'Interessada / Formulário',
     color: 'bg-status-interested/15 text-status-interested border border-status-interested/30 hover:bg-status-interested/25 transition-colors',
+    borderColor: 'border-status-interested',
     tooltip: 'Escolheu o caminho Formulário na landing page'
   },
   registada_simple: {
-    label: 'Registada',
+    label: 'Registada / Simple',
     color: 'bg-status-registered/15 text-status-registered border border-status-registered/30 hover:bg-status-registered/25 transition-colors',
+    borderColor: 'border-status-registered',
     tooltip: 'Criou conta no Simple'
   },
   em_progresso_simple: {
     label: 'Em progresso / Simple',
     color: 'bg-status-progress/15 text-status-progress border border-status-progress/30 hover:bg-status-progress/25 transition-colors',
+    borderColor: 'border-status-progress',
     tooltip: 'Iniciou o cálculo da pegada no Simple'
   },
   em_progresso_formulario: {
     label: 'Em progresso / Formulário',
     color: 'bg-status-progress/15 text-status-progress border border-status-progress/30 hover:bg-status-progress/25 transition-colors',
+    borderColor: 'border-status-progress',
     tooltip: 'Iniciou o preenchimento do formulário'
   },
   completo: {
     label: 'Completo',
     color: 'bg-status-complete/15 text-status-complete border border-status-complete/30 hover:bg-status-complete/25 transition-colors',
+    borderColor: 'border-status-complete',
     tooltip: 'Pegada calculada com sucesso'
   },
 };
@@ -144,20 +162,36 @@ const Incentive = () => {
   const [activeTab, setActiveTab] = useState<"pending" | "archive">("pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCluster, setSelectedCluster] = useState("all");
+  const [universalFilters, setUniversalFilters] = useState<UniversalFilterState>({
+    companySize: [],
+    district: [],
+    municipality: [],
+    parish: [],
+    sector: [],
+  });
   const [advancedFilters, setAdvancedFilters] = useState<IncentiveFilters>({
     onboardingStatus: [],
     emailCount: "all",
   });
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
-  const [expandedCompany, setExpandedCompany] = useState<string | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState(emailTemplates[0].id);
-  const [subject, setSubject] = useState(emailTemplates[0].subject);
-  const [message, setMessage] = useState(emailTemplates[0].body);
+  
+  // Templates state
+  const [templates, setTemplates] = useState<EmailTemplate[]>(defaultEmailTemplates);
+  const [selectedTemplate, setSelectedTemplate] = useState(defaultEmailTemplates[0].id);
+  const [subject, setSubject] = useState(defaultEmailTemplates[0].subject);
+  const [message, setMessage] = useState(defaultEmailTemplates[0].body);
+
+  // Template editing state
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
+  const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
+  const [templateForm, setTemplateForm] = useState({ name: '', description: '', subject: '', body: '' });
+
   const [isLoading, setIsLoading] = useState(false);
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
-  const [sortBy, setSortBy] = useState<'name' | 'status' | 'emails' | 'lastContact'>('status');
+  const [sortBy, setSortBy] = useState<'status' | 'status-desc' | 'emails' | 'emails-desc'>('status');
   const [showSmartSendDialog, setShowSmartSendDialog] = useState(false);
   const [showKPIsModal, setShowKPIsModal] = useState(false);
+  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   
   // Status order for sorting (most advanced first)
   const statusOrder: Record<string, number> = {
@@ -177,7 +211,7 @@ const Incentive = () => {
     const ownerType = isMunicipio ? 'municipio' : 'empresa';
     return getClustersByOwnerType(ownerType);
   }, [isMunicipio]);
-  
+
   // Empresas SEM pegada (para contactar)
   const companiesWithoutFootprint = useMemo((): CompanyWithTracking[] => {
     const ownerType = isMunicipio ? 'municipio' : 'empresa';
@@ -199,26 +233,65 @@ const Incentive = () => {
     });
   }, [isMunicipio]);
 
+  // Cluster counts para o ClusterSelector
+  const clusterCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: companiesWithoutFootprint.length };
+    clusters.forEach(cluster => {
+      counts[cluster.id] = companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length;
+    });
+    return counts;
+  }, [companiesWithoutFootprint, clusters]);
+
+  // Empresas filtradas por cluster e filtros universais (para KPIs)
+  const globalFilteredCompanies = useMemo(() => {
+    let filtered = companiesWithoutFootprint;
+
+    // Filtro de cluster
+    if (selectedCluster !== 'all') {
+      filtered = filtered.filter(c => c.clusterId === selectedCluster);
+    }
+
+    // Filtros universais
+    if (universalFilters.companySize.length > 0) {
+      filtered = filtered.filter(c => universalFilters.companySize.includes(c.companySize || ''));
+    }
+    if (universalFilters.sector.length > 0) {
+      filtered = filtered.filter(c => universalFilters.sector.includes(c.sector));
+    }
+    if (universalFilters.district.length > 0) {
+      filtered = filtered.filter(c => universalFilters.district.includes(c.district || ''));
+    }
+    if (universalFilters.municipality.length > 0) {
+      filtered = filtered.filter(c => universalFilters.municipality.includes(c.municipality || ''));
+    }
+    if (universalFilters.parish.length > 0) {
+      filtered = filtered.filter(c => universalFilters.parish.includes(c.parish || ''));
+    }
+
+    return filtered;
+  }, [companiesWithoutFootprint, selectedCluster, universalFilters]);
+
   // Empresas que completaram o onboarding (para o arquivo)
   const companiesCompleted = useMemo(() => {
-    return companiesWithoutFootprint.filter(c => c.onboardingStatus === 'completo');
-  }, [companiesWithoutFootprint]);
+    return globalFilteredCompanies.filter(c => c.onboardingStatus === 'completo');
+  }, [globalFilteredCompanies]);
+
+  // Empresas pendentes (sem pegada e não completas)
+  const companiesPending = useMemo(() => {
+    return globalFilteredCompanies.filter(c => c.onboardingStatus !== 'completo');
+  }, [globalFilteredCompanies]);
   
-  // Filtered companies (sem pegada)
+  // Filtered companies (já tem cluster e universal filters aplicados via companiesPending)
   const filteredCompanies = useMemo(() => {
-    let filtered = [...companiesWithoutFootprint];
-    
+    let filtered = [...companiesPending];
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(c => 
+      filtered = filtered.filter(c =>
         c.name.toLowerCase().includes(query)
       );
     }
-    
-    if (selectedCluster !== "all") {
-      filtered = filtered.filter(c => c.clusterId === selectedCluster);
-    }
-    
+
     // Advanced filters - email count
     if (advancedFilters.emailCount !== "all") {
       if (advancedFilters.emailCount === "0") {
@@ -231,56 +304,48 @@ const Incentive = () => {
         filtered = filtered.filter(c => c.emailsSent >= 3);
       }
     }
-    
+
     // Advanced filters - onboarding status
     if (advancedFilters.onboardingStatus.length > 0) {
       filtered = filtered.filter(c => advancedFilters.onboardingStatus.includes(c.onboardingStatus));
     }
-    
+
     // Apply sorting
     switch (sortBy) {
       case 'status':
         filtered.sort((a, b) => (statusOrder[a.onboardingStatus] || 99) - (statusOrder[b.onboardingStatus] || 99));
         break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      case 'status-desc':
+        filtered.sort((a, b) => (statusOrder[b.onboardingStatus] || 99) - (statusOrder[a.onboardingStatus] || 99));
         break;
       case 'emails':
         filtered.sort((a, b) => b.emailsSent - a.emailsSent);
         break;
-      case 'lastContact':
-        filtered.sort((a, b) => {
-          if (!a.lastContactDate) return 1;
-          if (!b.lastContactDate) return -1;
-          return new Date(b.lastContactDate).getTime() - new Date(a.lastContactDate).getTime();
-        });
+      case 'emails-desc':
+        filtered.sort((a, b) => a.emailsSent - b.emailsSent);
         break;
     }
-    
+
     return filtered;
-  }, [companiesWithoutFootprint, searchQuery, selectedCluster, advancedFilters, sortBy, statusOrder]);
-  
-  // Filtered archive (empresas que completaram onboarding)
+  }, [companiesPending, searchQuery, advancedFilters, sortBy, statusOrder]);
+
+  // Filtered archive (já tem cluster e universal filters aplicados via companiesCompleted)
   const filteredArchive = useMemo(() => {
     let filtered = [...companiesCompleted];
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(c => 
+      filtered = filtered.filter(c =>
         c.name.toLowerCase().includes(query)
       );
     }
-    
-    if (selectedCluster !== "all") {
-      filtered = filtered.filter(c => c.clusterId === selectedCluster);
-    }
-    
+
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
-  }, [companiesCompleted, searchQuery, selectedCluster]);
+  }, [companiesCompleted, searchQuery]);
   
-  // Funnel metrics based on onboardingStatus
+  // Funnel metrics based on onboardingStatus (filtrados por cluster e filtros universais)
   const funnelMetrics = useMemo(() => {
-    const allCompanies = companiesWithoutFootprint;
+    const allCompanies = globalFilteredCompanies;
     const total = allCompanies.length;
     
     const statusCounts = allCompanies.reduce((acc, c) => {
@@ -413,9 +478,11 @@ const Incentive = () => {
       templateStats,
       // Funnel stats
       funnelStats,
+      // Flag: sem atividade (só empresas por contactar)
+      hasNoActivity: emailsSent === 0,
     };
-  }, [companiesWithoutFootprint]);
-  
+  }, [globalFilteredCompanies]);
+
   // Handlers
   const handleSelectCompany = (companyId: string) => {
     setSelectedCompanies(prev => 
@@ -438,14 +505,112 @@ const Incentive = () => {
   };
   
   const handleTemplateChange = (templateId: string) => {
-    const template = emailTemplates.find(t => t.id === templateId);
+    const template = templates.find(t => t.id === templateId);
     if (template) {
       setSelectedTemplate(templateId);
       setSubject(template.subject);
       setMessage(template.body);
     }
   };
-  
+
+  // Template management handlers
+  const handleEditTemplate = (template: EmailTemplate) => {
+    setEditingTemplate(template);
+    setTemplateForm({
+      name: template.name,
+      description: template.description,
+      subject: template.subject,
+      body: template.body,
+    });
+    setIsCreatingTemplate(false);
+  };
+
+  const handleCreateTemplate = () => {
+    setEditingTemplate(null);
+    setTemplateForm({ name: '', description: '', subject: '', body: '' });
+    setIsCreatingTemplate(true);
+  };
+
+  const handleSaveTemplate = () => {
+    if (!templateForm.name || !templateForm.subject || !templateForm.body) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isCreatingTemplate) {
+      // Create new template
+      const newTemplate: EmailTemplate = {
+        id: `t${Date.now()}`,
+        name: templateForm.name,
+        description: templateForm.description,
+        subject: templateForm.subject,
+        body: templateForm.body,
+      };
+      setTemplates(prev => [...prev, newTemplate]);
+      toast({
+        title: "Template criado",
+        description: `O template "${newTemplate.name}" foi criado com sucesso.`,
+      });
+    } else if (editingTemplate) {
+      // Update existing template
+      setTemplates(prev => prev.map(t =>
+        t.id === editingTemplate.id
+          ? { ...t, ...templateForm }
+          : t
+      ));
+      // Update composer if this template is selected
+      if (selectedTemplate === editingTemplate.id) {
+        setSubject(templateForm.subject);
+        setMessage(templateForm.body);
+      }
+      toast({
+        title: "Template atualizado",
+        description: `O template "${templateForm.name}" foi atualizado com sucesso.`,
+      });
+    }
+
+    // Reset form state
+    setEditingTemplate(null);
+    setIsCreatingTemplate(false);
+    setTemplateForm({ name: '', description: '', subject: '', body: '' });
+  };
+
+  const handleDeleteTemplate = (template: EmailTemplate) => {
+    if (templates.length <= 1) {
+      toast({
+        title: "Não é possível apagar",
+        description: "Deve existir pelo menos um template.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setTemplates(prev => prev.filter(t => t.id !== template.id));
+
+    // If deleted template was selected, select another one
+    if (selectedTemplate === template.id) {
+      const remaining = templates.filter(t => t.id !== template.id);
+      if (remaining.length > 0) {
+        handleTemplateChange(remaining[0].id);
+      }
+    }
+
+    toast({
+      title: "Template removido",
+      description: `O template "${template.name}" foi removido.`,
+    });
+  };
+
+  const handleCancelTemplateEdit = () => {
+    setEditingTemplate(null);
+    setIsCreatingTemplate(false);
+    setTemplateForm({ name: '', description: '', subject: '', body: '' });
+  };
+
   const handleSend = async () => {
     if (selectedCompanies.length === 0) return;
     
@@ -461,11 +626,7 @@ const Incentive = () => {
     setIsLoading(false);
   };
   
-  const toggleExpandCompany = (companyId: string) => {
-    setExpandedCompany(prev => prev === companyId ? null : companyId);
-  };
-  
-  const formatEmailDate = (dateString: string) => {
+    const formatEmailDate = (dateString: string) => {
     return format(new Date(dateString), "d MMM yyyy, HH:mm", { locale: pt });
   };
   
@@ -494,7 +655,7 @@ const Incentive = () => {
   
   const suggestedTemplateName = useMemo(() => {
     if (!suggestedTemplate) return null;
-    const template = emailTemplates.find(t => t.id === suggestedTemplate);
+    const template = templates.find(t => t.id === suggestedTemplate);
     return template?.name || null;
   }, [suggestedTemplate]);
   
@@ -509,7 +670,7 @@ const Incentive = () => {
       if (!company) return;
       
       const suggestedId = templateSuggestions[company.onboardingStatus] || 't1';
-      const template = emailTemplates.find(t => t.id === suggestedId);
+      const template = templates.find(t => t.id === suggestedId);
       
       if (!groups[suggestedId]) {
         groups[suggestedId] = {
@@ -543,15 +704,6 @@ const Incentive = () => {
     setIsLoading(false);
   };
   
-  const previewSubject = useMemo(() => {
-    if (!firstSelectedCompany) return subject;
-    return subject.replace(/{companyName}/g, firstSelectedCompany.name);
-  }, [subject, firstSelectedCompany]);
-  
-  const previewMessage = useMemo(() => {
-    if (!firstSelectedCompany) return message;
-    return message.replace(/{companyName}/g, firstSelectedCompany.name);
-  }, [message, firstSelectedCompany]);
   
   const currentList = activeTab === "pending" ? filteredCompanies : filteredArchive;
   const allSelected = currentList.length > 0 && currentList.every(c => selectedCompanies.includes(c.id));
@@ -568,10 +720,21 @@ const Incentive = () => {
             Incentivo ao Cálculo de Pegada
           </h1>
           <p className="text-muted-foreground mt-1">
-            Contacte empresas para calcular ou actualizar a sua pegada de carbono
+            Contacte empresas para calcular ou atualizar a sua pegada de carbono
           </p>
         </div>
-        
+
+        {/* Cluster Selector */}
+        <ClusterSelector
+          selectedCluster={selectedCluster}
+          onClusterChange={setSelectedCluster}
+          clusterCounts={clusterCounts}
+          showPotential={false}
+          suppliers={companiesWithoutFootprint as unknown as Supplier[]}
+          universalFilters={universalFilters}
+          onUniversalFiltersChange={setUniversalFilters}
+        />
+
         {/* Funnel Metrics Card */}
         <Collapsible open={isMetricsExpanded} onOpenChange={setIsMetricsExpanded}>
           <Card className="shadow-md mb-6">
@@ -583,167 +746,182 @@ const Incentive = () => {
                 expanded={isMetricsExpanded}
                 onToggle={() => setIsMetricsExpanded(!isMetricsExpanded)}
                 actions={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs"
-                    onClick={() => setShowKPIsModal(true)}
-                  >
-                    <Info className="h-3 w-3" />
-                    O que significa cada KPI?
-                  </Button>
+                  !funnelMetrics.hasNoActivity && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => setShowKPIsModal(true)}
+                    >
+                      <Info className="h-3 w-3" />
+                      O que significa cada KPI?
+                    </Button>
+                  )
                 }
               />
             </CardHeader>
             <CollapsibleContent>
               <CardContent>
-                {/* Linha 1 - Métricas de Performance (4 KPIs numéricos) */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <KPICard
-                    title="Taxa de Conversão"
-                    value={`${funnelMetrics.conversionRate}%`}
-                    unit={`${funnelMetrics.completo} de ${funnelMetrics.total} empresas`}
-                    icon={TrendingUp}
-                    iconColor="text-success"
-                    iconBgColor="bg-success/10"
-                    valueColor="text-success"
-                  />
-                  <KPICard
-                    title="Time to Value"
-                    value={funnelMetrics.avgDaysToConversion}
-                    unit="dias em média"
-                    icon={Clock}
-                    iconColor="text-primary"
-                    iconBgColor="bg-primary/10"
-                  />
-                  <KPICard
-                    title="Open Rate"
-                    value={`${funnelMetrics.openRate}%`}
-                    unit={`${funnelMetrics.emailsSent} emails enviados`}
-                    icon={Mail}
-                    iconColor={funnelMetrics.openRate >= 20 ? "text-success" : "text-warning"}
-                    iconBgColor={funnelMetrics.openRate >= 20 ? "bg-success/10" : "bg-warning/10"}
-                    valueColor={funnelMetrics.openRate >= 20 ? "text-success" : "text-warning"}
-                  />
-                  <KPICard
-                    title="Click-to-Open"
-                    value={`${funnelMetrics.clickToOpenRate}%`}
-                    unit="qualidade do conteúdo"
-                    icon={Zap}
-                    iconColor={funnelMetrics.clickToOpenRate >= 30 ? "text-success" : "text-primary"}
-                    iconBgColor={funnelMetrics.clickToOpenRate >= 30 ? "bg-success/10" : "bg-primary/10"}
-                    valueColor={funnelMetrics.clickToOpenRate >= 30 ? "text-success" : "text-primary"}
-                  />
-                </div>
+                {/* KPIs - só mostrar quando há atividade */}
+                {!funnelMetrics.hasNoActivity && (
+                  <>
+                    {/* Linha 1 - Métricas de Performance (4 KPIs numéricos) */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <KPICard
+                        title="Taxa de Conversão"
+                        value={`${funnelMetrics.conversionRate}%`}
+                        unit={`${funnelMetrics.completo} de ${funnelMetrics.total} empresas`}
+                        icon={TrendingUp}
+                        iconColor="text-success"
+                        iconBgColor="bg-success/10"
+                        valueColor="text-success"
+                      />
+                      <KPICard
+                        title="Time to Value"
+                        value={funnelMetrics.avgDaysToConversion}
+                        unit="dias em média"
+                        icon={Clock}
+                        iconColor="text-primary"
+                        iconBgColor="bg-primary/10"
+                      />
+                      <KPICard
+                        title="Open Rate"
+                        value={`${funnelMetrics.openRate}%`}
+                        unit={`${funnelMetrics.emailsSent} emails enviados`}
+                        icon={Mail}
+                        iconColor={funnelMetrics.openRate >= 20 ? "text-success" : "text-warning"}
+                        iconBgColor={funnelMetrics.openRate >= 20 ? "bg-success/10" : "bg-warning/10"}
+                        valueColor={funnelMetrics.openRate >= 20 ? "text-success" : "text-warning"}
+                      />
+                      <KPICard
+                        title="Click-to-Open"
+                        value={`${funnelMetrics.clickToOpenRate}%`}
+                        unit="qualidade do conteúdo"
+                        icon={Zap}
+                        iconColor={funnelMetrics.clickToOpenRate >= 30 ? "text-success" : "text-primary"}
+                        iconBgColor={funnelMetrics.clickToOpenRate >= 30 ? "bg-success/10" : "bg-primary/10"}
+                        valueColor={funnelMetrics.clickToOpenRate >= 30 ? "text-success" : "text-primary"}
+                      />
+                    </div>
 
-                {/* Linha 2 - Insights Accionáveis */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  {/* Card composto: Bottleneck + Pie Chart */}
-                  <div className="border rounded-lg shadow-md flex overflow-hidden">
-                    {/* Lado esquerdo: Info do bottleneck */}
-                    <div className="flex-1 p-4 flex flex-col gap-3">
-                      <p className="text-xs font-normal text-muted-foreground h-7 flex items-center">Bottleneck</p>
-                      <div>
-                        <p className="text-2xl font-bold" style={{ color: funnelMetrics.bottleneckColor }}>{funnelMetrics.bottleneck}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{funnelMetrics.bottleneckTooltip}</p>
+                    {/* Linha 2 - Insights Accionáveis */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      {/* Card composto: Bottleneck + Pie Chart */}
+                      <div className="border rounded-lg shadow-md flex overflow-hidden">
+                        {/* Lado esquerdo: Info do bottleneck */}
+                        <div className="flex-1 p-4 flex flex-col gap-3">
+                          <p className="text-xs font-normal text-muted-foreground h-7 flex items-center">Bottleneck</p>
+                          <div>
+                            <p className="text-2xl font-bold" style={{ color: funnelMetrics.bottleneckColor }}>
+                              {funnelMetrics.bottleneck}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {funnelMetrics.bottleneckTooltip}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Separador vertical */}
+                        <div className="w-px bg-border" />
+
+                        {/* Lado direito: Mini Pie Chart */}
+                        <div className="w-[110px] flex items-center justify-center">
+                          <ResponsiveContainer width={94} height={94}>
+                            <PieChart>
+                              <Pie
+                                data={funnelMetrics.funnelStats}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={24}
+                                outerRadius={44}
+                                stroke="hsl(var(--card))"
+                                strokeWidth={1}
+                              >
+                                {funnelMetrics.funnelStats.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <RechartsTooltip
+                                position={{ x: -120, y: 27 }}
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    const data = payload[0].payload;
+                                    return (
+                                      <div className="bg-popover border rounded-md shadow-md px-3 py-2 whitespace-nowrap">
+                                        <p className="text-xs font-medium">{data.name}</p>
+                                        <p className="text-xs text-muted-foreground">{data.value} empresas</p>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      {/* Card composto: Melhor Template + Pie Chart */}
+                      <div className="border rounded-lg shadow-md flex overflow-hidden">
+                        {/* Lado esquerdo: Info do melhor template */}
+                        <div className="flex-1 p-4 flex flex-col gap-3">
+                          <p className="text-xs font-normal text-muted-foreground h-7 flex items-center">Melhor Template</p>
+                          <div>
+                            <p className="text-2xl font-bold">
+                              {funnelMetrics.bestTemplate}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {funnelMetrics.bestTemplateRate}% conversão
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Separador vertical */}
+                        <div className="w-px bg-border" />
+
+                        {/* Lado direito: Mini Pie Chart */}
+                        <div className="w-[110px] flex items-center justify-center">
+                          <ResponsiveContainer width={94} height={94}>
+                            <PieChart>
+                              <Pie
+                                data={funnelMetrics.templateStats}
+                                dataKey="conversions"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={24}
+                                outerRadius={44}
+                                stroke="hsl(var(--card))"
+                                strokeWidth={1}
+                              >
+                                {funnelMetrics.templateStats.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <RechartsTooltip
+                                position={{ x: -120, y: 27 }}
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    const data = payload[0].payload;
+                                    return (
+                                      <div className="bg-popover border rounded-md shadow-md px-3 py-2 whitespace-nowrap">
+                                        <p className="text-xs font-medium">{data.name}</p>
+                                        <p className="text-xs text-muted-foreground">{data.conversions}% conversão</p>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Separador vertical */}
-                    <div className="w-px bg-border" />
-
-                    {/* Lado direito: Mini Pie Chart */}
-                    <div className="w-[110px] flex items-center justify-center">
-                      <ResponsiveContainer width={94} height={94}>
-                        <PieChart>
-                          <Pie
-                            data={funnelMetrics.funnelStats}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={24}
-                            outerRadius={44}
-                            stroke="hsl(var(--card))"
-                            strokeWidth={1}
-                          >
-                            {funnelMetrics.funnelStats.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip
-                            position={{ x: -120, y: 27 }}
-                            content={({ active, payload }) => {
-                              if (active && payload && payload.length) {
-                                const data = payload[0].payload;
-                                return (
-                                  <div className="bg-popover border rounded-md shadow-md px-3 py-2 whitespace-nowrap">
-                                    <p className="text-xs font-medium">{data.name}</p>
-                                    <p className="text-xs text-muted-foreground">{data.value} empresas</p>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  {/* Card composto: Melhor Template + Pie Chart */}
-                  <div className="border rounded-lg shadow-md flex overflow-hidden">
-                    {/* Lado esquerdo: Info do melhor template */}
-                    <div className="flex-1 p-4 flex flex-col gap-3">
-                      <p className="text-xs font-normal text-muted-foreground h-7 flex items-center">Melhor Template</p>
-                      <div>
-                        <p className="text-2xl font-bold">{funnelMetrics.bestTemplate}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{funnelMetrics.bestTemplateRate}% conversão</p>
-                      </div>
-                    </div>
-
-                    {/* Separador vertical */}
-                    <div className="w-px bg-border" />
-
-                    {/* Lado direito: Mini Pie Chart */}
-                    <div className="w-[110px] flex items-center justify-center">
-                      <ResponsiveContainer width={94} height={94}>
-                        <PieChart>
-                          <Pie
-                            data={funnelMetrics.templateStats}
-                            dataKey="conversions"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={24}
-                            outerRadius={44}
-                            stroke="hsl(var(--card))"
-                            strokeWidth={1}
-                          >
-                            {funnelMetrics.templateStats.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip
-                            position={{ x: -120, y: 27 }}
-                            content={({ active, payload }) => {
-                              if (active && payload && payload.length) {
-                                const data = payload[0].payload;
-                                return (
-                                  <div className="bg-popover border rounded-md shadow-md px-3 py-2 whitespace-nowrap">
-                                    <p className="text-xs font-medium">{data.name}</p>
-                                    <p className="text-xs text-muted-foreground">{data.conversions}% conversão</p>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
 
                 {/* Funil com ramificação - largura total */}
                 {(() => {
@@ -830,13 +1008,15 @@ const Incentive = () => {
                                 { key: 'complete', value: funnelMetrics.formulario.complete, color: 'bg-status-complete', label: 'Completo' },
                               ].filter(s => s.value > 0);
 
+                              const hasBothBranches = simpleTotal > 0 && formularioTotal > 0;
+
                               return (
                                 <>
                                   {/* Ramo Simple */}
                                   {simpleTotal > 0 && (
-                                    <div className="space-y-1">
+                                    <div className={cn("space-y-1", !hasBothBranches && "pb-[28px]")}>
                                       <p className="text-xs font-bold">Simple <span className="font-normal text-muted-foreground">({simpleTotal})</span></p>
-                                      <div className="h-4 flex gap-px" style={{ width: `${simpleWidthPercent}%` }}>
+                                      <div className="h-4 flex gap-px" style={{ width: hasBothBranches ? `${simpleWidthPercent}%` : '100%' }}>
                                         {simpleSegments.map((segment, index) => (
                                           <div
                                             key={segment.key}
@@ -856,8 +1036,8 @@ const Incentive = () => {
 
                                   {/* Ramo Formulário */}
                                   {formularioTotal > 0 && (
-                                    <div className="space-y-1">
-                                      <div className="h-4 flex gap-px" style={{ width: `${formularioWidthPercent}%` }}>
+                                    <div className={cn("space-y-1", !hasBothBranches && "pt-[20px]")}>
+                                      <div className="h-4 flex gap-px" style={{ width: hasBothBranches ? `${formularioWidthPercent}%` : '100%' }}>
                                         {formularioSegments.map((segment, index) => (
                                           <div
                                             key={segment.key}
@@ -913,16 +1093,16 @@ const Incentive = () => {
         </Collapsible>
         
         {/* Main Grid: List + Compose */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,480px] gap-6">
           {/* Left Column: Company List */}
-          <div className="flex flex-col border rounded-lg overflow-hidden bg-card h-[700px]">
+          <div className="flex flex-col border rounded-lg overflow-hidden bg-card shadow-md h-[700px]">
             {/* Tabs: Por Contactar / Arquivo */}
             <div className="border-b p-3">
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "pending" | "archive")}>
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="pending" className="flex items-center gap-2">
                     <Target className="h-4 w-4" />
-                    Por calcular pegada ({companiesWithoutFootprint.length})
+                    Com pegada por calcular ({companiesPending.length})
                   </TabsTrigger>
                   <TabsTrigger value="archive" className="flex items-center gap-2">
                     <Archive className="h-4 w-4" />
@@ -935,7 +1115,7 @@ const Incentive = () => {
             {/* Filters */}
             <div className="p-4 border-b space-y-3 bg-muted/30">
               <div className="flex items-center gap-2">
-                <div className="relative flex-1 max-w-sm">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Pesquisar empresa..."
@@ -947,55 +1127,22 @@ const Incentive = () => {
                 <IncentiveFiltersDialog
                   filters={advancedFilters}
                   onFiltersChange={setAdvancedFilters}
-                  companies={activeTab === "pending" ? companiesWithoutFootprint : companiesCompleted as any}
+                  companies={activeTab === "pending" ? companiesPending : companiesCompleted as any}
                 />
                 <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-                  <SelectTrigger className="w-[160px]">
+                  <SelectTrigger className="w-[220px]">
                     <SelectValue placeholder="Ordenar por" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="status">Status (avançado)</SelectItem>
-                    <SelectItem value="name">Nome (A-Z)</SelectItem>
-                    <SelectItem value="emails">Nº emails</SelectItem>
-                    <SelectItem value="lastContact">Último contacto</SelectItem>
+                    <SelectItem value="status">Status (mais avançado)</SelectItem>
+                    <SelectItem value="status-desc">Status (menos avançado)</SelectItem>
+                    <SelectItem value="emails">Nº emails (mais)</SelectItem>
+                    <SelectItem value="emails-desc">Nº emails (menos)</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline" onClick={handleSelectAll} size="sm">
-                  {allSelected ? "Desmarcar" : "Selec. todas"}
+                <Button variant="outline" onClick={handleSelectAll} size="sm" className="shrink-0 border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted">
+                  {allSelected ? "Desmarcar todas" : "Selecionar todas"}
                 </Button>
-              </div>
-              
-              <div className="flex gap-1 flex-wrap">
-                <Button
-                  variant={selectedCluster === "all" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCluster("all")}
-                  className="gap-1.5"
-                >
-                  Todos
-                  <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
-                    {activeTab === "pending" ? companiesWithoutFootprint.length : companiesCompleted.length}
-                  </Badge>
-                </Button>
-                {clusters.map(cluster => {
-                  const count = activeTab === "pending"
-                    ? companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length
-                    : companiesCompleted.filter(c => c.clusterId === cluster.id).length;
-                  return (
-                    <Button
-                      key={cluster.id}
-                      variant={selectedCluster === cluster.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedCluster(cluster.id)}
-                      className="gap-1.5"
-                    >
-                      {cluster.name}
-                      <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5">
-                        {count}
-                      </Badge>
-                    </Button>
-                  );
-                })}
               </div>
             </div>
             
@@ -1006,112 +1153,109 @@ const Incentive = () => {
                   // Lista de empresas sem pegada
                   filteredCompanies.length > 0 ? (
                     filteredCompanies.map(company => (
-                      <Collapsible key={company.id} open={expandedCompany === company.id}>
-                        <div className={`rounded-lg border transition-colors ${
-                          company.emailsSent >= 3 ? 'border-warning/30 bg-warning/10' : ''
-                        } ${selectedCompanies.includes(company.id) ? 'bg-primary/5 border-primary/30' : ''}`}>
-                          <div className="flex items-center gap-3 p-3">
-                            <Checkbox
-                              checked={selectedCompanies.includes(company.id)}
-                              onCheckedChange={() => handleSelectCompany(company.id)}
-                            />
-                            
-                            <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
-                              <p className="font-normal truncate">{company.name}</p>
-                            </div>
-                            
-                            {/* Status + próxima acção + histórico */}
-                            <div className="flex items-center gap-2">
-                              {/* Badge de status */}
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
+                      <div
+                        key={company.id}
+                        className={`rounded-lg border transition-colors ${
+                          company.emailsSent >= 3 ? 'border-danger/30' : ''
+                        } ${selectedCompanies.includes(company.id) ? 'bg-primary/5 border-primary/30' : ''}`}
+                        style={company.emailsSent >= 3 ? { boxShadow: 'inset 0 0 12px hsl(var(--danger) / 0.15)' } : undefined}
+                      >
+                        <div className="flex items-center gap-3 p-3">
+                          <Checkbox
+                            checked={selectedCompanies.includes(company.id)}
+                            onCheckedChange={() => handleSelectCompany(company.id)}
+                          />
+
+                          <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
+                            <p className="font-normal truncate">{company.name}</p>
+                          </div>
+
+                          {/* Status + próxima acção + histórico */}
+                          <div className="flex items-center gap-2">
+                            {/* Badge de status */}
+                            <TooltipProvider delayDuration={100}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="cursor-help">
                                     <Badge className={`text-xs py-0 shrink-0 ${onboardingStatusConfig[company.onboardingStatus]?.color || 'bg-muted text-muted-foreground'}`}>
                                       {onboardingStatusConfig[company.onboardingStatus]?.label || company.onboardingStatus}
                                     </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    {onboardingStatusConfig[company.onboardingStatus]?.tooltip || ''}
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                              
-                              {/* Próxima acção sugerida */}
-                              <span className="text-xs text-muted-foreground hidden lg:inline">
-                                → {getNextAction(company.onboardingStatus)}
-                              </span>
-                              
-                              {/* Contador de emails com hover de saturação */}
-                              {company.emailHistory.length > 0 ? (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <CollapsibleTrigger asChild>
-                                        <button
-                                          className={`inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal rounded-md ${getEmailCountColor(company.emailsSent)}`}
-                                          onClick={() => toggleExpandCompany(company.id)}
-                                        >
-                                          <Mail className="h-3.5 w-3.5" />
-                                          {company.emailsSent}
-                                          {expandedCompany === company.id ? (
-                                            <ChevronUp className="h-3.5 w-3.5" />
-                                          ) : (
-                                            <ChevronDown className="h-3.5 w-3.5" />
-                                          )}
-                                        </button>
-                                      </CollapsibleTrigger>
-                                    </TooltipTrigger>
-                                    {company.emailsSent >= 3 && (
-                                      <TooltipContent>Risco de saturação - considere parar de contactar</TooltipContent>
-                                    )}
-                                  </Tooltip>
-                                </TooltipProvider>
-                              ) : (
-                                <div className="inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal bg-muted text-muted-foreground border border-muted-foreground/30 rounded-md">
-                                  <Mail className="h-3.5 w-3.5" />
-                                  0
-                                  <ChevronDown className="h-3.5 w-3.5 opacity-0" />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Histórico expandido */}
-                          <CollapsibleContent>
-                            <div className="px-3 pb-3 pt-0">
-                              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-                                <p className="text-xs font-normal text-muted-foreground flex items-center gap-1">
-                                  <Mail className="h-3 w-3" />
-                                  Histórico de emails
-                                </p>
-                                <div className="space-y-1.5">
-                                  {company.emailHistory.map(email => (
-                                    <div key={email.id} className="flex items-center gap-2 text-xs">
-                                      {email.templateUsed === "Personalizado" ? (
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <Badge variant="outline" className="text-xs py-0 cursor-help">
-                                              {email.templateUsed}
-                                            </Badge>
-                                          </TooltipTrigger>
-                                          <TooltipContent side="top" className="max-w-[300px]">
-                                            <p className="text-xs">{email.subject}</p>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      ) : (
-                                        <Badge variant="outline" className="text-xs py-0">
-                                          {email.templateUsed}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent className={cn("border", onboardingStatusConfig[company.onboardingStatus]?.borderColor)}>
+                                  {onboardingStatusConfig[company.onboardingStatus]?.tooltip || ''}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            {/* Próxima acção sugerida */}
+                            <span className="text-xs text-muted-foreground hidden lg:inline">
+                              → {getNextAction(company.onboardingStatus)}
+                            </span>
+
+                            {/* Contador de emails com Popover */}
+                            {company.emailHistory.length > 0 ? (
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button
+                                    className={`inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal rounded-md ${getEmailCountColor(company.emailsSent)}`}
+                                  >
+                                    <Mail className="h-3.5 w-3.5" />
+                                    {company.emailsSent}
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="end" className="w-80 p-0">
+                                  <div className="p-3 border-b bg-muted/30">
+                                    <div className="flex items-center justify-between">
+                                      <p className="font-medium text-sm">Histórico de Emails</p>
+                                      {company.emailsSent >= 3 && (
+                                        <Badge variant="outline" className="text-xs border-danger/50 text-danger bg-danger/10">
+                                          <AlertTriangle className="h-3 w-3 mr-1" />
+                                          Saturação
                                         </Badge>
                                       )}
-                                      <span className="text-muted-foreground">{formatEmailDate(email.sentAt)}</span>
                                     </div>
-                                  ))}
-                                </div>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {company.emailsSent} email{company.emailsSent !== 1 ? 's' : ''} enviado{company.emailsSent !== 1 ? 's' : ''}
+                                    </p>
+                                  </div>
+                                  <div className="p-3 space-y-3 max-h-[250px] overflow-y-auto">
+                                    {company.emailHistory.map((email, index) => (
+                                      <div key={email.id} className="flex gap-3">
+                                        <div className="flex flex-col items-center">
+                                          <div className={cn(
+                                            "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+                                            index === 0 ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                                          )}>
+                                            {index === 0 ? <MailOpen className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
+                                          </div>
+                                          {index < company.emailHistory.length - 1 && (
+                                            <div className="w-px h-full bg-border mt-1" />
+                                          )}
+                                        </div>
+                                        <div className="flex-1 pb-3">
+                                          <p className="font-medium text-sm">{email.templateUsed}</p>
+                                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                            {email.subject}
+                                          </p>
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            {formatDistanceToNow(new Date(email.sentAt), { addSuffix: true, locale: pt })}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal bg-muted text-muted-foreground border border-muted-foreground/30 rounded-md">
+                                <Mail className="h-3.5 w-3.5" />
+                                0
                               </div>
-                            </div>
-                          </CollapsibleContent>
+                            )}
+                          </div>
                         </div>
-                      </Collapsible>
+                      </div>
                     ))
                   ) : (
                     <div className="p-8 text-center text-muted-foreground">
@@ -1136,26 +1280,29 @@ const Incentive = () => {
                         />
                         
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-normal truncate">{company.name}</p>
-                            <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
-                          </div>
+                          <p className="font-normal truncate">{company.name}</p>
                           {company.lastContactDate && (
-                            <p className="text-xs text-muted-foreground mt-0.5">
+                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                              <CheckCircle2 className="h-3 w-3 text-success" />
                               Concluído em {format(new Date(company.lastContactDate), "d MMM yyyy", { locale: pt })}
                             </p>
                           )}
                         </div>
                         
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {company.completedVia === 'simple' ? 'Simple' : 'Formulário'}
-                          </Badge>
-                          <Badge variant="outline" className="text-success border-success/30 bg-success/10">
-                            <Calculator className="h-3 w-3 mr-1" />
-                            Pegada calculada
-                          </Badge>
-                        </div>
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="cursor-help">
+                                <Badge className={`text-xs py-0 shrink-0 ${onboardingStatusConfig['completo']?.color}`}>
+                                  Completo / {company.completedVia === 'simple' ? 'Simple' : 'Formulário'}
+                                </Badge>
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className={cn("border", onboardingStatusConfig['completo']?.borderColor)}>
+                              {onboardingStatusConfig['completo']?.tooltip}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     ))
                   ) : (
@@ -1170,57 +1317,75 @@ const Incentive = () => {
             {/* Footer */}
             <div className="p-3 border-t bg-muted/30">
               <p className="text-sm text-center text-muted-foreground">
-                {selectedCompanies.length} seleccionada{selectedCompanies.length !== 1 ? "s" : ""}
+                {selectedCompanies.length} selecionada{selectedCompanies.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
           
-          {/* Right Column: Email Compose - altura fixa com scroll próprio */}
-          <div className="flex flex-col border rounded-lg overflow-hidden bg-card h-[700px]">
+          {/* Right Column: Envio Inteligente + Email Compose */}
+          <div className="flex flex-col gap-4 h-[700px]">
             {/* Super Wizard - Envio Inteligente */}
-            {selectedCompanies.length > 0 && (
-              <div className="p-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <Zap className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-normal text-sm">Envio Inteligente</p>
-                      <p className="text-xs text-muted-foreground">
-                        {selectedCompanies.length} empresa{selectedCompanies.length !== 1 ? 's' : ''} · Templates optimizados por status
-                      </p>
-                    </div>
+            <div className="p-4 border rounded-lg shadow-md bg-gradient-to-r from-primary/5 to-primary/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Zap className="h-5 w-5 text-primary" />
                   </div>
-                  <Button onClick={handleSmartSendPreview} size="sm" className="gap-1.5">
-                    <Zap className="h-4 w-4" />
-                    Preparar Envio
-                  </Button>
-                </div>
-              </div>
-            )}
-            <Tabs defaultValue="compose" className="flex flex-col flex-1 min-h-0">
-              <TabsList className="m-4 mb-0 grid grid-cols-2 shrink-0">
-                <TabsTrigger value="compose">Compor</TabsTrigger>
-                <TabsTrigger value="preview">Preview</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="compose" className="flex-1 overflow-auto p-4 pt-2">
-                <div className="space-y-4">
                   <div>
+                    <p className="font-bold text-sm">Envio Inteligente</p>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedCompanies.length > 0
+                        ? `${selectedCompanies.length} empresa${selectedCompanies.length !== 1 ? 's' : ''} selecionada${selectedCompanies.length !== 1 ? 's' : ''}`
+                        : 'Selecione uma ou mais empresas'
+                      }
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleSmartSendPreview}
+                  size="sm"
+                  disabled={selectedCompanies.length === 0}
+                >
+                  Preparar Envio
+                </Button>
+              </div>
+            </div>
+
+            {/* Email Composer */}
+            <div className="flex flex-col flex-1 border rounded-lg shadow-md overflow-hidden bg-card">
+              <div className="p-4 flex-1 flex flex-col">
+                <div className="space-y-4 flex-1 flex flex-col">
+                  <div className="space-y-2">
                     <Label>Template</Label>
-                    <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {emailTemplates.map(template => (
-                          <SelectItem key={template.id} value={template.id}>
-                            {template.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2">
+                      <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {templates.map(template => (
+                            <SelectItem key={template.id} value={template.id}>
+                              {template.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="shrink-0 border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted"
+                              onClick={() => setShowTemplatesModal(true)}
+                            >
+                              <Settings2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Gerir templates</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     {suggestedTemplate && selectedTemplate !== suggestedTemplate && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2 p-2 bg-warning/10 rounded-md border border-warning/20">
                         <TooltipProvider>
@@ -1246,72 +1411,40 @@ const Incentive = () => {
                     )}
                   </div>
                   
-                  <div>
+                  <div className="space-y-2">
                     <Label>Assunto</Label>
                     <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
                   </div>
                   
-                  <div>
+                  <div className="flex-1 flex flex-col space-y-2">
                     <Label>Mensagem</Label>
-                    <Textarea 
-                      value={message} 
+                    <Textarea
+                      value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="min-h-[280px] resize-none"
+                      className="flex-1 min-h-[200px] resize-none"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Use {"{companyName}"} para personalizar
-                    </p>
                   </div>
                 </div>
-              </TabsContent>
-              
-              <TabsContent value="preview" className="flex-1 overflow-auto p-4 pt-2">
-                {firstSelectedCompany ? (
-                  <div className="space-y-3">
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Para</p>
-                      <p className="font-normal">{firstSelectedCompany.contact.email}</p>
-                    </div>
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Assunto</p>
-                      <p className="font-normal">{previewSubject}</p>
-                    </div>
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-1">Mensagem</p>
-                      <p className="whitespace-pre-wrap text-sm">{previewMessage}</p>
-                    </div>
-                    {selectedCompanies.length > 1 && (
-                      <p className="text-sm text-muted-foreground text-center">
-                        + {selectedCompanies.length - 1} emails semelhantes
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center text-muted-foreground">
-                    <Mail className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Seleccione empresas para ver o preview</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-            
-            {/* Send button - sempre visível no fundo */}
-            <div className="p-4 border-t shrink-0">
-              <Button 
-                className="w-full" 
-                disabled={selectedCompanies.length === 0 || isLoading}
-                onClick={handleSend}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> A enviar...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" /> Enviar ({selectedCompanies.length})
-                  </>
-                )}
-              </Button>
+              </div>
+
+              {/* Send button - sempre visível no fundo */}
+              <div className="p-4 border-t shrink-0">
+                <Button
+                  className="w-full"
+                  disabled={selectedCompanies.length === 0 || isLoading}
+                  onClick={handleSend}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> A enviar...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" /> Enviar ({selectedCompanies.length})
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -1319,7 +1452,7 @@ const Incentive = () => {
         {/* Smart Send Dialog */}
         <Dialog open={showSmartSendDialog} onOpenChange={setShowSmartSendDialog}>
           <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
+            <DialogHeader className="pr-12">
               <DialogTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-primary" />
                 Confirmar Envio Inteligente
@@ -1363,11 +1496,11 @@ const Incentive = () => {
         {/* Modal de explicação dos KPIs */}
         <Dialog open={showKPIsModal} onOpenChange={setShowKPIsModal}>
           <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <div className="flex items-center gap-3">
+            <DialogHeader className="pr-12">
+              <DialogTitle className="flex items-center gap-3">
                 <BookOpen className="h-5 w-5 text-primary" />
-                <DialogTitle>O que significa cada KPI?</DialogTitle>
-              </div>
+                O que significa cada KPI?
+              </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
@@ -1470,6 +1603,132 @@ const Incentive = () => {
               <Button onClick={() => setShowKPIsModal(false)}>
                 Entendido
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Templates Management Modal */}
+        <Dialog open={showTemplatesModal} onOpenChange={(open) => {
+          setShowTemplatesModal(open);
+          if (!open) handleCancelTemplateEdit();
+        }}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader className="pr-12">
+              <DialogTitle className="flex items-center gap-2">
+                <Settings2 className="h-5 w-5 text-primary" />
+                {isCreatingTemplate ? 'Novo Template' : editingTemplate ? 'Editar Template' : 'Gestão de Templates'}
+              </DialogTitle>
+              <DialogDescription>
+                {isCreatingTemplate || editingTemplate
+                  ? 'Preencha os campos abaixo para configurar o template de email.'
+                  : 'Crie, edite ou remova templates de email para comunicação com empresas.'}
+              </DialogDescription>
+            </DialogHeader>
+
+            {isCreatingTemplate || editingTemplate ? (
+              // Edit/Create Form
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Nome do template *</Label>
+                  <Input
+                    placeholder="Ex: Convite Inicial"
+                    value={templateForm.name}
+                    onChange={(e) => setTemplateForm(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Descrição</Label>
+                  <Input
+                    placeholder="Ex: Primeiro contacto para convidar ao cálculo"
+                    value={templateForm.description}
+                    onChange={(e) => setTemplateForm(prev => ({ ...prev, description: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Assunto do email *</Label>
+                  <Input
+                    placeholder="Ex: Convite para calcular a sua pegada de carbono"
+                    value={templateForm.subject}
+                    onChange={(e) => setTemplateForm(prev => ({ ...prev, subject: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Corpo do email *</Label>
+                  <Textarea
+                    placeholder="Escreva o conteúdo do email..."
+                    value={templateForm.body}
+                    onChange={(e) => setTemplateForm(prev => ({ ...prev, body: e.target.value }))}
+                    className="min-h-[200px]"
+                  />
+                </div>
+              </div>
+            ) : (
+              // Templates List
+              <div className="space-y-3 py-4 max-h-[400px] overflow-y-auto">
+                {templates.map(template => (
+                  <div key={template.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">{template.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{template.description}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleEditTemplate(template)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Editar template</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-danger hover:text-danger"
+                              onClick={() => handleDeleteTemplate(template)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Remover template</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <DialogFooter className="flex-row gap-2 sm:gap-0">
+              {isCreatingTemplate || editingTemplate ? (
+                <>
+                  <Button variant="outline" onClick={handleCancelTemplateEdit}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleSaveTemplate}>
+                    {isCreatingTemplate ? 'Criar Template' : 'Guardar Alterações'}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" className="flex-1 sm:flex-none gap-2" onClick={handleCreateTemplate}>
+                    <Plus className="h-4 w-4" />
+                    Novo Template
+                  </Button>
+                  <Button onClick={() => setShowTemplatesModal(false)}>
+                    Fechar
+                  </Button>
+                </>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>

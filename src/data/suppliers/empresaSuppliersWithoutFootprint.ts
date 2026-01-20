@@ -46,8 +46,8 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     district: 'Porto', municipality: 'Matosinhos', parish: 'Leça da Palmeira',
     companySize: 'pequena', employees: 22, area: 550, revenue: 1.8,
     contact: { email: 'geral@materiasbase.pt', phone: '+351 229 100 005', website: 'https://materiasbase.pt', nif: '504234005' },
-    emailsSent: 0,
-    onboardingStatus: 'por_contactar',
+    emailsSent: 1, lastContactDate: '2025-01-05',
+    onboardingStatus: 'sem_interacao',
   },
 
   // ===== CLIENTES SEM PEGADA (15) =====
@@ -183,8 +183,8 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     district: 'Braga', municipality: 'Guimarães', parish: 'Creixomil',
     companySize: 'micro', employees: 6, area: 90, revenue: 0.35,
     contact: { email: 'encomendas@padariatradicao.pt', phone: '+351 253 200 015', website: '', nif: '505234015' },
-    emailsSent: 0,
-    onboardingStatus: 'por_contactar',
+    emailsSent: 1, lastContactDate: '2024-12-29',
+    onboardingStatus: 'sem_interacao',
   },
 
   // ===== PARCEIROS SEM PEGADA (20) =====

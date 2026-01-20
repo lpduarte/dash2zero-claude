@@ -7,13 +7,14 @@
 // ============================================================================
 
 // Mapeamento de setores (chave -> nome em português)
-// As chaves são em português para consistência
+// Inclui tanto chaves em português como em inglês para compatibilidade
 export const sectorLabels: Record<string, string> = {
   // Valor especial para filtros
   all: "Todas as atividades",
 
   // -------------------------------------------------------------------------
   // SETORES PRINCIPAIS (baseados nas Secções CAE)
+  // Chaves em português
   // -------------------------------------------------------------------------
   agricultura: "Agricultura",                 // CAE A - Agricultura, produção animal, caça, floresta e pesca
   extracao: "Indústrias Extrativas",          // CAE B - Indústrias extrativas
@@ -35,6 +36,31 @@ export const sectorLabels: Record<string, string> = {
   servicos: "Outros Serviços",                // CAE S - Outras atividades de serviços
 
   // -------------------------------------------------------------------------
+  // ALIASES EM INGLÊS (para compatibilidade com dados legados)
+  // -------------------------------------------------------------------------
+  agriculture: "Agricultura",
+  mining: "Indústrias Extrativas",
+  manufacturing: "Indústria",
+  energy: "Energia",
+  water: "Água e Saneamento",
+  construction: "Construção",
+  retail: "Comércio",
+  trade: "Comércio",
+  transport: "Logística",
+  logistics: "Logística",
+  hospitality: "Hotelaria e Restauração",
+  technology: "Tecnologia",
+  finance: "Banca e Seguros",
+  "real-estate": "Imobiliário",
+  consulting: "Consultoria",
+  administrative: "Serviços Administrativos",
+  education: "Educação",
+  health: "Saúde",
+  healthcare: "Saúde",
+  entertainment: "Cultura e Lazer",
+  services: "Outros Serviços",
+
+  // -------------------------------------------------------------------------
   // SUBSETORES DA INDÚSTRIA (Divisões CAE dentro da Secção C)
   // Usados no campo 'subsector' para detalhe adicional
   // -------------------------------------------------------------------------
@@ -53,7 +79,33 @@ export const sectorLabels: Record<string, string> = {
   mobiliario: "Mobiliário",                   // CAE 31
   embalagens: "Embalagens",                   // Transversal
 
+  // -------------------------------------------------------------------------
+  // SUBSETORES DE SERVIÇOS E OUTROS
+  // -------------------------------------------------------------------------
+  restauracao: "Restauração",
+  retalho: "Retalho",
+  turismo: "Turismo",
+  legal: "Serviços Jurídicos",
+  contabilidade: "Contabilidade",
+  marketing: "Marketing",
+  design: "Design",
+  seguranca: "Segurança",
+  limpeza: "Limpeza",
+  formacao: "Formação",
+  traducao: "Tradução",
+  arquitetura: "Arquitetura",
+  rh: "Recursos Humanos",
+  eventos: "Eventos",
+  grafica: "Artes Gráficas",
+  fotografia: "Fotografia",
+  catering: "Catering",
+  eletricidade: "Eletricidade",
+  jardinagem: "Jardinagem",
+  manutencao: "Manutenção",
+  mobilidade: "Mobilidade",
+  veterinario: "Veterinário",
 };
+
 
 // Função helper para obter nome do setor em português
 export const getSectorName = (sectorKey: string): string => {

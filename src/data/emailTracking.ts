@@ -168,9 +168,9 @@ export const emailTemplates: EmailTemplate[] = [
     name: "Convite Inicial",
     description: "Primeiro contacto para convidar ao cálculo",
     subject: "Convite para calcular a sua pegada de carbono",
-    body: `Prezado/a,
+    body: `Boa tarde,
 
-Gostaríamos de convidá-lo/a a calcular a pegada de carbono da {companyName} através da plataforma Get2Zero.
+Gostaríamos de convidá-lo/a a calcular a pegada de carbono da sua empresa através da plataforma Get2Zero.
 
 O cálculo da pegada de carbono é fundamental para:
 • Identificar oportunidades de redução de emissões
@@ -190,11 +190,11 @@ Equipa de Sustentabilidade`
     name: "Lembrete",
     description: "Follow-up amigável após primeiro contacto",
     subject: "Lembrete: Cálculo de pegada de carbono",
-    body: `Prezado/a,
+    body: `Boa tarde,
 
 Esperamos que esteja bem.
 
-Gostaríamos de relembrar o nosso convite para calcular a pegada de carbono da {companyName} através da plataforma Get2Zero.
+Gostaríamos de relembrar o nosso convite para calcular a pegada de carbono da sua empresa através da plataforma Get2Zero.
 
 Compreendemos que possa ter questões ou necessitar de apoio no processo. A nossa equipa está disponível para:
 • Esclarecer dúvidas sobre o processo de cálculo
@@ -211,9 +211,9 @@ Equipa de Sustentabilidade`
     name: "Benefícios",
     description: "Destacar vantagens competitivas",
     subject: "Benefícios do cálculo de pegada de carbono para a sua empresa",
-    body: `Prezado/a,
+    body: `Boa tarde,
 
-Gostaríamos de partilhar consigo os benefícios que o cálculo da pegada de carbono pode trazer à {companyName}:
+Gostaríamos de partilhar consigo os benefícios que o cálculo da pegada de carbono pode trazer à sua empresa:
 
 📊 VANTAGENS COMPETITIVAS
 • Diferenciação no mercado face a concorrentes
@@ -240,9 +240,9 @@ Equipa de Sustentabilidade`
     name: "Urgente",
     description: "Comunicação sobre prazos ou requisitos",
     subject: "Importante: Requisitos de sustentabilidade - Ação necessária",
-    body: `Prezado/a,
+    body: `Boa tarde,
 
-Face aos novos requisitos regulamentares e às exigências crescentes de sustentabilidade, reforçamos a importância do cálculo da pegada de carbono da {companyName}.
+Face aos novos requisitos regulamentares e às exigências crescentes de sustentabilidade, reforçamos a importância do cálculo da pegada de carbono da sua empresa.
 
 ⚠️ PONTOS IMPORTANTES:
 • Novos requisitos de reporte ESG entram em vigor em breve

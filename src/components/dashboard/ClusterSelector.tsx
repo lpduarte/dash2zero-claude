@@ -14,7 +14,8 @@ interface ClusterSelectorProps {
   selectedCluster: string;
   onClusterChange: (cluster: string) => void;
   clusterCounts: Record<string, number>;
-  clusterPotentials: Record<string, ImprovementPotential>;
+  clusterPotentials?: Record<string, ImprovementPotential>;
+  showPotential?: boolean;
   suppliers: Supplier[];
   universalFilters: UniversalFilterState;
   onUniversalFiltersChange: (filters: UniversalFilterState) => void;
@@ -41,11 +42,12 @@ const getPotentialConfig = (potential: ImprovementPotential, isSelected: boolean
   return configs[potential];
 };
 
-export function ClusterSelector({ 
-  selectedCluster, 
-  onClusterChange, 
-  clusterCounts, 
+export function ClusterSelector({
+  selectedCluster,
+  onClusterChange,
+  clusterCounts,
   clusterPotentials,
+  showPotential = true,
   suppliers,
   universalFilters,
   onUniversalFiltersChange,
@@ -161,7 +163,7 @@ export function ClusterSelector({
                 >
                   {clusterCounts[option.value]}
                 </span>
-                {(() => {
+                {showPotential && clusterPotentials && (() => {
                   const potential = clusterPotentials[option.value];
                   const config = getPotentialConfig(potential, selectedCluster === option.value);
                   const PotentialIcon = config.icon;

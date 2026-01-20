@@ -116,7 +116,7 @@ export const IncentiveFiltersDialog = ({
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5">
+        <Button variant="outline" size="sm" className="gap-1.5 border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted">
           <Filter className="h-4 w-4" />
           Filtros
           {activeFiltersCount > 0 && (
