@@ -6,6 +6,7 @@ import { getApplicableMeasures, isMeasureRecommended } from '@/data/mockMeasures
 import { cascaisInfrastructure } from '@/data/mockInfrastructure';
 import { mockFunding, getFundingByCategory } from '@/data/mockFunding';
 import { formatNumber, formatPercentage } from '@/lib/formatters';
+import { scopeColors } from '@/lib/styles';
 
 export const Step2Measures = ({
   supplier,
@@ -175,22 +176,17 @@ export const Step2Measures = ({
   const renderScopeColumn = (scope: Scope) => {
     const scopeNames = { 1: 'Âmbito 1 - Diretas', 2: 'Âmbito 2 - Energia', 3: 'Âmbito 3 - Indiretas' };
     const scopePcts = { 1: scope1Pct, 2: scope2Pct, 3: scope3Pct };
-    const scopeColorMap = {
-      1: { headerBg: 'bg-violet-50 dark:bg-violet-950/30', text: 'text-violet-700 dark:text-violet-300', textSecondary: 'text-violet-600 dark:text-violet-400', badge: 'bg-violet-700 dark:bg-violet-600' },
-      2: { headerBg: 'bg-primary/10', text: 'text-primary', textSecondary: 'text-primary/80', badge: 'bg-primary' },
-      3: { headerBg: 'bg-warning/10', text: 'text-warning', textSecondary: 'text-warning/80', badge: 'bg-warning' }
-    };
-    const colors = scopeColorMap[scope];
+    const colors = scopeColors[scope];
     const measures = measuresByScope[scope];
 
     return (
       <div className="flex flex-col">
-        <div className={`flex items-center justify-between p-3 rounded-lg mb-3 ${colors.headerBg}`}>
+        <div className={`flex items-center justify-between p-3 rounded-lg mb-3 ${colors.bgLight}`}>
           <div className="flex items-center gap-2">
             <span className={`font-normal text-sm ${colors.text}`}>{scopeNames[scope]}</span>
-            <span className={`text-sm ${colors.textSecondary}`}>({formatPercentage(scopePcts[scope], 0)})</span>
+            <span className={`text-sm ${colors.textLight}`}>({formatPercentage(scopePcts[scope], 0)})</span>
           </div>
-          <span className={`w-6 h-6 rounded-full text-white text-xs font-normal flex items-center justify-center ${colors.badge}`}>
+          <span className={`w-6 h-6 rounded-full text-white text-xs font-normal flex items-center justify-center ${colors.bg}`}>
             {measures.length}
           </span>
         </div>
@@ -207,7 +203,7 @@ export const Step2Measures = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       <style>{`
         @keyframes shadow-pulse {
           0%, 100% { box-shadow: 0 0 10px 2px hsl(var(--success) / 0.3); }
@@ -218,8 +214,8 @@ export const Step2Measures = ({
         }
       `}</style>
 
-      {/* Header do step - Fixo */}
-      <div className="shrink-0 p-6 pb-4 border-b border-border/50">
+      {/* Header do step */}
+      <div className="p-6 pb-4 border-b border-border/50">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-bold text-2xl mb-1">Seleção de Medidas</h3>
@@ -252,8 +248,8 @@ export const Step2Measures = ({
         </div>
       </div>
 
-      {/* Colunas dos âmbitos - Scrollável */}
-      <div className="flex-1 overflow-y-auto px-6 pt-4 min-h-0">
+      {/* Colunas dos âmbitos */}
+      <div className="px-6 pt-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4">
           {renderScopeColumn(1)}
           {renderScopeColumn(2)}
@@ -261,8 +257,8 @@ export const Step2Measures = ({
         </div>
       </div>
 
-      {/* Impacto/Totais - Fixo no fundo */}
-      <div className="shrink-0 p-6 pt-4 border-t bg-muted/10">
+      {/* Impacto/Totais */}
+      <div className="p-6 pt-4 border-t bg-muted/10">
         <div className="rounded-lg overflow-hidden border border-border">
           {/* ÁREA 1: Header */}
           <div className="flex border-b border-border">

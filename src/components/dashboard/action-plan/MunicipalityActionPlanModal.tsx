@@ -229,9 +229,9 @@ export const MunicipalityActionPlanModal = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-7xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-7xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-y-auto">
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 border-b shrink-0">
+        <DialogHeader className="p-6 pb-4 border-b">
           <div className="flex items-start justify-between pr-10">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-primary/10">
@@ -268,7 +268,7 @@ export const MunicipalityActionPlanModal = ({
         <Separator />
 
         {/* Steps Indicator */}
-        <div className="px-6 py-4 bg-muted/30 border-b shrink-0">
+        <div className="px-6 py-4 bg-muted/30 border-b">
           <div className="flex items-center justify-center gap-2">
             {stepConfig.map((step, idx) => {
               const StepIcon = step.icon;
@@ -333,13 +333,13 @@ export const MunicipalityActionPlanModal = ({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div>
           {renderStepContent()}
         </div>
 
         {/* Footer Navigation - Escondido no Step 4 (tem footer próprio) */}
         {currentStep !== 4 && (
-          <div className="p-4 border-t shrink-0 bg-background rounded-b-lg">
+          <div className="p-4 border-t bg-background rounded-b-lg">
             <div className="relative flex items-center justify-between">
               <Button variant="outline" onClick={handlePrevious} disabled={currentStep === 1} className="gap-2">
                 <ChevronLeft className="h-4 w-4" />

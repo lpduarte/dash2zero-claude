@@ -190,9 +190,9 @@ export const Step3Funding = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header do step - Fixo */}
-      <div className="shrink-0 p-6 pb-4 border-b border-border/50">
+    <div className="flex flex-col">
+      {/* Header do step */}
+      <div className="p-6 pb-4 border-b border-border/50">
         <div>
           <h3 className="font-bold text-2xl mb-1">Financiamento Disponível</h3>
           <p className="text-sm text-muted-foreground">
@@ -210,8 +210,8 @@ export const Step3Funding = ({
         )}
       </div>
 
-      {/* Colunas dos tipos de financiamento - Scrollável */}
-      <div className="flex-1 overflow-y-auto px-6 pt-4 min-h-0">
+      {/* Colunas dos tipos de financiamento */}
+      <div className="px-6 pt-4">
         {selectedMeasures.length > 0 && (
           <div className="grid grid-cols-3 gap-4 pb-4">
             {renderTypeColumn('subsidio')}
@@ -221,8 +221,8 @@ export const Step3Funding = ({
         )}
       </div>
 
-      {/* Resumo/Totais - Fixo no fundo */}
-      <div className="shrink-0 p-6 pt-4 border-t bg-muted/10">
+      {/* Resumo/Totais */}
+      <div className="p-6 pt-4 border-t bg-muted/10">
         <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border">
           <div className="text-center">
             <p className="text-xs text-muted-foreground mb-1">Fundos Selecionados</p>

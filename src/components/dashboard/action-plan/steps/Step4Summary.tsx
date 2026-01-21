@@ -123,9 +123,9 @@ export const Step4Summary = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header do step - Fixo */}
-      <div className="shrink-0 p-6 pb-4 border-b border-border/50">
+    <div className="flex flex-col">
+      {/* Header do step */}
+      <div className="p-6 pb-4 border-b border-border/50">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-bold text-2xl mb-1">Resumo do Plano de Ação</h3>
@@ -157,8 +157,8 @@ export const Step4Summary = ({
         </div>
       </div>
 
-      {/* Conteúdo - Scrollável */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+      {/* Conteúdo */}
+      <div ref={scrollContainerRef} className="p-6 space-y-4">
         {/* SECÇÃO: Próximos Passos */}
         <CollapsibleSection
           id="proximosPassos"
@@ -491,8 +491,8 @@ export const Step4Summary = ({
         </CollapsibleSection>
       </div>
 
-      {/* Footer - Fixo */}
-      <div className="shrink-0 p-4 border-t bg-background">
+      {/* Footer */}
+      <div className="p-4 border-t bg-background">
         <div className="relative flex items-center justify-between">
           <Button variant="outline" onClick={onPrevious} className="gap-2">
             <ChevronLeft className="h-4 w-4" />
