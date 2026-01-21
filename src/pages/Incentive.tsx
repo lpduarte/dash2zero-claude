@@ -42,7 +42,9 @@ import {
   Trash2,
   MailOpen,
   MousePointerClick,
-  Circle
+  Circle,
+  MailX,
+  ShieldAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
@@ -52,7 +54,7 @@ import {
 } from "@/data/suppliers";
 import { ClusterSelector } from "@/components/dashboard/ClusterSelector";
 import { UniversalFilterState, Supplier } from "@/types/supplier";
-import { emailTemplates as defaultEmailTemplates, getCompanyEmailTracking, EmailRecord, EmailTemplate } from "@/data/emailTracking";
+import { emailTemplates as defaultEmailTemplates, getCompanyEmailTracking, getDeliveryMetrics, EmailRecord, EmailTemplate } from "@/data/emailTracking";
 import { SupplierWithoutFootprint } from "@/types/supplierNew";
 import { useToast } from "@/hooks/use-toast";
 import { format, formatDistanceToNow } from "date-fns";
@@ -65,6 +67,13 @@ interface CompanyWithTracking extends SupplierWithoutFootprint {
   lastContactDate?: string;
   emailHistory: EmailRecord[];
   completedVia?: 'simple' | 'formulario';
+  // Deliverability
+  hasDeliveryIssues: boolean;
+  lastDeliveryIssue?: {
+    type: 'bounced' | 'spam';
+    reason?: string;
+    date: string;
+  };
 }
 
 const onboardingStatusConfig: Record<string, { label: string; color: string; borderColor: string; tooltip: string }> = {
@@ -172,6 +181,7 @@ const Incentive = () => {
   const [advancedFilters, setAdvancedFilters] = useState<IncentiveFilters>({
     onboardingStatus: [],
     emailCount: "all",
+    deliveryIssues: [],
   });
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   
@@ -216,12 +226,12 @@ const Incentive = () => {
   const companiesWithoutFootprint = useMemo((): CompanyWithTracking[] => {
     const ownerType = isMunicipio ? 'municipio' : 'empresa';
     const suppliers = getSuppliersWithoutFootprintByOwnerType(ownerType);
-    
+
     return suppliers.map(s => {
       const tracking = getCompanyEmailTracking(s.id);
       // Derivar caminho de conclusão baseado no ID (simulação - em produção viria do backend)
-      const completedVia: 'simple' | 'formulario' = s.id.includes('001') || s.id.includes('003') || s.id.includes('005') 
-        ? 'simple' 
+      const completedVia: 'simple' | 'formulario' = s.id.includes('001') || s.id.includes('003') || s.id.includes('005')
+        ? 'simple'
         : 'formulario';
       return {
         ...s,
@@ -229,6 +239,9 @@ const Incentive = () => {
         lastContactDate: tracking.emailHistory[0]?.sentAt,
         emailHistory: tracking.emailHistory,
         completedVia,
+        // Deliverability
+        hasDeliveryIssues: tracking.hasDeliveryIssues,
+        lastDeliveryIssue: tracking.lastDeliveryIssue,
       };
     });
   }, [isMunicipio]);
@@ -308,6 +321,22 @@ const Incentive = () => {
     // Advanced filters - onboarding status
     if (advancedFilters.onboardingStatus.length > 0) {
       filtered = filtered.filter(c => advancedFilters.onboardingStatus.includes(c.onboardingStatus));
+    }
+
+    // Advanced filters - delivery issues
+    if (advancedFilters.deliveryIssues.length > 0) {
+      filtered = filtered.filter(c => {
+        if (advancedFilters.deliveryIssues.includes('bounced') && c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'bounced') {
+          return true;
+        }
+        if (advancedFilters.deliveryIssues.includes('spam') && c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'spam') {
+          return true;
+        }
+        if (advancedFilters.deliveryIssues.includes('none') && !c.hasDeliveryIssues) {
+          return true;
+        }
+        return false;
+      });
     }
 
     // Apply sorting
@@ -425,6 +454,11 @@ const Incentive = () => {
 
     const openRate = emailsSent > 0 ? Math.round((emailsOpened / emailsSent) * 100) : 0;
     const clickToOpenRate = emailsOpened > 0 ? Math.round((emailsClicked / emailsOpened) * 100) : 0;
+
+    // Deliverability metrics (bounces e spam)
+    const deliveryMetrics = getDeliveryMetrics(allCompanies.map(c => c.id));
+    const companiesWithBounce = allCompanies.filter(c => c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'bounced').length;
+    const companiesWithSpam = allCompanies.filter(c => c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'spam').length;
     
     const chartData = [
       {
@@ -480,6 +514,13 @@ const Incentive = () => {
       funnelStats,
       // Flag: sem atividade (só empresas por contactar)
       hasNoActivity: emailsSent === 0,
+      // Deliverability metrics
+      bounceRate: deliveryMetrics.bounceRate,
+      spamRate: deliveryMetrics.spamRate,
+      bounced: deliveryMetrics.bounced,
+      spam: deliveryMetrics.spam,
+      companiesWithBounce,
+      companiesWithSpam,
     };
   }, [globalFilteredCompanies]);
 
@@ -765,8 +806,8 @@ const Incentive = () => {
                 {/* KPIs - só mostrar quando há atividade */}
                 {!funnelMetrics.hasNoActivity && (
                   <>
-                    {/* Linha 1 - Métricas de Performance (4 KPIs numéricos) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Linha 1 - Métricas de Performance (6 KPIs) */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                       <KPICard
                         title="Taxa de Conversão"
                         value={`${funnelMetrics.conversionRate}%`}
@@ -801,6 +842,24 @@ const Incentive = () => {
                         iconColor={funnelMetrics.clickToOpenRate >= 30 ? "text-success" : "text-primary"}
                         iconBgColor={funnelMetrics.clickToOpenRate >= 30 ? "bg-success/10" : "bg-primary/10"}
                         valueColor={funnelMetrics.clickToOpenRate >= 30 ? "text-success" : "text-primary"}
+                      />
+                      <KPICard
+                        title="Bounce Rate"
+                        value={`${funnelMetrics.bounceRate}%`}
+                        unit={`${funnelMetrics.bounced} não entregues`}
+                        icon={MailX}
+                        iconColor={funnelMetrics.bounceRate > 5 ? "text-danger" : funnelMetrics.bounceRate > 2 ? "text-warning" : "text-muted-foreground"}
+                        iconBgColor={funnelMetrics.bounceRate > 5 ? "bg-danger/10" : funnelMetrics.bounceRate > 2 ? "bg-warning/10" : "bg-muted"}
+                        valueColor={funnelMetrics.bounceRate > 5 ? "text-danger" : funnelMetrics.bounceRate > 2 ? "text-warning" : undefined}
+                      />
+                      <KPICard
+                        title="Spam Rate"
+                        value={`${funnelMetrics.spamRate}%`}
+                        unit={`${funnelMetrics.spam} reportados`}
+                        icon={ShieldAlert}
+                        iconColor={funnelMetrics.spamRate > 1 ? "text-danger" : funnelMetrics.spamRate > 0.5 ? "text-warning" : "text-muted-foreground"}
+                        iconBgColor={funnelMetrics.spamRate > 1 ? "bg-danger/10" : funnelMetrics.spamRate > 0.5 ? "bg-warning/10" : "bg-muted"}
+                        valueColor={funnelMetrics.spamRate > 1 ? "text-danger" : funnelMetrics.spamRate > 0.5 ? "text-warning" : undefined}
                       />
                     </div>
 
@@ -1155,10 +1214,17 @@ const Incentive = () => {
                     filteredCompanies.map(company => (
                       <div
                         key={company.id}
-                        className={`rounded-lg border transition-colors ${
-                          company.emailsSent >= 3 ? 'border-danger/30' : ''
-                        } ${selectedCompanies.includes(company.id) ? 'bg-primary/5 border-primary/30' : ''}`}
-                        style={company.emailsSent >= 3 ? { boxShadow: 'inset 0 0 12px hsl(var(--danger) / 0.15)' } : undefined}
+                        className={cn(
+                          "rounded-lg border transition-colors",
+                          company.hasDeliveryIssues && "border-danger/30",
+                          company.emailsSent >= 3 && !company.hasDeliveryIssues && "border-danger/30",
+                          selectedCompanies.includes(company.id) && "bg-primary/5 border-primary/30"
+                        )}
+                        style={
+                          company.hasDeliveryIssues || company.emailsSent >= 3
+                            ? { boxShadow: 'inset 0 0 12px hsl(var(--danger) / 0.15)' }
+                            : undefined
+                        }
                       >
                         <div className="flex items-center gap-3 p-3">
                           <Checkbox
@@ -1167,7 +1233,33 @@ const Incentive = () => {
                           />
 
                           <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
-                            <p className="font-normal truncate">{company.name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-normal truncate">{company.name}</p>
+                              {/* Alerta de deliverability */}
+                              {company.hasDeliveryIssues && company.lastDeliveryIssue && (
+                                <TooltipProvider delayDuration={100}>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="cursor-help shrink-0">
+                                        {company.lastDeliveryIssue.type === 'bounced' ? (
+                                          <MailX className="h-4 w-4 text-danger" />
+                                        ) : (
+                                          <ShieldAlert className="h-4 w-4 text-danger" />
+                                        )}
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="border border-danger max-w-[250px]">
+                                      <p className="font-medium">
+                                        {company.lastDeliveryIssue.type === 'bounced' ? 'Email não entregue' : 'Marcado como spam'}
+                                      </p>
+                                      {company.lastDeliveryIssue.reason && (
+                                        <p className="text-xs text-muted-foreground mt-1">{company.lastDeliveryIssue.reason}</p>
+                                      )}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </div>
                           </div>
 
                           {/* Status + próxima acção + histórico */}
@@ -1198,52 +1290,106 @@ const Incentive = () => {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <button
-                                    className={`inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal rounded-md ${getEmailCountColor(company.emailsSent)}`}
+                                    className={cn(
+                                      "inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal rounded-md",
+                                      company.hasDeliveryIssues
+                                        ? "bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30 transition-colors"
+                                        : getEmailCountColor(company.emailsSent)
+                                    )}
                                   >
-                                    <Mail className="h-3.5 w-3.5" />
+                                    {company.hasDeliveryIssues ? (
+                                      company.lastDeliveryIssue?.type === 'bounced' ? (
+                                        <MailX className="h-3.5 w-3.5" />
+                                      ) : (
+                                        <ShieldAlert className="h-3.5 w-3.5" />
+                                      )
+                                    ) : (
+                                      <Mail className="h-3.5 w-3.5" />
+                                    )}
                                     {company.emailsSent}
                                   </button>
                                 </PopoverTrigger>
                                 <PopoverContent align="end" className="w-80 p-0">
                                   <div className="p-3 border-b bg-muted/30">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between gap-2">
                                       <p className="font-medium text-sm">Histórico de Emails</p>
-                                      {company.emailsSent >= 3 && (
-                                        <Badge variant="outline" className="text-xs border-danger/50 text-danger bg-danger/10">
-                                          <AlertTriangle className="h-3 w-3 mr-1" />
-                                          Saturação
-                                        </Badge>
-                                      )}
+                                      <div className="flex items-center gap-1">
+                                        {company.hasDeliveryIssues && company.lastDeliveryIssue && (
+                                          <Badge variant="outline" className="text-xs border-danger/50 text-danger bg-danger/10">
+                                            {company.lastDeliveryIssue.type === 'bounced' ? (
+                                              <>
+                                                <MailX className="h-3 w-3 mr-1" />
+                                                Bounce
+                                              </>
+                                            ) : (
+                                              <>
+                                                <ShieldAlert className="h-3 w-3 mr-1" />
+                                                Spam
+                                              </>
+                                            )}
+                                          </Badge>
+                                        )}
+                                        {company.emailsSent >= 3 && !company.hasDeliveryIssues && (
+                                          <Badge variant="outline" className="text-xs border-danger/50 text-danger bg-danger/10">
+                                            <AlertTriangle className="h-3 w-3 mr-1" />
+                                            Saturação
+                                          </Badge>
+                                        )}
+                                      </div>
                                     </div>
                                     <p className="text-xs text-muted-foreground mt-1">
                                       {company.emailsSent} email{company.emailsSent !== 1 ? 's' : ''} enviado{company.emailsSent !== 1 ? 's' : ''}
                                     </p>
                                   </div>
                                   <div className="p-3 space-y-3 max-h-[250px] overflow-y-auto">
-                                    {company.emailHistory.map((email, index) => (
-                                      <div key={email.id} className="flex gap-3">
-                                        <div className="flex flex-col items-center">
-                                          <div className={cn(
-                                            "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-                                            index === 0 ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
-                                          )}>
-                                            {index === 0 ? <MailOpen className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
+                                    {company.emailHistory.map((email, index) => {
+                                      // Determinar ícone e cor baseado no status de entrega
+                                      const getEmailIcon = () => {
+                                        if (email.deliveryStatus === 'bounced') return { icon: MailX, color: 'bg-danger/20 text-danger' };
+                                        if (email.deliveryStatus === 'spam') return { icon: ShieldAlert, color: 'bg-warning/20 text-warning' };
+                                        if (email.deliveryStatus === 'clicked') return { icon: MousePointerClick, color: 'bg-success/20 text-success' };
+                                        if (email.deliveryStatus === 'opened') return { icon: MailOpen, color: 'bg-primary/20 text-primary' };
+                                        return { icon: Mail, color: 'bg-muted text-muted-foreground' };
+                                      };
+                                      const { icon: EmailIcon, color: iconColor } = getEmailIcon();
+
+                                      return (
+                                        <div key={email.id} className="flex gap-3">
+                                          <div className="flex flex-col items-center">
+                                            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", iconColor)}>
+                                              <EmailIcon className="h-4 w-4" />
+                                            </div>
+                                            {index < company.emailHistory.length - 1 && (
+                                              <div className="w-px h-full bg-border mt-1" />
+                                            )}
                                           </div>
-                                          {index < company.emailHistory.length - 1 && (
-                                            <div className="w-px h-full bg-border mt-1" />
-                                          )}
+                                          <div className="flex-1 pb-3">
+                                            <div className="flex items-center gap-2">
+                                              <p className="font-medium text-sm">{email.templateUsed}</p>
+                                              {email.deliveryStatus === 'bounced' && (
+                                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-danger/50 text-danger">
+                                                  {email.bounceType === 'hard' ? 'Hard bounce' : 'Soft bounce'}
+                                                </Badge>
+                                              )}
+                                              {email.deliveryStatus === 'spam' && (
+                                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-warning/50 text-warning">
+                                                  Spam
+                                                </Badge>
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                              {email.subject}
+                                            </p>
+                                            {email.bounceReason && (
+                                              <p className="text-xs text-danger mt-0.5">{email.bounceReason}</p>
+                                            )}
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                              {formatDistanceToNow(new Date(email.sentAt), { addSuffix: true, locale: pt })}
+                                            </p>
+                                          </div>
                                         </div>
-                                        <div className="flex-1 pb-3">
-                                          <p className="font-medium text-sm">{email.templateUsed}</p>
-                                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                                            {email.subject}
-                                          </p>
-                                          <p className="text-xs text-muted-foreground mt-1">
-                                            {formatDistanceToNow(new Date(email.sentAt), { addSuffix: true, locale: pt })}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    ))}
+                                      );
+                                    })}
                                   </div>
                                 </PopoverContent>
                               </Popover>
@@ -1592,6 +1738,48 @@ const Incentive = () => {
                         O template de email com maior taxa de conversão histórica.
                         O gráfico circular mostra a comparação entre templates. Use-o como referência
                         para comunicação com empresas em fases iniciais do funil.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alertas de Deliverability */}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Alertas de Deliverability</p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 border rounded-lg border-danger/30 bg-danger/5">
+                    <div className="p-2 rounded-lg bg-danger/10">
+                      <MailX className="h-4 w-4 text-danger" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Bounce Rate</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Percentagem de emails que não foram entregues. Existem dois tipos:
+                      </p>
+                      <ul className="text-xs text-muted-foreground mt-1 ml-4 list-disc">
+                        <li><span className="font-medium">Hard bounce:</span> endereço inválido ou domínio inexistente (permanente)</li>
+                        <li><span className="font-medium">Soft bounce:</span> caixa cheia ou servidor temporariamente indisponível</li>
+                      </ul>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Benchmark: <span className="text-danger font-medium">&lt;2%</span> é aceitável. Acima de 5% requer ação imediata.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 border rounded-lg border-warning/30 bg-warning/5">
+                    <div className="p-2 rounded-lg bg-warning/10">
+                      <ShieldAlert className="h-4 w-4 text-warning" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Spam Rate</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Percentagem de destinatários que marcaram o email como spam.
+                        Este é um indicador crítico pois afeta a reputação do domínio remetente.
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Benchmark: <span className="text-danger font-medium">&lt;0.1%</span> é o ideal.
+                        Acima de 0.5% pode resultar em bloqueio pelos provedores de email.
                       </p>
                     </div>
                   </div>

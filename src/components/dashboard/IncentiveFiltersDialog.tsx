@@ -13,17 +13,23 @@ import {
   SheetTrigger,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { Filter, X } from "lucide-react";
+import { Filter, X, MailX, ShieldAlert } from "lucide-react";
 
 export interface IncentiveFilters {
   onboardingStatus: string[];
   emailCount: "all" | "0" | "1" | "2" | "3+";
+  deliveryIssues: ("bounced" | "spam" | "none")[];
 }
 
 interface IncentiveFiltersDialogProps {
   filters: IncentiveFilters;
   onFiltersChange: (filters: IncentiveFilters) => void;
-  companies: { onboardingStatus?: string; emailsSent?: number }[];
+  companies: {
+    onboardingStatus?: string;
+    emailsSent?: number;
+    hasDeliveryIssues?: boolean;
+    lastDeliveryIssue?: { type: 'bounced' | 'spam' };
+  }[];
 }
 
 const onboardingStatusOptions = [
@@ -44,6 +50,12 @@ const emailCountOptions = [
   { value: "1", label: "1 email" },
   { value: "2", label: "2 emails" },
   { value: "3+", label: "3+ emails (saturadas)" },
+];
+
+const deliveryIssueOptions = [
+  { value: "bounced", label: "Bounce (não entregue)", icon: MailX },
+  { value: "spam", label: "Spam", icon: ShieldAlert },
+  { value: "none", label: "Sem problemas", icon: null },
 ];
 
 export const IncentiveFiltersDialog = ({
@@ -68,11 +80,36 @@ export const IncentiveFiltersDialog = ({
     })).filter(opt => opt.count > 0);
   }, [companies]);
 
+  // Calculate delivery issues counts
+  const deliveryIssuesWithCounts = useMemo(() => {
+    const counts = {
+      bounced: 0,
+      spam: 0,
+      none: 0,
+    };
+
+    companies.forEach(c => {
+      if (c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'bounced') {
+        counts.bounced++;
+      } else if (c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'spam') {
+        counts.spam++;
+      } else {
+        counts.none++;
+      }
+    });
+
+    return deliveryIssueOptions.map(opt => ({
+      ...opt,
+      count: counts[opt.value as keyof typeof counts] || 0,
+    }));
+  }, [companies]);
+
   // Count active filters
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.onboardingStatus.length > 0) count++;
     if (filters.emailCount !== "all") count++;
+    if (filters.deliveryIssues.length > 0) count++;
     return count;
   }, [filters]);
 
@@ -92,6 +129,15 @@ export const IncentiveFiltersDialog = ({
     }));
   };
 
+  const handleDeliveryIssueToggle = (issue: "bounced" | "spam" | "none") => {
+    setLocalFilters(prev => ({
+      ...prev,
+      deliveryIssues: prev.deliveryIssues.includes(issue)
+        ? prev.deliveryIssues.filter(i => i !== issue)
+        : [...prev.deliveryIssues, issue],
+    }));
+  };
+
   const handleApply = () => {
     onFiltersChange(localFilters);
     setOpen(false);
@@ -101,6 +147,7 @@ export const IncentiveFiltersDialog = ({
     const resetFilters: IncentiveFilters = {
       onboardingStatus: [],
       emailCount: "all",
+      deliveryIssues: [],
     };
     setLocalFilters(resetFilters);
     onFiltersChange(resetFilters);
@@ -172,6 +219,31 @@ export const IncentiveFiltersDialog = ({
                       onCheckedChange={() => handleEmailCountChange(option.value)}
                     />
                     <span className="text-sm">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Delivery Issues Filter */}
+            <div className="space-y-3">
+              <Label className="text-sm font-normal">Problemas de entrega</Label>
+              <div className="space-y-2">
+                {deliveryIssuesWithCounts.map(({ value, label, icon: Icon, count }) => (
+                  <label
+                    key={value}
+                    className="flex items-center gap-3 cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={localFilters.deliveryIssues.includes(value as "bounced" | "spam" | "none")}
+                      onCheckedChange={() => handleDeliveryIssueToggle(value as "bounced" | "spam" | "none")}
+                    />
+                    <span className="text-sm flex-1 flex items-center gap-2">
+                      {Icon && <Icon className="h-3.5 w-3.5 text-danger" />}
+                      {label}
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {count}
+                    </Badge>
                   </label>
                 ))}
               </div>

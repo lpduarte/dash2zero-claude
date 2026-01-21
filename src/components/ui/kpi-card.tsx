@@ -25,6 +25,8 @@ interface KPICardProps {
   extra?: React.ReactNode;
   /** Handler de click (opcional) */
   onClick?: () => void;
+  /** Mensagem de alerta (aparece abaixo do unit) */
+  alert?: string;
 }
 
 export const KPICard = ({
@@ -39,6 +41,7 @@ export const KPICard = ({
   className,
   extra,
   onClick,
+  alert,
 }: KPICardProps) => {
   const Component = onClick ? 'button' : 'div';
   
@@ -69,6 +72,12 @@ export const KPICard = ({
           <div>
             <p className={cn("text-2xl font-bold", valueColor)}>{value}</p>
             {unit && <p className="text-xs text-muted-foreground mt-1">{unit}</p>}
+            {alert && (
+              <p className="text-xs text-warning mt-2 flex items-center gap-1">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-warning" />
+                {alert}
+              </p>
+            )}
           </div>
         )}
       </div>

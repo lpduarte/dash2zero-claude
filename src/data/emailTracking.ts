@@ -1,122 +1,326 @@
-// Tipos para tracking de emails enviados
+// ============================================================================
+// TIPOS PARA TRACKING DE EMAILS (compatível com SendGrid Webhooks)
+// ============================================================================
+//
+// INTEGRAÇÃO SENDGRID - DOCUMENTAÇÃO
+// ===================================
+//
+// 1. CONFIGURAÇÃO DE WEBHOOKS
+//    - Criar endpoint POST /api/webhooks/sendgrid no backend
+//    - Configurar Event Webhook no SendGrid: Settings > Mail Settings > Event Webhook
+//    - URL: https://[dominio]/api/webhooks/sendgrid
+//    - Selecionar eventos: Delivered, Bounced, Dropped, Spam Reports, Opens, Clicks
+//
+// 2. ESTRUTURA DO PAYLOAD SENDGRID (exemplo)
+//    [
+//      {
+//        "email": "destinatario@exemplo.com",
+//        "timestamp": 1234567890,
+//        "event": "delivered" | "bounce" | "dropped" | "spamreport" | "open" | "click",
+//        "sg_message_id": "abc123.xyz",
+//        "reason": "...",           // Para bounces
+//        "type": "bounce" | "blocked", // Para bounces: hard vs soft
+//        "url": "..."               // Para clicks
+//      }
+//    ]
+//
+// 3. MAPEAMENTO DE EVENTOS SENDGRID -> EmailDeliveryStatus
+//    - "delivered"   -> 'delivered'
+//    - "open"        -> 'opened'
+//    - "click"       -> 'clicked'
+//    - "bounce"      -> 'bounced' (type: "bounce" = hard, "blocked" = soft)
+//    - "dropped"     -> 'dropped'
+//    - "spamreport"  -> 'spam'
+//
+// 4. CAMPOS A GUARDAR NA BASE DE DADOS
+//    - sg_message_id: identificador único do email (para associar eventos)
+//    - email: endereço do destinatário
+//    - event timestamps: deliveredAt, openedAt, clickedAt, bouncedAt, spamReportedAt
+//    - bounce_type: 'hard' | 'soft'
+//    - bounce_reason: motivo do bounce
+//
+// 5. SEGURANÇA
+//    - Validar assinatura do webhook SendGrid (Event Webhook Signature Verification)
+//    - Docs: https://docs.sendgrid.com/for-developers/tracking-events/getting-started-event-webhook-security-features
+//
+// 6. AÇÕES RECOMENDADAS
+//    - Hard bounce: remover email da lista ou marcar como inválido
+//    - Soft bounce: tentar novamente após 24-48h, máximo 3 tentativas
+//    - Spam report: remover da lista de envio (obrigatório por lei)
+//
+// ============================================================================
+// Eventos SendGrid: processed, delivered, bounce, dropped, spamreport, open, click
+// Docs: https://docs.sendgrid.com/for-developers/tracking-events/event
+
+// Status de entrega de email (baseado em eventos SendGrid)
+export type EmailDeliveryStatus =
+  | 'delivered'    // Email entregue com sucesso
+  | 'opened'       // Email foi aberto
+  | 'clicked'      // Link foi clicado
+  | 'bounced'      // Email não entregue (hard/soft bounce)
+  | 'dropped'      // SendGrid rejeitou (invalid, unsubscribed, etc.)
+  | 'spam'         // Marcado como spam pelo destinatário
+  | 'pending';     // Enviado mas sem confirmação de entrega
+
+// Tipo de bounce (SendGrid distingue hard vs soft)
+export type BounceType = 'hard' | 'soft';
+
+// Registo de um email enviado
 export interface EmailRecord {
   id: string;
   sentAt: string;
   subject: string;
   preview: string;
   templateUsed: string;
+  // Campos de deliverability (vindos dos webhooks SendGrid)
+  deliveryStatus: EmailDeliveryStatus;
+  deliveredAt?: string;      // Timestamp de entrega
+  openedAt?: string;         // Timestamp de abertura
+  clickedAt?: string;        // Timestamp de clique
+  bouncedAt?: string;        // Timestamp de bounce
+  bounceType?: BounceType;   // Tipo de bounce (hard = permanente, soft = temporário)
+  bounceReason?: string;     // Razão do bounce (ex: "invalid email", "mailbox full")
+  spamReportedAt?: string;   // Timestamp de report de spam
+}
+
+// Resumo de deliverability por empresa
+export interface DeliverySummary {
+  totalSent: number;
+  delivered: number;
+  opened: number;
+  clicked: number;
+  bounced: number;
+  spam: number;
+  pending: number;
 }
 
 export interface CompanyEmailTracking {
   companyId: string;
   emailsSent: number;
   emailHistory: EmailRecord[];
+  // Flag para alertas visuais
+  hasDeliveryIssues: boolean;  // true se tem bounce ou spam
+  lastDeliveryIssue?: {
+    type: 'bounced' | 'spam';
+    reason?: string;
+    date: string;
+  };
+}
+
+// Opções para gerar emails com problemas de entrega
+interface EmailGenerationOptions {
+  deliveryIssue?: 'bounced' | 'spam';
+  bounceType?: BounceType;
+  bounceReason?: string;
 }
 
 // Função para gerar histórico de emails
-const generateEmailHistory = (companyId: string, count: number, startDaysAgo: number = 90): EmailRecord[] => {
+const generateEmailHistory = (
+  companyId: string,
+  count: number,
+  startDaysAgo: number = 90,
+  options?: EmailGenerationOptions
+): EmailRecord[] => {
   const templates = [
     { id: 't1', name: 'Convite Inicial', subject: 'Convite para calcular a sua pegada de carbono' },
     { id: 't2', name: 'Lembrete', subject: 'Lembrete: Cálculo de pegada de carbono' },
     { id: 't3', name: 'Benefícios', subject: 'Benefícios do cálculo de pegada de carbono para a sua empresa' },
     { id: 't4', name: 'Urgente', subject: 'Importante: Requisitos de sustentabilidade - Ação necessária' },
   ];
-  
+
   const history: EmailRecord[] = [];
   const now = new Date();
-  
+
   for (let i = 0; i < count; i++) {
     const daysAgo = startDaysAgo - (i * 25); // Espaçar ~25 dias entre emails
-    const date = new Date(now.getTime() - Math.max(daysAgo, 1) * 24 * 60 * 60 * 1000);
+    const sentDate = new Date(now.getTime() - Math.max(daysAgo, 1) * 24 * 60 * 60 * 1000);
     const template = templates[Math.min(i, templates.length - 1)];
-    
+
+    // Determinar status de entrega
+    // O último email (i === 0 após ordenação) pode ter problema se options definir
+    const isLastEmail = i === count - 1;
+    const hasIssue = isLastEmail && options?.deliveryIssue;
+
+    let deliveryStatus: EmailDeliveryStatus = 'delivered';
+    let deliveredAt: string | undefined;
+    let openedAt: string | undefined;
+    let clickedAt: string | undefined;
+    let bouncedAt: string | undefined;
+    let bounceType: BounceType | undefined;
+    let bounceReason: string | undefined;
+    let spamReportedAt: string | undefined;
+
+    if (hasIssue && options?.deliveryIssue === 'bounced') {
+      deliveryStatus = 'bounced';
+      bouncedAt = new Date(sentDate.getTime() + 60000).toISOString(); // 1 min depois
+      bounceType = options.bounceType || 'hard';
+      bounceReason = options.bounceReason || 'Email address does not exist';
+    } else if (hasIssue && options?.deliveryIssue === 'spam') {
+      deliveryStatus = 'spam';
+      deliveredAt = new Date(sentDate.getTime() + 30000).toISOString();
+      openedAt = new Date(sentDate.getTime() + 3600000).toISOString(); // 1h depois
+      spamReportedAt = new Date(sentDate.getTime() + 3700000).toISOString(); // Pouco depois de abrir
+    } else {
+      // Email normal - simular abertura e clique com probabilidade
+      deliveredAt = new Date(sentDate.getTime() + 30000).toISOString();
+      // ~70% abrem
+      if (Math.random() < 0.7) {
+        openedAt = new Date(sentDate.getTime() + Math.random() * 86400000).toISOString();
+        deliveryStatus = 'opened';
+        // ~40% dos que abrem clicam
+        if (Math.random() < 0.4) {
+          clickedAt = new Date(new Date(openedAt).getTime() + Math.random() * 300000).toISOString();
+          deliveryStatus = 'clicked';
+        }
+      }
+    }
+
     history.push({
       id: `${companyId}-email-${i + 1}`,
-      sentAt: date.toISOString(),
+      sentAt: sentDate.toISOString(),
       subject: template.subject,
       preview: `Email enviado usando o template "${template.name}" para incentivar o cálculo de pegada de carbono...`,
-      templateUsed: template.name
+      templateUsed: template.name,
+      deliveryStatus,
+      deliveredAt,
+      openedAt,
+      clickedAt,
+      bouncedAt,
+      bounceType,
+      bounceReason,
+      spamReportedAt,
     });
   }
-  
+
   return history.sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
+};
+
+// Helper para criar tracking sem problemas de entrega
+const createTracking = (companyId: string, emailsSent: number, startDaysAgo: number = 90): CompanyEmailTracking => ({
+  companyId,
+  emailsSent,
+  emailHistory: emailsSent > 0 ? generateEmailHistory(companyId, emailsSent, startDaysAgo) : [],
+  hasDeliveryIssues: false,
+});
+
+// Helper para criar tracking COM problemas de entrega
+const createTrackingWithIssue = (
+  companyId: string,
+  emailsSent: number,
+  startDaysAgo: number,
+  issue: 'bounced' | 'spam',
+  issueDetails?: { bounceType?: BounceType; bounceReason?: string }
+): CompanyEmailTracking => {
+  const history = generateEmailHistory(companyId, emailsSent, startDaysAgo, {
+    deliveryIssue: issue,
+    bounceType: issueDetails?.bounceType,
+    bounceReason: issueDetails?.bounceReason,
+  });
+
+  const lastEmail = history[0]; // Mais recente
+
+  return {
+    companyId,
+    emailsSent,
+    emailHistory: history,
+    hasDeliveryIssues: true,
+    lastDeliveryIssue: {
+      type: issue,
+      reason: issue === 'bounced' ? lastEmail.bounceReason : 'Marcado como spam pelo destinatário',
+      date: issue === 'bounced' ? lastEmail.bouncedAt! : lastEmail.spamReportedAt!,
+    },
+  };
 };
 
 // Mock data para empresas (vista Empresa)
 // Distribuição: ~25% nunca contactadas, ~35% 1 email, ~25% 2 emails, ~15% 3+ emails
+// Alguns com problemas de entrega: ~5% bounce, ~3% spam
 export const mockEmailTracking: Record<string, CompanyEmailTracking> = {
   // ===== FORNECEDORES (5 empresas) =====
   // 1 nunca contactada, 2 com 1 email, 1 com 2 emails, 1 saturada
-  'emp-sup-np-001': { companyId: 'emp-sup-np-001', emailsSent: 2, emailHistory: generateEmailHistory('emp-sup-np-001', 2, 45) },
-  'emp-sup-np-002': { companyId: 'emp-sup-np-002', emailsSent: 0, emailHistory: [] },
-  'emp-sup-np-003': { companyId: 'emp-sup-np-003', emailsSent: 3, emailHistory: generateEmailHistory('emp-sup-np-003', 3, 80) },
-  'emp-sup-np-004': { companyId: 'emp-sup-np-004', emailsSent: 1, emailHistory: generateEmailHistory('emp-sup-np-004', 1, 30) },
-  'emp-sup-np-005': { companyId: 'emp-sup-np-005', emailsSent: 1, emailHistory: generateEmailHistory('emp-sup-np-005', 1, 15) },
-  
+  // emp-sup-np-003: BOUNCED (email inválido)
+  'emp-sup-np-001': createTracking('emp-sup-np-001', 2, 45),
+  'emp-sup-np-002': createTracking('emp-sup-np-002', 0),
+  'emp-sup-np-003': createTrackingWithIssue('emp-sup-np-003', 3, 80, 'bounced', {
+    bounceType: 'hard',
+    bounceReason: 'Email address does not exist'
+  }),
+  'emp-sup-np-004': createTracking('emp-sup-np-004', 1, 30),
+  'emp-sup-np-005': createTracking('emp-sup-np-005', 1, 15),
+
   // ===== CLIENTES (15 empresas) =====
-  // 4 nunca contactadas, 5 com 1 email, 4 com 2 emails, 2 saturadas
-  'emp-cli-np-001': { companyId: 'emp-cli-np-001', emailsSent: 1, emailHistory: generateEmailHistory('emp-cli-np-001', 1, 28) },
-  'emp-cli-np-002': { companyId: 'emp-cli-np-002', emailsSent: 0, emailHistory: [] },
-  'emp-cli-np-003': { companyId: 'emp-cli-np-003', emailsSent: 2, emailHistory: generateEmailHistory('emp-cli-np-003', 2, 60) },
-  'emp-cli-np-004': { companyId: 'emp-cli-np-004', emailsSent: 1, emailHistory: generateEmailHistory('emp-cli-np-004', 1, 20) },
-  'emp-cli-np-005': { companyId: 'emp-cli-np-005', emailsSent: 0, emailHistory: [] },
-  'emp-cli-np-006': { companyId: 'emp-cli-np-006', emailsSent: 3, emailHistory: generateEmailHistory('emp-cli-np-006', 3, 90) },
-  'emp-cli-np-007': { companyId: 'emp-cli-np-007', emailsSent: 0, emailHistory: [] },
-  'emp-cli-np-008': { companyId: 'emp-cli-np-008', emailsSent: 2, emailHistory: generateEmailHistory('emp-cli-np-008', 2, 50) },
-  'emp-cli-np-009': { companyId: 'emp-cli-np-009', emailsSent: 1, emailHistory: generateEmailHistory('emp-cli-np-009', 1, 12) },
-  'emp-cli-np-010': { companyId: 'emp-cli-np-010', emailsSent: 0, emailHistory: [] },
-  'emp-cli-np-011': { companyId: 'emp-cli-np-011', emailsSent: 2, emailHistory: generateEmailHistory('emp-cli-np-011', 2, 55) },
-  'emp-cli-np-012': { companyId: 'emp-cli-np-012', emailsSent: 1, emailHistory: generateEmailHistory('emp-cli-np-012', 1, 35) },
-  'emp-cli-np-013': { companyId: 'emp-cli-np-013', emailsSent: 0, emailHistory: [] },
-  'emp-cli-np-014': { companyId: 'emp-cli-np-014', emailsSent: 3, emailHistory: generateEmailHistory('emp-cli-np-014', 3, 85) },
-  'emp-cli-np-015': { companyId: 'emp-cli-np-015', emailsSent: 1, emailHistory: generateEmailHistory('emp-cli-np-015', 1, 22) },
-  
+  // emp-cli-np-006: SPAM (marcado como spam)
+  // emp-cli-np-011: BOUNCED (caixa cheia)
+  'emp-cli-np-001': createTracking('emp-cli-np-001', 1, 28),
+  'emp-cli-np-002': createTracking('emp-cli-np-002', 0),
+  'emp-cli-np-003': createTracking('emp-cli-np-003', 2, 60),
+  'emp-cli-np-004': createTracking('emp-cli-np-004', 1, 20),
+  'emp-cli-np-005': createTracking('emp-cli-np-005', 0),
+  'emp-cli-np-006': createTrackingWithIssue('emp-cli-np-006', 3, 90, 'spam'),
+  'emp-cli-np-007': createTracking('emp-cli-np-007', 0),
+  'emp-cli-np-008': createTracking('emp-cli-np-008', 2, 50),
+  'emp-cli-np-009': createTracking('emp-cli-np-009', 1, 12),
+  'emp-cli-np-010': createTracking('emp-cli-np-010', 0),
+  'emp-cli-np-011': createTrackingWithIssue('emp-cli-np-011', 2, 55, 'bounced', {
+    bounceType: 'soft',
+    bounceReason: 'Mailbox full'
+  }),
+  'emp-cli-np-012': createTracking('emp-cli-np-012', 1, 35),
+  'emp-cli-np-013': createTracking('emp-cli-np-013', 0),
+  'emp-cli-np-014': createTracking('emp-cli-np-014', 3, 85),
+  'emp-cli-np-015': createTracking('emp-cli-np-015', 1, 22),
+
   // ===== PARCEIROS (20 empresas) =====
-  // 5 nunca contactadas, 7 com 1 email, 5 com 2 emails, 3 saturadas
-  'emp-par-np-001': { companyId: 'emp-par-np-001', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-002': { companyId: 'emp-par-np-002', emailsSent: 1, emailHistory: generateEmailHistory('emp-par-np-002', 1, 25) },
-  'emp-par-np-003': { companyId: 'emp-par-np-003', emailsSent: 2, emailHistory: generateEmailHistory('emp-par-np-003', 2, 48) },
-  'emp-par-np-004': { companyId: 'emp-par-np-004', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-005': { companyId: 'emp-par-np-005', emailsSent: 1, emailHistory: generateEmailHistory('emp-par-np-005', 1, 18) },
-  'emp-par-np-006': { companyId: 'emp-par-np-006', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-007': { companyId: 'emp-par-np-007', emailsSent: 3, emailHistory: generateEmailHistory('emp-par-np-007', 3, 75) },
-  'emp-par-np-008': { companyId: 'emp-par-np-008', emailsSent: 1, emailHistory: generateEmailHistory('emp-par-np-008', 1, 32) },
-  'emp-par-np-009': { companyId: 'emp-par-np-009', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-010': { companyId: 'emp-par-np-010', emailsSent: 2, emailHistory: generateEmailHistory('emp-par-np-010', 2, 42) },
-  'emp-par-np-011': { companyId: 'emp-par-np-011', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-012': { companyId: 'emp-par-np-012', emailsSent: 1, emailHistory: generateEmailHistory('emp-par-np-012', 1, 10) },
-  'emp-par-np-013': { companyId: 'emp-par-np-013', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-014': { companyId: 'emp-par-np-014', emailsSent: 2, emailHistory: generateEmailHistory('emp-par-np-014', 2, 65) },
-  'emp-par-np-015': { companyId: 'emp-par-np-015', emailsSent: 1, emailHistory: generateEmailHistory('emp-par-np-015', 1, 40) },
-  'emp-par-np-016': { companyId: 'emp-par-np-016', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-017': { companyId: 'emp-par-np-017', emailsSent: 3, emailHistory: generateEmailHistory('emp-par-np-017', 3, 88) },
-  'emp-par-np-018': { companyId: 'emp-par-np-018', emailsSent: 1, emailHistory: generateEmailHistory('emp-par-np-018', 1, 8) },
-  'emp-par-np-019': { companyId: 'emp-par-np-019', emailsSent: 0, emailHistory: [] },
-  'emp-par-np-020': { companyId: 'emp-par-np-020', emailsSent: 2, emailHistory: generateEmailHistory('emp-par-np-020', 2, 38) },
-  
+  // emp-par-np-007: BOUNCED (domínio inválido)
+  // emp-par-np-017: SPAM
+  'emp-par-np-001': createTracking('emp-par-np-001', 0),
+  'emp-par-np-002': createTracking('emp-par-np-002', 1, 25),
+  'emp-par-np-003': createTracking('emp-par-np-003', 2, 48),
+  'emp-par-np-004': createTracking('emp-par-np-004', 0),
+  'emp-par-np-005': createTracking('emp-par-np-005', 1, 18),
+  'emp-par-np-006': createTracking('emp-par-np-006', 0),
+  'emp-par-np-007': createTrackingWithIssue('emp-par-np-007', 3, 75, 'bounced', {
+    bounceType: 'hard',
+    bounceReason: 'Domain does not exist'
+  }),
+  'emp-par-np-008': createTracking('emp-par-np-008', 1, 32),
+  'emp-par-np-009': createTracking('emp-par-np-009', 0),
+  'emp-par-np-010': createTracking('emp-par-np-010', 2, 42),
+  'emp-par-np-011': createTracking('emp-par-np-011', 0),
+  'emp-par-np-012': createTracking('emp-par-np-012', 1, 10),
+  'emp-par-np-013': createTracking('emp-par-np-013', 0),
+  'emp-par-np-014': createTracking('emp-par-np-014', 2, 65),
+  'emp-par-np-015': createTracking('emp-par-np-015', 1, 40),
+  'emp-par-np-016': createTracking('emp-par-np-016', 0),
+  'emp-par-np-017': createTrackingWithIssue('emp-par-np-017', 3, 88, 'spam'),
+  'emp-par-np-018': createTracking('emp-par-np-018', 1, 8),
+  'emp-par-np-019': createTracking('emp-par-np-019', 0),
+  'emp-par-np-020': createTracking('emp-par-np-020', 2, 38),
+
   // ===== MUNICÍPIO - APOIADAS (8 empresas) =====
-  // 2 nunca contactadas, 3 com 1 email, 2 com 2 emails, 1 saturada
-  'mun-apo-np-001': { companyId: 'mun-apo-np-001', emailsSent: 1, emailHistory: generateEmailHistory('mun-apo-np-001', 1, 20) },
-  'mun-apo-np-002': { companyId: 'mun-apo-np-002', emailsSent: 0, emailHistory: [] },
-  'mun-apo-np-003': { companyId: 'mun-apo-np-003', emailsSent: 2, emailHistory: generateEmailHistory('mun-apo-np-003', 2, 55) },
-  'mun-apo-np-004': { companyId: 'mun-apo-np-004', emailsSent: 0, emailHistory: [] },
-  'mun-apo-np-005': { companyId: 'mun-apo-np-005', emailsSent: 3, emailHistory: generateEmailHistory('mun-apo-np-005', 3, 70) },
-  'mun-apo-np-006': { companyId: 'mun-apo-np-006', emailsSent: 1, emailHistory: generateEmailHistory('mun-apo-np-006', 1, 15) },
-  'mun-apo-np-007': { companyId: 'mun-apo-np-007', emailsSent: 0, emailHistory: [] },
-  'mun-apo-np-008': { companyId: 'mun-apo-np-008', emailsSent: 2, emailHistory: generateEmailHistory('mun-apo-np-008', 2, 45) },
-  
+  // mun-apo-np-005: BOUNCED
+  'mun-apo-np-001': createTracking('mun-apo-np-001', 1, 20),
+  'mun-apo-np-002': createTracking('mun-apo-np-002', 0),
+  'mun-apo-np-003': createTracking('mun-apo-np-003', 2, 55),
+  'mun-apo-np-004': createTracking('mun-apo-np-004', 0),
+  'mun-apo-np-005': createTrackingWithIssue('mun-apo-np-005', 3, 70, 'bounced', {
+    bounceType: 'hard',
+    bounceReason: 'User unknown'
+  }),
+  'mun-apo-np-006': createTracking('mun-apo-np-006', 1, 15),
+  'mun-apo-np-007': createTracking('mun-apo-np-007', 0),
+  'mun-apo-np-008': createTracking('mun-apo-np-008', 2, 45),
+
   // ===== MUNICÍPIO - MONITORIZADAS (4 empresas) =====
-  // 1 nunca contactada, 1 com 1 email, 1 com 2 emails, 1 saturada
-  'mun-mon-np-001': { companyId: 'mun-mon-np-001', emailsSent: 2, emailHistory: generateEmailHistory('mun-mon-np-001', 2, 50) },
-  'mun-mon-np-002': { companyId: 'mun-mon-np-002', emailsSent: 1, emailHistory: generateEmailHistory('mun-mon-np-002', 1, 28) },
-  'mun-mon-np-003': { companyId: 'mun-mon-np-003', emailsSent: 0, emailHistory: [] },
-  'mun-mon-np-004': { companyId: 'mun-mon-np-004', emailsSent: 3, emailHistory: generateEmailHistory('mun-mon-np-004', 3, 82) },
-  
+  'mun-mon-np-001': createTracking('mun-mon-np-001', 2, 50),
+  'mun-mon-np-002': createTracking('mun-mon-np-002', 1, 28),
+  'mun-mon-np-003': createTracking('mun-mon-np-003', 0),
+  'mun-mon-np-004': createTracking('mun-mon-np-004', 3, 82),
+
   // ===== MUNICÍPIO - PARCEIRAS (3 empresas) =====
-  // 1 nunca contactada, 1 com 1 email, 1 com 2 emails
-  'mun-par-np-001': { companyId: 'mun-par-np-001', emailsSent: 0, emailHistory: [] },
-  'mun-par-np-002': { companyId: 'mun-par-np-002', emailsSent: 1, emailHistory: generateEmailHistory('mun-par-np-002', 1, 22) },
-  'mun-par-np-003': { companyId: 'mun-par-np-003', emailsSent: 2, emailHistory: generateEmailHistory('mun-par-np-003', 2, 40) },
+  'mun-par-np-001': createTracking('mun-par-np-001', 0),
+  'mun-par-np-002': createTracking('mun-par-np-002', 1, 22),
+  'mun-par-np-003': createTracking('mun-par-np-003', 2, 40),
 };
 
 // Função para obter tracking de uma empresa
@@ -124,7 +328,38 @@ export const getCompanyEmailTracking = (companyId: string): CompanyEmailTracking
   return mockEmailTracking[companyId] || {
     companyId,
     emailsSent: 0,
-    emailHistory: []
+    emailHistory: [],
+    hasDeliveryIssues: false,
+  };
+};
+
+// Função para calcular métricas globais de deliverability
+export const getDeliveryMetrics = (companyIds?: string[]): DeliverySummary & {
+  bounceRate: number;
+  spamRate: number;
+  deliveryRate: number;
+} => {
+  const trackingRecords = companyIds
+    ? companyIds.map(id => mockEmailTracking[id]).filter(Boolean)
+    : Object.values(mockEmailTracking);
+
+  const allEmails = trackingRecords.flatMap(t => t.emailHistory);
+
+  const summary: DeliverySummary = {
+    totalSent: allEmails.length,
+    delivered: allEmails.filter(e => e.deliveryStatus !== 'bounced' && e.deliveryStatus !== 'pending').length,
+    opened: allEmails.filter(e => e.deliveryStatus === 'opened' || e.deliveryStatus === 'clicked').length,
+    clicked: allEmails.filter(e => e.deliveryStatus === 'clicked').length,
+    bounced: allEmails.filter(e => e.deliveryStatus === 'bounced').length,
+    spam: allEmails.filter(e => e.deliveryStatus === 'spam').length,
+    pending: allEmails.filter(e => e.deliveryStatus === 'pending').length,
+  };
+
+  return {
+    ...summary,
+    bounceRate: summary.totalSent > 0 ? Math.round((summary.bounced / summary.totalSent) * 100) : 0,
+    spamRate: summary.totalSent > 0 ? Math.round((summary.spam / summary.totalSent) * 100) : 0,
+    deliveryRate: summary.totalSent > 0 ? Math.round((summary.delivered / summary.totalSent) * 100) : 0,
   };
 };
 
