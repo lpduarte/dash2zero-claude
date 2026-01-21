@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,12 +25,10 @@ import {
 import { Header } from "@/components/dashboard/Header";
 import { ClusterStats } from "@/components/clusters/ClusterStats";
 import { ProvidersTable } from "@/components/clusters/ProvidersTable";
-import { EmailDialog } from "@/components/clusters/EmailDialog";
 import { ImportDialog } from "@/components/clusters/ImportDialog";
 import { CreateClusterDialog } from "@/components/clusters/CreateClusterDialog";
 import { ClusterActionsMenu } from "@/components/clusters/ClusterActionsMenu";
 import { ClusterSelector } from "@/components/dashboard/ClusterSelector";
-import { emailTemplates } from "@/data/mockClusters";
 import {
   getSuppliersWithFootprintByOwnerType,
   getSuppliersWithoutFootprintByOwnerType,
@@ -46,7 +45,7 @@ import {
 import { ClusterProvider } from "@/types/cluster";
 import { ClusterDefinition, CreateClusterInput } from "@/types/clusterNew";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
-import { Users, Mail, Upload, Download, Search, X, Plus } from "lucide-react";
+import { Users, Upload, Download, Search, X, Plus, Target } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { getClusterConfig } from "@/config/clusters";
 import { useToast } from "@/hooks/use-toast";
@@ -68,14 +67,13 @@ const ITEMS_PER_PAGE = 10;
 export default function ClusterManagement() {
   const { user, isMunicipio, userType } = useUser();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const ownerType = isMunicipio ? 'municipio' : 'empresa';
 
   const [selectedClusterType, setSelectedClusterType] = useState<string>('all');
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingCluster, setEditingCluster] = useState<ClusterDefinition | undefined>();
-  const [selectedProvider, setSelectedProvider] = useState<ClusterProvider | undefined>();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>(["NIF/NIPC", "Email", "Setor"]);
@@ -176,16 +174,6 @@ export default function ClusterManagement() {
   const totalPages = Math.ceil(filteredSuppliers.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedSuppliers = filteredSuppliers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-  const handleSendEmail = (providerId?: string) => {
-    if (providerId) {
-      const provider = clusterProviders.find((p) => p.id === providerId);
-      setSelectedProvider(provider);
-    } else {
-      setSelectedProvider(undefined);
-    }
-    setEmailDialogOpen(true);
-  };
 
   const handleImport = (file: File) => {
     console.log("Importing file:", file.name);
@@ -375,6 +363,10 @@ export default function ClusterManagement() {
               <Plus className="h-4 w-4 mr-2" />
               Novo Cluster
             </Button>
+            <Button onClick={() => navigate(`/incentivo?cluster=${selectedClusterType}`)}>
+              <Target className="h-4 w-4 mr-2" />
+              Incentivar
+            </Button>
             <Button variant="outline" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
               Exportar
@@ -382,13 +374,6 @@ export default function ClusterManagement() {
             <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Importar
-            </Button>
-            <Button
-              onClick={() => handleSendEmail()}
-              disabled={clusterProviders.length === 0}
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              Enviar Email
             </Button>
           </div>
         </div>
@@ -406,10 +391,7 @@ export default function ClusterManagement() {
               companiesWithoutFootprint={companiesWithoutFootprint}
             />
             <Card className="p-6 shadow-md">
-              <ProvidersTable
-                providers={clusterProviders}
-                onSendEmail={handleSendEmail}
-              />
+              <ProvidersTable providers={clusterProviders} />
             </Card>
           </TabsContent>
 
@@ -532,14 +514,6 @@ export default function ClusterManagement() {
           </TabsContent>
         </Tabs>
       </main>
-
-      <EmailDialog
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-        templates={emailTemplates}
-        provider={selectedProvider}
-        providers={selectedProvider ? undefined : clusterProviders}
-      />
 
       <ImportDialog
         open={importDialogOpen}

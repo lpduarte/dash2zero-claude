@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,13 +8,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ClusterProvider } from "@/types/cluster";
-import { Mail } from "lucide-react";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 
 interface ProvidersTableProps {
   providers: ClusterProvider[];
-  onSendEmail: (providerId: string) => void;
 }
 
 const statusConfig = {
@@ -33,7 +30,7 @@ const statusConfig = {
   },
 };
 
-export function ProvidersTable({ providers, onSendEmail }: ProvidersTableProps) {
+export function ProvidersTable({ providers }: ProvidersTableProps) {
   if (providers.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -52,7 +49,6 @@ export function ProvidersTable({ providers, onSendEmail }: ProvidersTableProps) 
           <TableHead>Estado</TableHead>
           <TableHead className="text-center">Emails Enviados</TableHead>
           <TableHead>Último Contacto</TableHead>
-          <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -71,15 +67,6 @@ export function ProvidersTable({ providers, onSendEmail }: ProvidersTableProps) 
               {provider.lastContact
                 ? format(provider.lastContact, "dd MMM yyyy", { locale: pt })
                 : "-"}
-            </TableCell>
-            <TableCell className="text-right">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => onSendEmail(provider.id)}
-              >
-                <Mail className="h-4 w-4" />
-              </Button>
             </TableCell>
           </TableRow>
         ))}

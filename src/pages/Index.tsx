@@ -10,7 +10,8 @@ import {
   Eye,
   BookOpen,
   Leaf,
-  ArrowRight
+  ArrowRight,
+  ListTodo
 } from 'lucide-react';
 
 interface PageLink {
@@ -74,6 +75,12 @@ const documentationPages: PageLink[] = [
     title: 'Metodologia',
     description: 'Documentação técnica e fontes de dados',
     icon: BookOpen,
+  },
+  {
+    path: '/pipeline',
+    title: 'Pipeline',
+    description: 'Progresso das funcionalidades em desenvolvimento',
+    icon: ListTodo,
   },
 ];
 

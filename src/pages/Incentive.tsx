@@ -229,18 +229,6 @@ const Incentive = () => {
     }
   }, [initialCompany]);
 
-  // Show toast when navigating from Clusters with context
-  useEffect(() => {
-    if (initialCluster && initialCluster !== 'all') {
-      toast({
-        title: "Cluster selecionado",
-        description: "Lista filtrada pelo cluster escolhido.",
-      });
-    }
-    // Only run on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Data
   const clusters = useMemo(() => {
     const ownerType = isMunicipio ? 'municipio' : 'empresa';
