@@ -17,6 +17,7 @@ import {
   Monitor
 } from "lucide-react";
 import logoCascais from "@/assets/logo-cascais.svg";
+import headerImage from "/img/header.jpg";
 
 const EmailTemplate = () => {
   const navigate = useNavigate();
@@ -115,53 +116,36 @@ const EmailTemplate = () => {
         >
           <Card className="shadow-lg overflow-hidden">
             {/* Email Content */}
-            <div 
+            <div
               id="email-content"
-              style={{ 
-                fontFamily: "'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+              style={{
+                fontFamily: "'Plus Jakarta Sans', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
                 backgroundColor: "#ffffff",
                 maxWidth: "600px",
                 margin: "0 auto"
               }}
             >
-              {/* Header */}
-              <div 
-                style={{ 
-                  background: "linear-gradient(135deg, hsl(168 71% 31% / 0.1) 0%, hsl(168 71% 31% / 0.05) 100%)",
-                  padding: "32px 24px",
-                  textAlign: "center" as const,
-                  borderBottom: "1px solid hsl(168 71% 31% / 0.1)"
+              {/* Google Fonts import for email clients that support it */}
+              <style dangerouslySetInnerHTML={{ __html: `
+                @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+              `}} />
+              {/* Header with dash2zero + Cascais branding */}
+              <div
+                style={{
+                  borderRadius: "8px 8px 0 0",
+                  overflow: "hidden" as const
                 }}
               >
-                <div 
-                  style={{ 
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "64px",
-                    height: "64px",
-                    borderRadius: "50%",
-                    backgroundColor: "hsl(175 66% 38%)",
-                    marginBottom: "16px"
+                <img
+                  src={headerImage}
+                  alt="dash2zero + Cascais"
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    height: "auto",
+                    maxWidth: "600px"
                   }}
-                >
-                  <img 
-                    src={logoCascais} 
-                    alt="Município de Cascais" 
-                    style={{ width: "40px", height: "40px" }}
-                  />
-                </div>
-                <div 
-                  style={{ 
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    color: "hsl(175 66% 38%)",
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase" as const
-                  }}
-                >
-                  Município de Cascais
-                </div>
+                />
               </div>
 
               {/* Body */}
@@ -232,7 +216,7 @@ const EmailTemplate = () => {
                   }}
                 >
                   <p style={{ fontSize: "14px", color: "#4a4a4a", margin: 0, lineHeight: 1.5 }}>
-                    <strong>Já tem a pegada calculada?</strong> Também pode participar — basta 
+                    <strong>Já tem a pegada calculada?</strong><br />Também pode participar — basta 
                     submeter os dados que já tem.
                   </p>
                 </div>
