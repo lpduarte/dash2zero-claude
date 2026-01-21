@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run version:patch:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(for component in accordion aspect-ratio hover-card menubar navigation-menu context-menu toggle toggle-group radio-group slider alert-dialog breadcrumb sheet)",
+      "Bash(do echo \"=== $component ===\")",
+      "Bash(done)",
+      "Bash(for component in avatar scroll-area collapsible popover toast tooltip form label separator switch checkbox tabs select progress dialog dropdown-menu)",
+      "Bash(node scripts/bump-version.js:*)",
+      "Bash(grep:*)",
+      "Bash(npx tsc:*)",
+      "Bash(xargs sed:*)",
+      "WebSearch",
+      "Bash(git checkout:*)",
+      "WebFetch(domain:www.ine.pt)"
+    ]
+  }
+}

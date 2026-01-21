@@ -26,20 +26,30 @@ import { ClusterStats } from "@/components/clusters/ClusterStats";
 import { ProvidersTable } from "@/components/clusters/ProvidersTable";
 import { EmailDialog } from "@/components/clusters/EmailDialog";
 import { ImportDialog } from "@/components/clusters/ImportDialog";
-import { FilterButton } from "@/components/dashboard/FilterButton";
-import { FilterModal } from "@/components/dashboard/FilterModal";
-import { ActiveFiltersDisplay } from "@/components/dashboard/ActiveFiltersDisplay";
+import { CreateClusterDialog } from "@/components/clusters/CreateClusterDialog";
+import { ClusterActionsMenu } from "@/components/clusters/ClusterActionsMenu";
+import { ClusterSelector } from "@/components/dashboard/ClusterSelector";
 import { emailTemplates } from "@/data/mockClusters";
-import { 
+import {
   getSuppliersWithFootprintByOwnerType,
+  getSuppliersWithoutFootprintByOwnerType,
 } from "@/data/suppliers";
-import { getClustersByOwnerType } from "@/data/clusters";
+import {
+  getClustersByOwnerType,
+  createCluster,
+  updateCluster,
+  archiveCluster,
+  deleteCluster,
+  duplicateCluster,
+  getClusterById,
+} from "@/data/clusters";
 import { ClusterProvider } from "@/types/cluster";
+import { ClusterDefinition, CreateClusterInput } from "@/types/clusterNew";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
-import { Mail, Upload, Download, Search, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Users, Mail, Upload, Download, Search, X, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { getClusterConfig } from "@/config/clusters";
+import { useToast } from "@/hooks/use-toast";
 
 // Converter Supplier para ClusterProvider
 const supplierToProvider = (supplier: Supplier): ClusterProvider => ({
@@ -57,12 +67,14 @@ const ITEMS_PER_PAGE = 10;
 
 export default function ClusterManagement() {
   const { user, isMunicipio, userType } = useUser();
-  const clusterOptions = getClusterConfig(userType);
-  
+  const { toast } = useToast();
+  const ownerType = isMunicipio ? 'municipio' : 'empresa';
+
   const [selectedClusterType, setSelectedClusterType] = useState<string>('all');
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editingCluster, setEditingCluster] = useState<ClusterDefinition | undefined>();
   const [selectedProvider, setSelectedProvider] = useState<ClusterProvider | undefined>();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,52 +86,31 @@ export default function ClusterManagement() {
     parish: [],
     sector: [],
   });
+  // Trigger para forçar refresh dos clusters
+  const [clustersVersion, setClustersVersion] = useState(0);
+  const refreshClusters = () => setClustersVersion(v => v + 1);
 
   // Base suppliers - filtrados por ownerType
   const baseSuppliers = useMemo(() => {
-    const ownerType = isMunicipio ? 'municipio' : 'empresa';
     return getSuppliersWithFootprintByOwnerType(ownerType) as Supplier[];
-  }, [isMunicipio]);
+  }, [ownerType]);
 
-  // Clusters dinâmicos
+  // Companies without footprint - for onboarding stats
+  const companiesWithoutFootprint = useMemo(() => {
+    return getSuppliersWithoutFootprintByOwnerType(ownerType);
+  }, [ownerType]);
+
+  // Clusters dinâmicos (depende de clustersVersion para refresh)
   const clusters = useMemo(() => {
-    const ownerType = isMunicipio ? 'municipio' : 'empresa';
     return getClustersByOwnerType(ownerType);
-  }, [isMunicipio]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownerType, clustersVersion]);
 
-  // Calculate active filters count
-  const activeFiltersCount = useMemo(() => {
-    return (
-      universalFilters.companySize.length +
-      universalFilters.district.length +
-      universalFilters.municipality.length +
-      universalFilters.parish.length
-    );
-  }, [universalFilters]);
-
-  // Handle removing individual filter
-  const handleRemoveUniversalFilter = (key: keyof UniversalFilterState, value: string) => {
-    const newFilters = { ...universalFilters };
-    
-    if (key === 'district') {
-      newFilters.district = newFilters.district.filter(v => v !== value);
-      // Reset dependent filters if removing last district
-      if (newFilters.district.length === 0) {
-        newFilters.municipality = [];
-        newFilters.parish = [];
-      }
-    } else if (key === 'municipality') {
-      newFilters.municipality = newFilters.municipality.filter(v => v !== value);
-      // Reset parish if removing last municipality
-      if (newFilters.municipality.length === 0) {
-        newFilters.parish = [];
-      }
-    } else {
-      newFilters[key] = newFilters[key].filter(v => v !== value);
-    }
-    
-    setUniversalFilters(newFilters);
-  };
+  // Cluster options (para o selector)
+  const clusterOptions = useMemo(() => {
+    return getClusterConfig(userType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userType, clustersVersion]);
 
   // Get cluster counts - dinâmicos
   const clusterCounts = useMemo(() => {
@@ -249,76 +240,141 @@ export default function ClusterManagement() {
     return option?.label || 'Cluster';
   };
 
+  // CRUD Handlers
+  const handleCreateCluster = (input: CreateClusterInput) => {
+    const newCluster = createCluster(input, ownerType);
+    refreshClusters();
+    toast({
+      title: "Cluster criado",
+      description: `O cluster "${newCluster.name}" foi criado com sucesso.`,
+    });
+  };
+
+  const handleEditCluster = (cluster: ClusterDefinition) => {
+    setEditingCluster(cluster);
+    setCreateDialogOpen(true);
+  };
+
+  const handleUpdateCluster = (input: CreateClusterInput) => {
+    if (!editingCluster) return;
+    const updated = updateCluster(editingCluster.id, input);
+    if (updated) {
+      refreshClusters();
+      toast({
+        title: "Cluster atualizado",
+        description: `O cluster "${updated.name}" foi atualizado com sucesso.`,
+      });
+    }
+    setEditingCluster(undefined);
+  };
+
+  const handleDuplicateCluster = (cluster: ClusterDefinition) => {
+    const duplicated = duplicateCluster(cluster.id);
+    if (duplicated) {
+      refreshClusters();
+      toast({
+        title: "Cluster duplicado",
+        description: `Foi criada uma cópia do cluster "${cluster.name}".`,
+      });
+    }
+  };
+
+  const handleArchiveCluster = (cluster: ClusterDefinition) => {
+    const success = archiveCluster(cluster.id);
+    if (success) {
+      // Se o cluster arquivado estava selecionado, voltar para "all"
+      if (selectedClusterType === cluster.id) {
+        setSelectedClusterType('all');
+      }
+      refreshClusters();
+      toast({
+        title: "Cluster arquivado",
+        description: `O cluster "${cluster.name}" foi arquivado.`,
+      });
+    }
+  };
+
+  const handleDeleteCluster = (cluster: ClusterDefinition) => {
+    const success = deleteCluster(cluster.id);
+    if (success) {
+      // Se o cluster eliminado estava selecionado, voltar para "all"
+      if (selectedClusterType === cluster.id) {
+        setSelectedClusterType('all');
+      }
+      refreshClusters();
+      toast({
+        title: "Cluster eliminado",
+        description: `O cluster "${cluster.name}" foi eliminado permanentemente.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setCreateDialogOpen(open);
+    if (!open) {
+      setEditingCluster(undefined);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       <main className="relative z-10 max-w-[1400px] mx-auto px-8 py-8">
-        {/* Cluster Selector with Filter Button */}
+        {/* Page Title */}
         <div className="mb-6">
-          <div className="flex justify-between items-start gap-4">
-            {/* Left side - Cluster filters */}
-            <div className="flex-1">
-              <h3 className="text-sm font-normal text-muted-foreground mb-3">Filtrar por Cluster</h3>
-              <div className="flex flex-wrap gap-2">
-                {clusterOptions.map((option) => {
-                  const Icon = option.icon;
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setSelectedClusterType(option.value);
-                        setCurrentPage(1);
-                      }}
-                      className={cn(
-                        "flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all duration-200",
-                        selectedClusterType === option.value
-                          ? "bg-primary text-primary-foreground border-primary shadow-md"
-                          : "bg-card text-card-foreground border-border hover:border-primary/50 hover:bg-accent hover:text-foreground hover:shadow-md"
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="font-normal">{option.labelPlural}</span>
-                      <span
-                        className={cn(
-                          "ml-1 px-2 py-0.5 rounded-full text-xs font-bold",
-                          selectedClusterType === option.value
-                            ? "bg-primary-foreground/20 text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        )}
-                      >
-                        {clusterCounts[option.value]}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            {/* Right side - Filter button */}
-            <div className="flex-shrink-0 pt-6">
-              <FilterButton
-                activeFiltersCount={activeFiltersCount}
-                onClick={() => setFilterModalOpen(true)}
-              />
-            </div>
-          </div>
-
-          {/* Active filters chips */}
-          <ActiveFiltersDisplay
-            filters={universalFilters}
-            onRemoveFilter={handleRemoveUniversalFilter}
-          />
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Users className="h-6 w-6 text-primary" />
+            Gestão de Clusters
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Organize e monitorize os seus grupos de empresas
+          </p>
         </div>
 
-        {/* Header with actions */}
+        {/* Cluster Selector */}
+        <ClusterSelector
+          selectedCluster={selectedClusterType}
+          onClusterChange={(cluster) => {
+            setSelectedClusterType(cluster);
+            setCurrentPage(1);
+          }}
+          clusterCounts={clusterCounts}
+          showPotential={false}
+          suppliers={baseSuppliers}
+          universalFilters={universalFilters}
+          onUniversalFiltersChange={setUniversalFilters}
+        />
+
+        {/* Actions Header */}
         <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">{getClusterLabel()}</h2>
-            <p className="text-sm text-muted-foreground">
-              {filteredSuppliers.length.toLocaleString('pt-PT')} empresas {selectedClusterType !== 'all' ? 'neste cluster' : 'no total'}
-            </p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h2 className="text-xl font-bold">{getClusterLabel()}</h2>
+              <p className="text-sm text-muted-foreground">
+                {filteredSuppliers.length.toLocaleString('pt-PT')} empresas {selectedClusterType !== 'all' ? 'neste cluster' : 'no total'}
+              </p>
+            </div>
+            {/* Menu de ações do cluster selecionado */}
+            {selectedClusterType !== 'all' && (() => {
+              const cluster = getClusterById(selectedClusterType);
+              return cluster ? (
+                <ClusterActionsMenu
+                  cluster={cluster}
+                  onEdit={handleEditCluster}
+                  onDuplicate={handleDuplicateCluster}
+                  onArchive={handleArchiveCluster}
+                  onDelete={handleDeleteCluster}
+                />
+              ) : null;
+            })()}
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Cluster
+            </Button>
             <Button variant="outline" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
               Exportar
@@ -337,15 +393,6 @@ export default function ClusterManagement() {
           </div>
         </div>
 
-        {/* Filter Modal */}
-        <FilterModal
-          suppliers={baseSuppliers}
-          currentFilters={universalFilters}
-          onFilterChange={setUniversalFilters}
-          open={filterModalOpen}
-          onOpenChange={setFilterModalOpen}
-        />
-
         <Tabs defaultValue="resumo" className="space-y-6">
           <TabsList>
             <TabsTrigger value="resumo">Vista Resumida</TabsTrigger>
@@ -353,8 +400,12 @@ export default function ClusterManagement() {
           </TabsList>
 
           <TabsContent value="resumo" className="space-y-6">
-            <ClusterStats providers={clusterProviders} />
-            <Card className="p-6">
+            <ClusterStats
+              providers={clusterProviders}
+              selectedCluster={selectedClusterType}
+              companiesWithoutFootprint={companiesWithoutFootprint}
+            />
+            <Card className="p-6 shadow-md">
               <ProvidersTable
                 providers={clusterProviders}
                 onSendEmail={handleSendEmail}
@@ -388,21 +439,21 @@ export default function ClusterManagement() {
             </div>
 
             {/* Full details table */}
-            <div className="border rounded-lg overflow-x-auto">
+            <Card className="shadow-md overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-primary hover:bg-primary">
-                    <TableHead className="text-primary-foreground min-w-[180px]">Nome</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[200px]">Email</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[120px]">Setor</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[100px]">Região</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[120px]">Faturação (€)</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[100px]">Colab.</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[100px]">Área (m²)</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[120px]">Âmbito 1</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[120px]">Âmbito 2</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[120px]">Âmbito 3</TableHead>
-                    <TableHead className="text-primary-foreground min-w-[140px]">Total (t CO₂e)</TableHead>
+                  <TableRow className="bg-muted/50 hover:bg-muted/50">
+                    <TableHead className="text-foreground font-bold min-w-[180px]">Nome</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[200px]">Email</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[120px]">Setor</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[100px]">Região</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[120px]">Faturação (€)</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[100px]">Colab.</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[100px]">Área (m²)</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[120px]">Âmbito 1</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[120px]">Âmbito 2</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[120px]">Âmbito 3</TableHead>
+                    <TableHead className="text-foreground font-bold min-w-[140px]">Total (t CO₂e)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -426,7 +477,7 @@ export default function ClusterManagement() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
+            </Card>
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -495,6 +546,13 @@ export default function ClusterManagement() {
         onOpenChange={setImportDialogOpen}
         clusterId={selectedClusterType}
         onImport={handleImport}
+      />
+
+      <CreateClusterDialog
+        open={createDialogOpen}
+        onOpenChange={handleDialogClose}
+        onSave={editingCluster ? handleUpdateCluster : handleCreateCluster}
+        existingCluster={editingCluster}
       />
     </div>
   );

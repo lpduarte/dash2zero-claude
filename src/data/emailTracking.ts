@@ -397,6 +397,73 @@ export interface EmailTemplate {
   description: string;
 }
 
+// Aggregate onboarding stats for a cluster
+export interface ClusterOnboardingStats {
+  total: number;
+  porContactar: number;
+  semInteracao: number;
+  interessada: number;
+  emProgresso: number;
+  completo: number;
+  // Percentages
+  porContactarPct: number;
+  semInteracaoPct: number;
+  interessadaPct: number;
+  emProgressoPct: number;
+  completoPct: number;
+}
+
+export const getClusterOnboardingStats = <T extends { onboardingStatus: string }>(
+  companies: T[]
+): ClusterOnboardingStats => {
+  const total = companies.length;
+
+  if (total === 0) {
+    return {
+      total: 0,
+      porContactar: 0,
+      semInteracao: 0,
+      interessada: 0,
+      emProgresso: 0,
+      completo: 0,
+      porContactarPct: 0,
+      semInteracaoPct: 0,
+      interessadaPct: 0,
+      emProgressoPct: 0,
+      completoPct: 0,
+    };
+  }
+
+  const statusCounts = companies.reduce((acc, c) => {
+    acc[c.onboardingStatus] = (acc[c.onboardingStatus] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const porContactar = statusCounts['por_contactar'] || 0;
+  const semInteracao = statusCounts['sem_interacao'] || 0;
+  const interessada = (statusCounts['interessada'] || 0) +
+                      (statusCounts['interessada_simple'] || 0) +
+                      (statusCounts['interessada_formulario'] || 0) +
+                      (statusCounts['registada_simple'] || 0);
+  const emProgresso = (statusCounts['em_progresso_simple'] || 0) +
+                      (statusCounts['em_progresso_formulario'] || 0);
+  const completo = statusCounts['completo'] || 0;
+
+  return {
+    total,
+    porContactar,
+    semInteracao,
+    interessada,
+    emProgresso,
+    completo,
+    porContactarPct: Math.round((porContactar / total) * 100),
+    semInteracaoPct: Math.round((semInteracao / total) * 100),
+    interessadaPct: Math.round((interessada / total) * 100),
+    emProgressoPct: Math.round((emProgresso / total) * 100),
+    completoPct: Math.round((completo / total) * 100),
+  };
+};
+
 export const emailTemplates: EmailTemplate[] = [
   {
     id: "t1",

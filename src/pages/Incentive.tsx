@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/dashboard/Header";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -166,11 +167,16 @@ const getNextAction = (status: string): string => {
 const Incentive = () => {
   const { isMunicipio } = useUser();
   const { toast } = useToast();
-  
+  const [searchParams] = useSearchParams();
+
+  // Read URL params for deep linking from Clusters page
+  const initialCluster = searchParams.get('cluster') || 'all';
+  const initialCompany = searchParams.get('company');
+
   // State
   const [activeTab, setActiveTab] = useState<"pending" | "archive">("pending");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCluster, setSelectedCluster] = useState("all");
+  const [selectedCluster, setSelectedCluster] = useState(initialCluster);
   const [universalFilters, setUniversalFilters] = useState<UniversalFilterState>({
     companySize: [],
     district: [],
@@ -215,7 +221,26 @@ const Incentive = () => {
     sem_interacao: 7,
     por_contactar: 8,
   };
-  
+
+  // Handle URL params from Clusters page
+  useEffect(() => {
+    if (initialCompany) {
+      setSelectedCompanies([initialCompany]);
+    }
+  }, [initialCompany]);
+
+  // Show toast when navigating from Clusters with context
+  useEffect(() => {
+    if (initialCluster && initialCluster !== 'all') {
+      toast({
+        title: "Cluster selecionado",
+        description: "Lista filtrada pelo cluster escolhido.",
+      });
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Data
   const clusters = useMemo(() => {
     const ownerType = isMunicipio ? 'municipio' : 'empresa';
