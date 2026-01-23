@@ -51,10 +51,10 @@ const statusConfig: Record<Status, { label: string; icon: typeof CheckCircle2; c
   blocked: { label: "Bloqueado", icon: AlertCircle, className: "text-destructive" }
 };
 
-const categoryConfig: Record<Category, { label: string; variant: "destructive" | "warning" | "secondary" }> = {
+const categoryConfig: Record<Category, { label: string; variant: "destructive" | "warning" | "success" }> = {
   critical: { label: "Crítico", variant: "destructive" },
   important: { label: "Importante", variant: "warning" },
-  normal: { label: "Normal", variant: "secondary" }
+  normal: { label: "Normal", variant: "success" }
 };
 
 function PipelineItemCard({ item }: { item: PipelineItem }) {
@@ -263,7 +263,7 @@ export default function Pipeline() {
         {normalItems.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">Normal</Badge>
+              <Badge variant="success">Normal</Badge>
               <span className="text-sm text-muted-foreground">
                 {normalItems.filter(i => i.status === "completed").length}/{normalItems.length} concluídos
               </span>
