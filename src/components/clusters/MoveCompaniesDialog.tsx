@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,7 @@ interface MoveCompaniesDialogProps {
   companies: SupplierAny[];
   currentClusterId: string | null;
   clusters: ClusterDefinition[];
-  onMove: (companyIds: string[], targetClusterId: string) => void;
+  onMove: (companyIds: string[], targetClusterId: string, keepCopy: boolean) => void;
 }
 
 export function MoveCompaniesDialog({
@@ -37,6 +38,7 @@ export function MoveCompaniesDialog({
   onMove,
 }: MoveCompaniesDialogProps) {
   const [targetClusterId, setTargetClusterId] = useState<string>("");
+  const [keepCopy, setKeepCopy] = useState(false);
 
   // Filter out the current cluster from available options
   const availableClusters = useMemo(() => {
@@ -50,16 +52,18 @@ export function MoveCompaniesDialog({
     if (!targetClusterId) return;
 
     const companyIds = companies.map(c => c.id);
-    onMove(companyIds, targetClusterId);
+    onMove(companyIds, targetClusterId, keepCopy);
 
     // Reset state and close
     setTargetClusterId("");
+    setKeepCopy(false);
     onOpenChange(false);
   };
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setTargetClusterId("");
+      setKeepCopy(false);
     }
     onOpenChange(isOpen);
   };
@@ -106,6 +110,23 @@ export function MoveCompaniesDialog({
               Não existem outros clusters disponíveis.
             </p>
           )}
+
+          <div className="flex items-start gap-2 mt-4">
+            <Checkbox
+              id="keepCopy"
+              checked={keepCopy}
+              onCheckedChange={(checked) => setKeepCopy(checked === true)}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <label htmlFor="keepCopy" className="text-sm font-normal cursor-pointer">
+                Manter cópia no cluster actual
+              </label>
+              <p className="text-xs text-muted-foreground">
+                A empresa continuará a contar como uma só para efeitos de envio de emails,
+                cálculo de pegada e outras funcionalidades.
+              </p>
+            </div>
+          </div>
         </div>
 
         <DialogFooter>

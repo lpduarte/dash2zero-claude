@@ -39,7 +39,7 @@ interface ProvidersTableProps {
   companies: SupplierAny[];
   onUpdateCompany?: (companyId: string, field: 'name' | 'nif' | 'email', value: string) => void;
   onDeleteCompanies?: (companyIds: string[]) => void;
-  onMoveCompanies?: (companyIds: string[], targetClusterId: string) => void;
+  onMoveCompanies?: (companyIds: string[], targetClusterId: string, keepCopy: boolean) => void;
   onAddCompanies?: () => void;
   onAddCompaniesInline?: (companies: NewCompanyData[]) => void;
   onIncentivize?: () => void;
@@ -457,9 +457,9 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
   };
 
   // Handle move dialog
-  const handleMove = (companyIds: string[], targetClusterId: string) => {
+  const handleMove = (companyIds: string[], targetClusterId: string, keepCopy: boolean) => {
     if (!onMoveCompanies) return;
-    onMoveCompanies(companyIds, targetClusterId);
+    onMoveCompanies(companyIds, targetClusterId, keepCopy);
     setSelectedIds(new Set()); // Clear selection after move
     setMoveTarget(null);
   };
