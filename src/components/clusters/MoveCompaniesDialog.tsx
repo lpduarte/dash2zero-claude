@@ -116,6 +116,7 @@ export function MoveCompaniesDialog({
               id="keepCopy"
               checked={keepCopy}
               onCheckedChange={(checked) => setKeepCopy(checked === true)}
+              className="mt-0.5"
             />
             <div className="grid gap-1.5 leading-none">
               <label htmlFor="keepCopy" className="text-sm font-normal cursor-pointer">
