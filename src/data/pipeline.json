@@ -233,19 +233,17 @@
     },
     {
       "id": "13",
-      "title": "Questões Técnicas e SBTi",
-      "description": "Verificar versão React e definir integração SBTi",
+      "title": "Atualização React",
+      "description": "Atualizar React para versão mais recente",
       "category": "normal",
-      "status": "pending",
+      "status": "completed",
       "priority": 13,
-      "briefing": "13-questoes-tecnicas-sbti.md",
+      "briefing": "",
       "criteria": [
-        { "text": "Versão React verificada e documentada", "done": true },
-        { "text": "Nível de integração SBTi definido", "done": false },
-        { "text": "Implementação inicial SBTi (se decidido)", "done": false }
+        { "text": "Versão React verificada e documentada", "done": true }
       ],
       "dependencies": [],
-      "notes": ""
+      "notes": "Concluído em baa5fdf - atualização React 18 → 19"
     },
     {
       "id": "14",
