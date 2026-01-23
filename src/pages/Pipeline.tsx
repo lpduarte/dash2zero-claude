@@ -16,7 +16,6 @@ import {
 import { Header } from "@/components/dashboard/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -148,7 +147,18 @@ export default function Pipeline() {
     localStorage.setItem(STORAGE_KEY, String(hideCompleted));
   }, [hideCompleted]);
 
-  const completedPercentage = summary.total > 0 ? Math.round((summary.completed / summary.total) * 100) : 0;
+  // Counts for the chart (based on all items, not filtered)
+  const completedCount = items.filter(i => i.status === "completed").length;
+  const criticalWipCount = items.filter(i => i.category === "critical" && i.status !== "completed").length;
+  const importantWipCount = items.filter(i => i.category === "important" && i.status !== "completed").length;
+  const normalWipCount = items.filter(i => i.category === "normal" && i.status !== "completed").length;
+  const totalItems = items.length;
+
+  // Percentages for stacked bar
+  const completedPct = totalItems > 0 ? (completedCount / totalItems) * 100 : 0;
+  const criticalPct = totalItems > 0 ? (criticalWipCount / totalItems) * 100 : 0;
+  const importantPct = totalItems > 0 ? (importantWipCount / totalItems) * 100 : 0;
+  const normalPct = totalItems > 0 ? (normalWipCount / totalItems) * 100 : 0;
 
   const filteredItems = hideCompleted
     ? items.filter(i => i.status !== "completed")
@@ -202,20 +212,54 @@ export default function Pipeline() {
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Progresso Geral</CardTitle>
             <CardDescription>
-              {summary.completed} de {summary.total} itens concluídos
+              {completedCount} de {totalItems} itens concluídos
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Progress value={completedPercentage} className="h-3" />
+            {/* Stacked Progress Bar */}
+            <div className="h-3 w-full rounded-full overflow-hidden flex bg-muted">
+              {completedPct > 0 && (
+                <div
+                  className="h-full bg-success transition-all"
+                  style={{ width: `${completedPct}%` }}
+                />
+              )}
+              {criticalPct > 0 && (
+                <div
+                  className="h-full bg-danger transition-all"
+                  style={{ width: `${criticalPct}%` }}
+                />
+              )}
+              {importantPct > 0 && (
+                <div
+                  className="h-full bg-warning transition-all"
+                  style={{ width: `${importantPct}%` }}
+                />
+              )}
+              {normalPct > 0 && (
+                <div
+                  className="h-full bg-secondary transition-all"
+                  style={{ width: `${normalPct}%` }}
+                />
+              )}
+            </div>
 
-            <div className="grid grid-cols-2 gap-4 text-center">
+            <div className="grid grid-cols-4 gap-4 text-center">
               <div className="space-y-1">
-                <div className="text-2xl font-bold text-success">{summary.completed}</div>
+                <div className="text-2xl font-bold text-success">{completedCount}</div>
                 <div className="text-xs text-muted-foreground">Concluídos</div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold text-muted-foreground">{summary.pending}</div>
-                <div className="text-xs text-muted-foreground">WIP</div>
+                <div className="text-2xl font-bold text-danger">{criticalWipCount}</div>
+                <div className="text-xs text-muted-foreground">Críticos</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-warning">{importantWipCount}</div>
+                <div className="text-xs text-muted-foreground">Importantes</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-muted-foreground">{normalWipCount}</div>
+                <div className="text-xs text-muted-foreground">Normais</div>
               </div>
             </div>
           </CardContent>
