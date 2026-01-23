@@ -910,7 +910,7 @@ const FormularioTotais = () => {
             <div className="space-y-6">
               {/* NIF Field */}
               <div className="space-y-2">
-                <Label htmlFor="nif">NIF da empresa</Label>
+                <Label htmlFor="nif">NIF/NIPC da empresa</Label>
                 <div className="flex gap-3">
                   <Input
                     id="nif"
@@ -1111,7 +1111,7 @@ const FormularioTotais = () => {
                   <p className="font-normal">{companyData?.name}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">NIF</p>
+                  <p className="text-sm text-muted-foreground">NIF/NIPC</p>
                   <p className="font-normal">{nif}</p>
                 </div>
                 <div className="space-y-1">

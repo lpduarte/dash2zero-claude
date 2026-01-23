@@ -9,8 +9,8 @@ export const municipioSuppliersWithFootprint: SupplierWithFootprint[] = mockSupp
 
 // Contagens por cluster
 export const municipioWithFootprintCounts = {
-  apoiadas: municipioSuppliersWithFootprint.filter(s => s.clusterId === 'mun-cluster-apoiadas').length,
-  monitorizadas: municipioSuppliersWithFootprint.filter(s => s.clusterId === 'mun-cluster-monitorizadas').length,
-  parceiras: municipioSuppliersWithFootprint.filter(s => s.clusterId === 'mun-cluster-parceiras').length,
+  apoiadas: municipioSuppliersWithFootprint.filter(s => s.clusterIds.includes('mun-cluster-apoiadas')).length,
+  monitorizadas: municipioSuppliersWithFootprint.filter(s => s.clusterIds.includes('mun-cluster-monitorizadas')).length,
+  parceiras: municipioSuppliersWithFootprint.filter(s => s.clusterIds.includes('mun-cluster-parceiras')).length,
   total: municipioSuppliersWithFootprint.length,
 };

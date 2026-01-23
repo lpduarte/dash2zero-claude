@@ -19,14 +19,14 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
       if (hasFootprint(company)) {
         // Empresas com pegada são "completo"
         return {
-          clusterId: company.clusterId,
+          clusterIds: company.clusterIds,
           onboardingStatus: 'completo' as const,
           completedVia: (company.dataSource === 'get2zero' ? 'simple' : 'formulario') as const,
         };
       }
       // Empresas sem pegada já têm os campos necessários
       return {
-        clusterId: company.clusterId,
+        clusterIds: company.clusterIds,
         onboardingStatus: company.onboardingStatus,
         completedVia: company.completedVia,
       };

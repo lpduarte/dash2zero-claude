@@ -55,6 +55,7 @@ interface CreateClusterDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (input: CreateClusterInput) => void;
   existingCluster?: ClusterDefinition;
+  existingClusterNames?: string[]; // For validating against external cluster lists (e.g., sandbox mode)
 }
 
 interface IconOption {
@@ -107,6 +108,7 @@ export function CreateClusterDialog({
   onOpenChange,
   onSave,
   existingCluster,
+  existingClusterNames,
 }: CreateClusterDialogProps) {
   const { isMunicipio } = useUser();
   const ownerType = isMunicipio ? 'municipio' : 'empresa';
@@ -137,7 +139,17 @@ export function CreateClusterDialog({
     } else if (name.length > 50) {
       setNameError("O nome não pode ter mais de 50 caracteres");
       return false;
-    } else if (!isClusterNameUnique(name, ownerType, existingCluster?.id)) {
+    }
+
+    // Check for duplicate names - use external list if provided, otherwise use data layer
+    const isDuplicate = existingClusterNames
+      ? existingClusterNames.some(n =>
+          n.toLowerCase() === name.trim().toLowerCase() &&
+          n.toLowerCase() !== existingCluster?.name.toLowerCase()
+        )
+      : !isClusterNameUnique(name, ownerType, existingCluster?.id);
+
+    if (isDuplicate) {
       setNameError("Já existe um cluster com este nome");
       return false;
     }

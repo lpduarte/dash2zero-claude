@@ -107,7 +107,7 @@ export function ManualEntryTab({ onAddCompanies, onClose }: ManualEntryTabProps)
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="nif">NIF *</Label>
+        <Label htmlFor="nif">NIF/NIPC *</Label>
         <Input
           id="nif"
           placeholder="123456789"

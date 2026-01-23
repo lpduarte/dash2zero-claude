@@ -226,7 +226,7 @@ export function FileImportTab({ onAddCompanies, onClose }: FileImportTabProps) {
         <Alert>
           <Info className="h-4 w-4" />
           <AlertDescription>
-            O ficheiro deve conter as colunas: <strong>Nome</strong>, <strong>NIF</strong>, <strong>Email</strong>
+            O ficheiro deve conter as colunas: <strong>Nome</strong>, <strong>NIF/NIPC</strong>, <strong>Email</strong>
             <br />
             <button
               onClick={downloadTemplate}
@@ -315,7 +315,7 @@ export function FileImportTab({ onAddCompanies, onClose }: FileImportTabProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead className="w-32">NIF</TableHead>
+              <TableHead className="w-32">NIF/NIPC</TableHead>
               <TableHead>Email</TableHead>
               <TableHead className="w-16 text-center">Estado</TableHead>
             </TableRow>

@@ -78,7 +78,7 @@ export const SupplierEmissionsChart = ({
       emissionsPerEmployee: s.emissionsPerEmployee,
       emissionsPerArea: s.emissionsPerArea,
       sector: s.sector,
-      cluster: s.clusterId || s.cluster
+      cluster: s.clusterIds?.[0] || s.cluster
     })).sort((a, b) => b.value - a.value);
 
     const avg = allData.length > 0 ? allData.reduce((sum, s) => sum + s.value, 0) / allData.length : 0;

@@ -484,12 +484,12 @@ export default function Methodology() {
                   <h3 className="font-semibold">Como é obtido o Setor de Atividade?</h3>
                   <div className="space-y-3 text-sm">
                     <p className="text-muted-foreground">
-                      O setor de atividade é obtido automaticamente a partir do <strong>NIF</strong> da empresa
+                      O setor de atividade é obtido automaticamente a partir do <strong>NIF/NIPC</strong> da empresa
                       durante o processo de criação de clusters ou onboarding. A informação é consultada
                       nos registos oficiais portugueses.
                     </p>
                     <p className="text-muted-foreground">
-                      Caso o NIF não esteja disponível ou a informação não possa ser obtida automaticamente,
+                      Caso o NIF/NIPC não esteja disponível ou a informação não possa ser obtida automaticamente,
                       o utilizador pode indicar manualmente o setor durante o processo de registo.
                     </p>
                   </div>

@@ -12,14 +12,14 @@ import {
   getSuppliersWithFootprintByOwnerType,
   getSuppliersWithoutFootprintByOwnerType,
   addSuppliersWithoutFootprint,
+  moveSuppliersToCluster,
+  deleteSuppliers,
 } from "@/data/suppliers";
 import {
   getClustersByOwnerType,
   createCluster,
   updateCluster,
   deleteCluster,
-  getClusterCompanies,
-  moveCompaniesToCluster,
 } from "@/data/clusters";
 import { ClusterDefinition, CreateClusterInput } from "@/types/clusterNew";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
@@ -53,6 +53,8 @@ export default function ClusterManagement() {
   const [testEmptyState, setTestEmptyState] = useState(false);
   // Sandbox clusters for test mode (not persisted to real data)
   const [testClusters, setTestClusters] = useState<ClusterDefinition[]>([]);
+  // Sandbox companies for test mode (not persisted to real data)
+  const [testCompanies, setTestCompanies] = useState<SupplierAny[]>([]);
 
   // Base suppliers - filtrados por ownerType
   const baseSuppliers = useMemo(() => {
@@ -89,14 +91,36 @@ export default function ClusterManagement() {
 
     const withoutFootprint = companiesWithoutFootprint as SupplierWithoutFootprint[];
 
-    return [...withFootprint, ...withoutFootprint];
+    // Deduplicar por NIF/NIPC (empresas com pegada têm prioridade)
+    const seen = new Set<string>();
+    const result: SupplierAny[] = [];
+
+    // Primeiro adicionar empresas com pegada
+    withFootprint.forEach(company => {
+      const key = company.contact.nif;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(company);
+      }
+    });
+
+    // Depois adicionar empresas sem pegada (apenas se não existirem)
+    withoutFootprint.forEach(company => {
+      const key = company.contact.nif;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(company);
+      }
+    });
+
+    return result;
   }, [baseSuppliers, companiesWithoutFootprint]);
 
   // Get cluster counts - baseado em TODAS as empresas
   const clusterCounts = useMemo(() => {
     const counts: Record<string, number> = { all: allCompanies.length };
     clusters.forEach(cluster => {
-      counts[cluster.id] = allCompanies.filter(c => c.clusterId === cluster.id).length;
+      counts[cluster.id] = allCompanies.filter(c => c.clusterIds.includes(cluster.id)).length;
     });
     return counts;
   }, [allCompanies, clusters]);
@@ -125,15 +149,17 @@ export default function ClusterManagement() {
     return clusterOptions;
   }, [testEmptyState, testClusters, clusterOptions]);
 
-  // Display cluster counts (test mode shows zeros)
+  // Display cluster counts (test mode uses testCompanies)
   const displayClusterCounts = useMemo(() => {
     if (testEmptyState) {
-      const counts: Record<string, number> = { all: 0 };
-      testClusters.forEach(c => { counts[c.id] = 0; });
+      const counts: Record<string, number> = { all: testCompanies.length };
+      testClusters.forEach(c => {
+        counts[c.id] = testCompanies.filter(tc => tc.clusterIds.includes(c.id)).length;
+      });
       return counts;
     }
     return clusterCounts;
-  }, [testEmptyState, testClusters, clusterCounts]);
+  }, [testEmptyState, testClusters, testCompanies, clusterCounts]);
 
   // State detection for empty states (based on display options)
   const hasNoClusters = displayClusterOptions.filter(c => c.value !== 'all').length === 0;
@@ -142,9 +168,9 @@ export default function ClusterManagement() {
   // Filter suppliers by selected cluster and universal filters
   const filteredSuppliers = useMemo(() => {
     let filtered = baseSuppliers;
-    
+
     if (selectedClusterType !== 'all') {
-      filtered = filtered.filter(s => s.clusterId === selectedClusterType);
+      filtered = filtered.filter(s => s.clusterIds.includes(selectedClusterType));
     }
     
     // Filtro de dimensão (multiselect)
@@ -180,8 +206,17 @@ export default function ClusterManagement() {
     if (selectedClusterType === 'all') {
       return allCompanies;
     }
-    return allCompanies.filter(c => c.clusterId === selectedClusterType);
+    return allCompanies.filter(c => c.clusterIds.includes(selectedClusterType));
   }, [allCompanies, selectedClusterType]);
+
+  // Display companies (test mode uses testCompanies)
+  const displayCompanies = useMemo(() => {
+    if (testEmptyState) {
+      if (selectedClusterType === 'all') return testCompanies;
+      return testCompanies.filter(c => c.clusterIds.includes(selectedClusterType));
+    }
+    return filteredAllCompanies;
+  }, [testEmptyState, testCompanies, selectedClusterType, filteredAllCompanies]);
 
   const handleAddCompanies = (companies: NewCompanyData[]) => {
     // Get the target cluster (use selected cluster if not 'all', otherwise empty string)
@@ -197,7 +232,7 @@ export default function ClusterManagement() {
       name: c.name,
       nif: c.nif,
       email: c.email,
-      clusterId: targetClusterId,
+      clusterIds: [targetClusterId],
     }));
 
     addSuppliersWithoutFootprint(inputs, ownerType);
@@ -209,6 +244,70 @@ export default function ClusterManagement() {
   const handleAddCompaniesInline = (companies: NewCompanyData[]) => {
     // Same logic as handleAddCompanies
     handleAddCompanies(companies);
+  };
+
+  // Sandbox handler for adding test companies (merge clusterIds se NIF existe)
+  const handleAddTestCompanies = (companies: NewCompanyData[]) => {
+    const targetClusterId = selectedClusterType !== 'all' ? selectedClusterType : '';
+    if (!targetClusterId) {
+      console.warn("No cluster selected for adding test companies");
+      return;
+    }
+
+    setTestCompanies(prev => {
+      // Criar Map com NIFs existentes para lookup
+      const existingByNif = new Map(prev.map(c => [c.contact.nif, c]));
+
+      let updated = [...prev];
+
+      companies.forEach(c => {
+        const existing = existingByNif.get(c.nif);
+        if (existing) {
+          // NIF existe - adicionar cluster se não estiver já
+          if (!existing.clusterIds.includes(targetClusterId)) {
+            updated = updated.map(s =>
+              s.contact.nif === c.nif
+                ? { ...s, clusterIds: [...s.clusterIds, targetClusterId] }
+                : s
+            );
+          }
+        } else {
+          // NIF novo - criar entrada
+          const newCompany = {
+            id: `test-sup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: c.name,
+            clusterIds: [targetClusterId],
+            sector: 'other',
+            region: 'other',
+            district: 'Desconhecido',
+            municipality: 'Desconhecido',
+            parish: 'Desconhecido',
+            companySize: 'micro' as const,
+            employees: 0,
+            area: 0,
+            revenue: 0,
+            contact: { email: c.email, phone: '', website: '', nif: c.nif },
+            emailsSent: 0,
+            onboardingStatus: 'por_contactar' as const,
+          };
+          updated.push(newCompany);
+          existingByNif.set(c.nif, newCompany);
+        }
+      });
+
+      return updated;
+    });
+  };
+
+  // Handler para eliminar empresas
+  const handleDeleteCompanies = (companyIds: string[]) => {
+    deleteSuppliers(companyIds, ownerType);
+    refreshClusters();
+  };
+
+  // Sandbox handler para eliminar empresas de teste
+  const handleDeleteTestCompanies = (companyIds: string[]) => {
+    setTestCompanies(prev => prev.filter(c => !companyIds.includes(c.id)));
   };
 
   // CRUD Handlers
@@ -236,17 +335,39 @@ export default function ClusterManagement() {
   const handleDeleteCluster = (cluster: ClusterDefinition, action?: DeleteAction, targetClusterId?: string) => {
     // If action is 'move' and target exists, move companies first
     if (action === 'move' && targetClusterId) {
-      const companyIds = getClusterCompanies(cluster.id);
-      if (companyIds.length > 0) {
-        moveCompaniesToCluster(companyIds, cluster.id, targetClusterId);
+      // Find companies in this cluster directly from allCompanies
+      const companiesInCluster = allCompanies.filter(c => c.clusterIds.includes(cluster.id));
+      if (companiesInCluster.length > 0) {
+        const companyIds = companiesInCluster.map(c => c.id);
+        moveSuppliersToCluster(companyIds, targetClusterId, ownerType);
       }
     }
-    // Note: if action is 'delete', the companies will be removed when deleteCluster removes memberships
+    // Note: if action is 'delete', companies remain orphaned (clusterIds points to deleted cluster)
+
+    // Encontrar cluster adjacente antes de eliminar
+    let nextClusterId = 'all';
+    if (selectedClusterType === cluster.id) {
+      const clusterList = displayClusterOptions.filter(c => c.value !== 'all' && c.value !== cluster.id);
+      if (clusterList.length > 0) {
+        // Encontrar índice do cluster actual
+        const currentIndex = displayClusterOptions.findIndex(c => c.value === cluster.id);
+        // Tentar o próximo, senão o anterior
+        const nextOption = displayClusterOptions[currentIndex + 1];
+        const prevOption = displayClusterOptions[currentIndex - 1];
+        if (nextOption && nextOption.value !== 'all') {
+          nextClusterId = nextOption.value;
+        } else if (prevOption && prevOption.value !== 'all') {
+          nextClusterId = prevOption.value;
+        } else {
+          nextClusterId = clusterList[0].value;
+        }
+      }
+    }
 
     const success = deleteCluster(cluster.id);
     if (success) {
       if (selectedClusterType === cluster.id) {
-        setSelectedClusterType('all');
+        setSelectedClusterType(nextClusterId);
       }
       refreshClusters();
     }
@@ -288,18 +409,56 @@ export default function ClusterManagement() {
     setEditingCluster(undefined);
   };
 
-  const handleDeleteTestCluster = (cluster: ClusterDefinition, _action?: DeleteAction, _targetClusterId?: string) => {
-    // In test mode, we don't have real companies to move/delete
+  const handleDeleteTestCluster = (cluster: ClusterDefinition, action?: DeleteAction, targetClusterId?: string) => {
+    // Handle test companies based on action
+    if (action === 'move' && targetClusterId) {
+      // Move test companies to target cluster (add new cluster, remove old)
+      setTestCompanies(prev => prev.map(c =>
+        c.clusterIds.includes(cluster.id)
+          ? { ...c, clusterIds: [...c.clusterIds.filter(id => id !== cluster.id), targetClusterId] }
+          : c
+      ));
+    } else if (action === 'delete') {
+      // Remove cluster from test companies (keep companies that have other clusters)
+      setTestCompanies(prev => prev.map(c =>
+        c.clusterIds.includes(cluster.id)
+          ? { ...c, clusterIds: c.clusterIds.filter(id => id !== cluster.id) }
+          : c
+      ).filter(c => c.clusterIds.length > 0)); // Remove companies with no clusters
+    }
+
+    // Encontrar cluster adjacente antes de eliminar
+    let nextClusterId = 'all';
+    if (selectedClusterType === cluster.id) {
+      const clusterList = displayClusterOptions.filter(c => c.value !== 'all' && c.value !== cluster.id);
+      if (clusterList.length > 0) {
+        // Encontrar índice do cluster actual
+        const currentIndex = displayClusterOptions.findIndex(c => c.value === cluster.id);
+        // Tentar o próximo, senão o anterior
+        const nextOption = displayClusterOptions[currentIndex + 1];
+        const prevOption = displayClusterOptions[currentIndex - 1];
+        if (nextOption && nextOption.value !== 'all') {
+          nextClusterId = nextOption.value;
+        } else if (prevOption && prevOption.value !== 'all') {
+          nextClusterId = prevOption.value;
+        } else {
+          nextClusterId = clusterList[0].value;
+        }
+      }
+    }
+
+    // Delete the test cluster
     setTestClusters(prev => prev.filter(c => c.id !== cluster.id));
     if (selectedClusterType === cluster.id) {
-      setSelectedClusterType('all');
+      setSelectedClusterType(nextClusterId);
     }
   };
 
   const handleToggleTestMode = () => {
     if (testEmptyState) {
-      // Exiting test mode - clear test clusters and reset selection
+      // Exiting test mode - clear test data and reset selection
       setTestClusters([]);
+      setTestCompanies([]);
       setSelectedClusterType('all');
     }
     setTestEmptyState(!testEmptyState);
@@ -362,13 +521,14 @@ export default function ClusterManagement() {
           <div className="space-y-6">
             <ClusterStats
               selectedCluster={selectedClusterType}
-              companies={testEmptyState ? [] : filteredAllCompanies}
+              companies={displayCompanies}
             />
             <Card className="p-6 shadow-md">
               <ProvidersTable
-                companies={testEmptyState ? [] : filteredAllCompanies}
+                companies={displayCompanies}
                 onAddCompanies={() => setAddCompaniesDialogOpen(true)}
-                onAddCompaniesInline={handleAddCompaniesInline}
+                onAddCompaniesInline={testEmptyState ? handleAddTestCompanies : handleAddCompaniesInline}
+                onDeleteCompanies={testEmptyState ? handleDeleteTestCompanies : handleDeleteCompanies}
                 onIncentivize={() => navigate(`/incentivo?cluster=${selectedClusterType}`)}
                 hasNoClusters={hasNoClusters}
                 selectedClusterId={selectedClusterId}
@@ -383,8 +543,8 @@ export default function ClusterManagement() {
         onOpenChange={setAddCompaniesDialogOpen}
         clusterId={selectedClusterType === 'all' ? '' : selectedClusterType}
         onClusterChange={setSelectedClusterType}
-        clusters={clusters}
-        onAddCompanies={handleAddCompanies}
+        clusters={testEmptyState ? testClusters : clusters}
+        onAddCompanies={testEmptyState ? handleAddTestCompanies : handleAddCompanies}
       />
 
       <CreateClusterDialog
@@ -395,6 +555,11 @@ export default function ClusterManagement() {
           : (editingCluster ? handleUpdateCluster : handleCreateCluster)
         }
         existingCluster={editingCluster}
+        existingClusterNames={
+          testEmptyState
+            ? testClusters.map(c => c.name)
+            : clusters.map(c => c.name)
+        }
       />
     </div>
   );

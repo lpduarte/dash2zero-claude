@@ -38,7 +38,7 @@ export interface Supplier {
   rating: 'A' | 'B' | 'C' | 'D' | 'E';
   dataSource: 'formulario' | 'get2zero';
   cluster?: 'fornecedor' | 'cliente' | 'parceiro'; // Legacy - manter para compatibilidade
-  clusterId?: string; // Novo - ID do cluster dinâmico
+  clusterIds?: string[]; // Array de IDs dos clusters a que pertence
 }
 
 export type SectorFilter = 'all' | 'industria' | 'tecnologia' | 'construcao' | 'logistica' | 'servicos' | 'comercio' | 'alimentar' | 'energia';

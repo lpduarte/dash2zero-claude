@@ -200,7 +200,7 @@ const Incentive = () => {
   const clusterCounts = useMemo(() => {
     const counts: Record<string, number> = { all: companiesWithoutFootprint.length };
     clusters.forEach(cluster => {
-      counts[cluster.id] = companiesWithoutFootprint.filter(c => c.clusterId === cluster.id).length;
+      counts[cluster.id] = companiesWithoutFootprint.filter(c => c.clusterIds.includes(cluster.id)).length;
     });
     return counts;
   }, [companiesWithoutFootprint, clusters]);
@@ -211,7 +211,7 @@ const Incentive = () => {
 
     // Filtro de cluster
     if (selectedCluster !== 'all') {
-      filtered = filtered.filter(c => c.clusterId === selectedCluster);
+      filtered = filtered.filter(c => c.clusterIds.includes(selectedCluster));
     }
 
     // Filtros universais

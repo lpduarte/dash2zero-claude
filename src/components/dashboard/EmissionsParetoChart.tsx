@@ -18,7 +18,7 @@ export const EmissionsParetoChart = ({ suppliers }: EmissionsParetoChartProps) =
     revenue: s.revenue,
     totalEmissions: s.totalEmissions,
     impact: s.totalEmissions, // Using total emissions as the impact metric
-    cluster: s.clusterId || s.cluster,
+    cluster: s.clusterIds?.[0] || s.cluster,
   })).sort((a, b) => b.impact - a.impact);
 
   // Calculate cumulative percentage

@@ -163,7 +163,7 @@ export function PasteDataTab({ onAddCompanies, onClose }: PasteDataTabProps) {
           <Info className="h-4 w-4" />
           <AlertDescription>
             Copie as linhas do Excel ou Google Sheets e cole abaixo.
-            Deve incluir colunas: <strong>Nome</strong>, <strong>NIF</strong>, <strong>Email</strong>
+            Deve incluir colunas: <strong>Nome</strong>, <strong>NIF/NIPC</strong>, <strong>Email</strong>
           </AlertDescription>
         </Alert>
 
@@ -206,7 +206,7 @@ export function PasteDataTab({ onAddCompanies, onClose }: PasteDataTabProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead className="w-32">NIF</TableHead>
+              <TableHead className="w-32">NIF/NIPC</TableHead>
               <TableHead>Email</TableHead>
               <TableHead className="w-16 text-center">Estado</TableHead>
             </TableRow>

@@ -53,9 +53,9 @@ const applyCustomFilters = (
       if (status !== customFilters.estado) return false;
     }
     
-    // Filtro por cluster - usa clusterId
+    // Filtro por cluster - usa clusterIds
     if (customFilters.cluster !== 'todos') {
-      if (s.clusterId !== customFilters.cluster) return false;
+      if (!s.clusterIds?.includes(customFilters.cluster)) return false;
     }
     
     // Filtro por setor

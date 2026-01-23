@@ -24,7 +24,7 @@ export const convertToSupplierWithFootprint = (
   return {
     id: supplier.id,
     name: supplier.name,
-    clusterId: clusterMap[supplier.cluster] || 'emp-cluster-fornecedores',
+    clusterIds: [clusterMap[supplier.cluster] || 'emp-cluster-fornecedores'],
     sector: supplier.sector,
     subsector: supplier.subsector,
     region: supplier.region,

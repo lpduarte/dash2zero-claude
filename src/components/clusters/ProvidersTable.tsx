@@ -317,6 +317,27 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
   // Delete confirmation state
   const [deleteTarget, setDeleteTarget] = useState<string | 'bulk' | null>(null);
 
+  // State to control inline add tabs visibility
+  const [showInlineAdd, setShowInlineAdd] = useState(true);
+
+  // Reset inline add visibility when cluster changes
+  useEffect(() => {
+    setShowInlineAdd(true);
+  }, [selectedClusterId]);
+
+  // Reset inline add visibility when cluster becomes empty
+  useEffect(() => {
+    if (companies.length === 0) {
+      setShowInlineAdd(true);
+    }
+  }, [companies.length]);
+
+  // Handler for inline add that hides tabs after success
+  const handleInlineAddCompanies = (newCompanies: NewCompanyData[]) => {
+    onAddCompaniesInline?.(newCompanies);
+    setShowInlineAdd(false);
+  };
+
   const handleStartEdit = (companyId: string, field: EditableField) => {
     setEditingCell({ companyId, field });
   };
@@ -512,7 +533,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
               <Checkbox disabled />
             </TableHead>
             <TableHead className="text-muted-foreground/50">Nome</TableHead>
-            <TableHead className="w-40 text-muted-foreground/50">NIF</TableHead>
+            <TableHead className="w-40 text-muted-foreground/50">NIF/NIPC</TableHead>
             <TableHead className="text-muted-foreground/50">Email</TableHead>
             <TableHead className="text-muted-foreground/50">Estado</TableHead>
             <TableHead className="w-10" />
@@ -537,7 +558,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
   }
 
   // Empty state 3: Cluster selected but no companies - show inline tabs
-  if (companies.length === 0 && selectedClusterId && onAddCompaniesInline) {
+  if (companies.length === 0 && selectedClusterId && onAddCompaniesInline && showInlineAdd) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -561,13 +582,13 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
           </TabsList>
 
           <TabsContent value="manual">
-            <ManualEntryTab onAddCompanies={onAddCompaniesInline} onClose={() => {}} />
+            <ManualEntryTab onAddCompanies={handleInlineAddCompanies} onClose={() => setShowInlineAdd(false)} />
           </TabsContent>
           <TabsContent value="paste">
-            <PasteDataTab onAddCompanies={onAddCompaniesInline} onClose={() => {}} />
+            <PasteDataTab onAddCompanies={handleInlineAddCompanies} onClose={() => setShowInlineAdd(false)} />
           </TabsContent>
           <TabsContent value="file">
-            <FileImportTab onAddCompanies={onAddCompaniesInline} onClose={() => {}} />
+            <FileImportTab onAddCompanies={handleInlineAddCompanies} onClose={() => setShowInlineAdd(false)} />
           </TabsContent>
         </Tabs>
       </div>
@@ -582,7 +603,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Pesquisar por nome, NIF ou email..."
+            placeholder="Pesquisar por nome, NIF/NIPC ou email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -652,7 +673,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
               />
               <SortableHeader
                 field="nif"
-                label="NIF"
+                label="NIF/NIPC"
                 sortState={sortState}
                 onSort={handleSort}
                 className="w-40"

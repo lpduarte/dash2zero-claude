@@ -52,7 +52,7 @@ export const ClusterKPIs = ({ suppliers, totalCompaniesInGroup = 15000 }: Cluste
   }, [dynamicClusters]);
 
   const getClusterData = (clusterId: string) => {
-    const clusterSuppliers = suppliers.filter(s => s.clusterId === clusterId);
+    const clusterSuppliers = suppliers.filter(s => s.clusterIds?.includes(clusterId));
     const totalEmissions = clusterSuppliers.reduce((sum, s) => sum + s.totalEmissions, 0);
     const avgEmissions = clusterSuppliers.length > 0 ? totalEmissions / clusterSuppliers.length : 0;
     const avgEmissionsPerEmployee = clusterSuppliers.length > 0

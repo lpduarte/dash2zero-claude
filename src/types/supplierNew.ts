@@ -4,7 +4,7 @@
 export interface SupplierWithFootprint {
   id: string;
   name: string;
-  clusterId: string;
+  clusterIds: string[];
   sector: string;
   subsector?: string;
   region: string;
@@ -43,7 +43,7 @@ export interface SupplierWithFootprint {
 export interface SupplierWithoutFootprint {
   id: string;
   name: string;
-  clusterId: string;
+  clusterIds: string[];
   sector: string;
   subsector?: string;
   region: string;

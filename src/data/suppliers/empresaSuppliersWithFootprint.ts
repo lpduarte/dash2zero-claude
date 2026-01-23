@@ -9,8 +9,8 @@ export const empresaSuppliersWithFootprint: SupplierWithFootprint[] =
 
 // Contagens por cluster
 export const empresaWithFootprintCounts = {
-  fornecedores: empresaSuppliersWithFootprint.filter(s => s.clusterId === 'emp-cluster-fornecedores').length,
-  clientes: empresaSuppliersWithFootprint.filter(s => s.clusterId === 'emp-cluster-clientes').length,
-  parceiros: empresaSuppliersWithFootprint.filter(s => s.clusterId === 'emp-cluster-parceiros').length,
+  fornecedores: empresaSuppliersWithFootprint.filter(s => s.clusterIds.includes('emp-cluster-fornecedores')).length,
+  clientes: empresaSuppliersWithFootprint.filter(s => s.clusterIds.includes('emp-cluster-clientes')).length,
+  parceiros: empresaSuppliersWithFootprint.filter(s => s.clusterIds.includes('emp-cluster-parceiros')).length,
   total: empresaSuppliersWithFootprint.length,
 };

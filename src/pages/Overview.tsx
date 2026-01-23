@@ -112,7 +112,7 @@ const Overview = () => {
   const clusterCounts = useMemo(() => {
     const counts: Record<string, number> = { all: baseSuppliers.length };
     clusters.forEach(cluster => {
-      counts[cluster.id] = baseSuppliers.filter(s => s.clusterId === cluster.id).length;
+      counts[cluster.id] = baseSuppliers.filter(s => s.clusterIds?.includes(cluster.id)).length;
     });
     return counts;
   }, [baseSuppliers, clusters]);
@@ -123,7 +123,7 @@ const Overview = () => {
     };
     clusters.forEach(cluster => {
       potentials[cluster.id] = calculateImprovementPotential(
-        baseSuppliers.filter(s => s.clusterId === cluster.id),
+        baseSuppliers.filter(s => s.clusterIds?.includes(cluster.id)),
         isMunicipio
       );
     });
@@ -135,7 +135,7 @@ const Overview = () => {
     const allSuppliers = isMunicipio ? allMunicipioSuppliers : allEmpresaSuppliers;
     const totals: Record<string, number> = { all: allSuppliers.length };
     clusters.forEach(cluster => {
-      totals[cluster.id] = allSuppliers.filter(s => s.clusterId === cluster.id).length;
+      totals[cluster.id] = allSuppliers.filter(s => s.clusterIds?.includes(cluster.id)).length;
     });
     return totals;
   }, [isMunicipio, clusters]);
@@ -145,7 +145,7 @@ const Overview = () => {
 
     // Filtro de cluster
     if (selectedCluster !== 'all') {
-      filtered = filtered.filter(supplier => supplier.clusterId === selectedCluster);
+      filtered = filtered.filter(supplier => supplier.clusterIds?.includes(selectedCluster));
     }
 
     // Filtro de dimensão (multiselect)

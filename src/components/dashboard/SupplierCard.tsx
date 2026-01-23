@@ -46,7 +46,7 @@ export const SupplierCard = memo(({
   supplier,
   sectorAverage
 }: SupplierCardProps) => {
-  const clusterInfo = getClusterInfo(supplier.clusterId || supplier.cluster);
+  const clusterInfo = getClusterInfo(supplier.clusterIds?.[0] || supplier.cluster);
   const ClusterIcon = clusterInfo.icon;
 
   // Use provided sector average or fallback to supplier's own emissions

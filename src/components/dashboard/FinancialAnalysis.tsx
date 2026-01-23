@@ -21,7 +21,7 @@ export const FinancialAnalysis = ({ suppliers }: FinancialAnalysisProps) => {
     revenue: s.revenue,
     emissionsPerRevenue: s.emissionsPerRevenue,
     totalEmissions: s.totalEmissions,
-    cluster: s.clusterId || s.cluster,
+    cluster: s.clusterIds?.[0] || s.cluster,
     sector: s.sector,
   }));
 
@@ -33,7 +33,7 @@ export const FinancialAnalysis = ({ suppliers }: FinancialAnalysisProps) => {
     emissionsPerRevenue: s.emissionsPerRevenue,
     revenuePerEmployee: (s.revenue * 1000000) / s.employees,
     employees: s.employees,
-    cluster: s.clusterId || s.cluster,
+    cluster: s.clusterIds?.[0] || s.cluster,
   })).sort((a, b) => a.emissionsPerRevenue - b.emissionsPerRevenue);
 
   const bestEfficiency = financialMetrics[0];

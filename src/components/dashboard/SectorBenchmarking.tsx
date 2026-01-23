@@ -57,7 +57,7 @@ export const SectorBenchmarking = ({
       sectorKey: supplier.sector,
       rank: rank,
       totalInSector: sectorAverages[supplier.sector].count,
-      cluster: supplier.clusterId || supplier.cluster
+      cluster: supplier.clusterIds?.[0] || supplier.cluster
     };
   }).sort((a, b) => b.deviation - a.deviation);
 

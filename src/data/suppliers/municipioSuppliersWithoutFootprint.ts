@@ -6,7 +6,7 @@ import { SupplierWithoutFootprint } from '@/types/supplierNew';
 export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
   // ===== APOIADAS SEM PEGADA (8) =====
   {
-    id: 'mun-apo-np-001', name: 'Café Central Cascais', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-001', name: 'Café Central Cascais', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'restauracao', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Cascais',
     companySize: 'micro', employees: 4, area: 65, revenue: 0.22,
@@ -15,7 +15,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'mun-apo-np-002', name: 'Mercearia do Bairro', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-002', name: 'Mercearia do Bairro', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'comercio', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Estoril',
     companySize: 'micro', employees: 3, area: 50, revenue: 0.18,
@@ -24,7 +24,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'mun-apo-np-003', name: 'Snack Bar Praia', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-003', name: 'Snack Bar Praia', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'restauracao', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Carcavelos',
     companySize: 'micro', employees: 5, area: 45, revenue: 0.25,
@@ -33,7 +33,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'mun-apo-np-004', name: 'Talho Tradicional', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-004', name: 'Talho Tradicional', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'comercio', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Parede',
     companySize: 'micro', employees: 4, area: 55, revenue: 0.32,
@@ -42,7 +42,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'mun-apo-np-005', name: 'Papelaria Escolar', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-005', name: 'Papelaria Escolar', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'comercio', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'São Domingos de Rana',
     companySize: 'micro', employees: 2, area: 40, revenue: 0.15,
@@ -51,7 +51,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_formulario',
   },
   {
-    id: 'mun-apo-np-006', name: 'Frutaria Fresca', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-006', name: 'Frutaria Fresca', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'comercio', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Alcabideche',
     companySize: 'micro', employees: 3, area: 45, revenue: 0.2,
@@ -60,7 +60,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'mun-apo-np-007', name: 'Churrasqueira Popular', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-007', name: 'Churrasqueira Popular', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'restauracao', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Cascais',
     companySize: 'micro', employees: 6, area: 80, revenue: 0.35,
@@ -69,7 +69,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'mun-apo-np-008', name: 'Café Esplanada Sol', clusterId: 'mun-cluster-apoiadas',
+    id: 'mun-apo-np-008', name: 'Café Esplanada Sol', clusterIds: ['mun-cluster-apoiadas'],
     sector: 'services', subsector: 'restauracao', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Estoril',
     companySize: 'micro', employees: 4, area: 60, revenue: 0.28,
@@ -80,7 +80,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
 
   // ===== MONITORIZADAS SEM PEGADA (4) =====
   {
-    id: 'mun-mon-np-001', name: 'Residencial Costa', clusterId: 'mun-cluster-monitorizadas',
+    id: 'mun-mon-np-001', name: 'Residencial Costa', clusterIds: ['mun-cluster-monitorizadas'],
     sector: 'services', subsector: 'hotelaria', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Parede',
     companySize: 'pequena', employees: 12, area: 450, revenue: 0.95,
@@ -89,7 +89,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_formulario',
   },
   {
-    id: 'mun-mon-np-002', name: 'Pensão Familiar', clusterId: 'mun-cluster-monitorizadas',
+    id: 'mun-mon-np-002', name: 'Pensão Familiar', clusterIds: ['mun-cluster-monitorizadas'],
     sector: 'services', subsector: 'hotelaria', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Cascais',
     companySize: 'pequena', employees: 8, area: 320, revenue: 0.55,
@@ -98,7 +98,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_formulario',
   },
   {
-    id: 'mun-mon-np-003', name: 'Hostel Juventude Cascais', clusterId: 'mun-cluster-monitorizadas',
+    id: 'mun-mon-np-003', name: 'Hostel Juventude Cascais', clusterIds: ['mun-cluster-monitorizadas'],
     sector: 'services', subsector: 'hotelaria', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Carcavelos',
     companySize: 'pequena', employees: 10, area: 380, revenue: 0.72,
@@ -107,7 +107,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'mun-mon-np-004', name: 'Apart-Hotel Vista Mar', clusterId: 'mun-cluster-monitorizadas',
+    id: 'mun-mon-np-004', name: 'Apart-Hotel Vista Mar', clusterIds: ['mun-cluster-monitorizadas'],
     sector: 'services', subsector: 'hotelaria', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Estoril',
     companySize: 'pequena', employees: 15, area: 600, revenue: 1.2,
@@ -119,7 +119,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
 
   // ===== PARCEIRAS SEM PEGADA (3) =====
   {
-    id: 'mun-par-np-001', name: 'EcoServiços Cascais', clusterId: 'mun-cluster-parceiras',
+    id: 'mun-par-np-001', name: 'EcoServiços Cascais', clusterIds: ['mun-cluster-parceiras'],
     sector: 'services', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Alcabideche',
     companySize: 'micro', employees: 8, area: 120, revenue: 0.45,
@@ -128,7 +128,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'mun-par-np-002', name: 'Mobilidade Verde', clusterId: 'mun-cluster-parceiras',
+    id: 'mun-par-np-002', name: 'Mobilidade Verde', clusterIds: ['mun-cluster-parceiras'],
     sector: 'services', subsector: 'mobilidade', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Cascais',
     companySize: 'micro', employees: 6, area: 80, revenue: 0.35,
@@ -137,7 +137,7 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'mun-par-np-003', name: 'Consultoria Ambiental Local', clusterId: 'mun-cluster-parceiras',
+    id: 'mun-par-np-003', name: 'Consultoria Ambiental Local', clusterIds: ['mun-cluster-parceiras'],
     sector: 'services', subsector: 'consultoria', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'São Domingos de Rana',
     companySize: 'micro', employees: 4, area: 60, revenue: 0.28,
@@ -148,8 +148,8 @@ export const municipioSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
 ];
 
 export const municipioWithoutFootprintCounts = {
-  apoiadas: municipioSuppliersWithoutFootprint.filter(s => s.clusterId === 'mun-cluster-apoiadas').length,
-  monitorizadas: municipioSuppliersWithoutFootprint.filter(s => s.clusterId === 'mun-cluster-monitorizadas').length,
-  parceiras: municipioSuppliersWithoutFootprint.filter(s => s.clusterId === 'mun-cluster-parceiras').length,
+  apoiadas: municipioSuppliersWithoutFootprint.filter(s => s.clusterIds.includes('mun-cluster-apoiadas')).length,
+  monitorizadas: municipioSuppliersWithoutFootprint.filter(s => s.clusterIds.includes('mun-cluster-monitorizadas')).length,
+  parceiras: municipioSuppliersWithoutFootprint.filter(s => s.clusterIds.includes('mun-cluster-parceiras')).length,
   total: municipioSuppliersWithoutFootprint.length,
 };

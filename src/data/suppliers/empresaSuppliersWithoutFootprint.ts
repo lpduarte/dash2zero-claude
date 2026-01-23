@@ -5,7 +5,7 @@ import { SupplierWithoutFootprint } from '@/types/supplierNew';
 export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
   // ===== FORNECEDORES SEM PEGADA (5) =====
   {
-    id: 'emp-sup-np-001', name: 'Plásticos Inovação', clusterId: 'emp-cluster-fornecedores',
+    id: 'emp-sup-np-001', name: 'Plásticos Inovação', clusterIds: ['emp-cluster-fornecedores'],
     sector: 'manufacturing', subsector: 'plasticos', region: 'north',
     district: 'Braga', municipality: 'Guimarães', parish: 'Oliveira do Castelo',
     companySize: 'pequena', employees: 28, area: 800, revenue: 2.1,
@@ -14,7 +14,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-sup-np-002', name: 'Embalagens Express', clusterId: 'emp-cluster-fornecedores',
+    id: 'emp-sup-np-002', name: 'Embalagens Express', clusterIds: ['emp-cluster-fornecedores'],
     sector: 'manufacturing', subsector: 'embalagens', region: 'center',
     district: 'Aveiro', municipality: 'Aveiro', parish: 'Glória',
     companySize: 'micro', employees: 8, area: 250, revenue: 0.65,
@@ -23,7 +23,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-sup-np-003', name: 'Componentes Técnicos SA', clusterId: 'emp-cluster-fornecedores',
+    id: 'emp-sup-np-003', name: 'Componentes Técnicos SA', clusterIds: ['emp-cluster-fornecedores'],
     sector: 'manufacturing', region: 'north',
     district: 'Porto', municipality: 'Gondomar', parish: 'Rio Tinto',
     companySize: 'media', employees: 75, area: 1800, revenue: 6.8,
@@ -32,7 +32,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_formulario',
   },
   {
-    id: 'emp-sup-np-004', name: 'Ferramentas Pro', clusterId: 'emp-cluster-fornecedores',
+    id: 'emp-sup-np-004', name: 'Ferramentas Pro', clusterIds: ['emp-cluster-fornecedores'],
     sector: 'manufacturing', region: 'center',
     district: 'Leiria', municipality: 'Leiria', parish: 'Leiria',
     companySize: 'pequena', employees: 18, area: 400, revenue: 1.2,
@@ -41,7 +41,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-sup-np-005', name: 'MatériasBase Lda', clusterId: 'emp-cluster-fornecedores',
+    id: 'emp-sup-np-005', name: 'MatériasBase Lda', clusterIds: ['emp-cluster-fornecedores'],
     sector: 'manufacturing', region: 'north',
     district: 'Porto', municipality: 'Matosinhos', parish: 'Leça da Palmeira',
     companySize: 'pequena', employees: 22, area: 550, revenue: 1.8,
@@ -52,7 +52,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
 
   // ===== CLIENTES SEM PEGADA (15) =====
   {
-    id: 'emp-cli-np-001', name: 'ComércioLocal Plus', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-001', name: 'ComércioLocal Plus', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'retalho', region: 'center',
     district: 'Lisboa', municipality: 'Sintra', parish: 'Cacém',
     companySize: 'pequena', employees: 15, area: 320, revenue: 1.5,
@@ -61,7 +61,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-cli-np-002', name: 'Serviços Digitais Norte', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-002', name: 'Serviços Digitais Norte', clusterIds: ['emp-cluster-clientes'],
     sector: 'technology', region: 'north',
     district: 'Porto', municipality: 'Porto', parish: 'Cedofeita',
     companySize: 'micro', employees: 6, area: 80, revenue: 0.45,
@@ -70,7 +70,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-cli-np-003', name: 'Restauração Moderna', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-003', name: 'Restauração Moderna', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'restauracao', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Benfica',
     companySize: 'pequena', employees: 25, area: 180, revenue: 1.2,
@@ -79,7 +79,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-cli-np-004', name: 'Clínica Saúde Total', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-004', name: 'Clínica Saúde Total', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'saude', region: 'north',
     district: 'Braga', municipality: 'Braga', parish: 'Maximinos',
     companySize: 'pequena', employees: 32, area: 450, revenue: 2.8,
@@ -88,7 +88,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-cli-np-005', name: 'Imobiliária Central', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-005', name: 'Imobiliária Central', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'imobiliario', region: 'center',
     district: 'Lisboa', municipality: 'Oeiras', parish: 'Carnaxide',
     companySize: 'pequena', employees: 18, area: 200, revenue: 3.5,
@@ -97,7 +97,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-cli-np-006', name: 'Academia Fitness Pro', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-006', name: 'Academia Fitness Pro', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', region: 'center',
     district: 'Lisboa', municipality: 'Amadora', parish: 'Amadora',
     companySize: 'pequena', employees: 20, area: 850, revenue: 0.95,
@@ -106,7 +106,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_formulario',
   },
   {
-    id: 'emp-cli-np-007', name: 'Escritório Advocacia Silva', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-007', name: 'Escritório Advocacia Silva', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'legal', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Avenidas Novas',
     companySize: 'micro', employees: 8, area: 120, revenue: 1.8,
@@ -115,7 +115,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-cli-np-008', name: 'Hotel Estrela do Mar', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-008', name: 'Hotel Estrela do Mar', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'hotelaria', region: 'south',
     district: 'Faro', municipality: 'Albufeira', parish: 'Albufeira',
     companySize: 'media', employees: 65, area: 3500, revenue: 5.2,
@@ -124,7 +124,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-cli-np-009', name: 'Supermercado Família', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-009', name: 'Supermercado Família', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'retalho', region: 'north',
     district: 'Porto', municipality: 'Vila Nova de Gaia', parish: 'Canidelo',
     companySize: 'pequena', employees: 28, area: 600, revenue: 2.2,
@@ -133,7 +133,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-cli-np-010', name: 'Escola Condução Segura', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-010', name: 'Escola Condução Segura', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'educacao', region: 'center',
     district: 'Coimbra', municipality: 'Coimbra', parish: 'Sé Nova',
     companySize: 'micro', employees: 10, area: 150, revenue: 0.55,
@@ -142,7 +142,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-cli-np-011', name: 'Agência Viagens Mundo', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-011', name: 'Agência Viagens Mundo', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'turismo', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Santa Maria Maior',
     companySize: 'pequena', employees: 12, area: 100, revenue: 1.8,
@@ -151,7 +151,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_simple',
   },
   {
-    id: 'emp-cli-np-012', name: 'Oficina Auto Premium', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-012', name: 'Oficina Auto Premium', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'automovel', region: 'north',
     district: 'Porto', municipality: 'Maia', parish: 'Milheirós',
     companySize: 'pequena', employees: 15, area: 400, revenue: 0.85,
@@ -160,7 +160,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-cli-np-013', name: 'Centro Veterinário Amigo', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-013', name: 'Centro Veterinário Amigo', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'veterinario', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Carcavelos',
     companySize: 'micro', employees: 8, area: 120, revenue: 0.65,
@@ -169,7 +169,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-cli-np-014', name: 'Lavandaria Express', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-014', name: 'Lavandaria Express', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', region: 'center',
     district: 'Lisboa', municipality: 'Almada', parish: 'Almada',
     companySize: 'micro', employees: 5, area: 80, revenue: 0.25,
@@ -179,7 +179,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     completedVia: 'formulario',
   },
   {
-    id: 'emp-cli-np-015', name: 'Padaria Tradição', clusterId: 'emp-cluster-clientes',
+    id: 'emp-cli-np-015', name: 'Padaria Tradição', clusterIds: ['emp-cluster-clientes'],
     sector: 'services', subsector: 'restauracao', region: 'north',
     district: 'Braga', municipality: 'Guimarães', parish: 'Creixomil',
     companySize: 'micro', employees: 6, area: 90, revenue: 0.35,
@@ -190,7 +190,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
 
   // ===== PARCEIROS SEM PEGADA (20) =====
   {
-    id: 'emp-par-np-001', name: 'Transportes Rápidos do Norte', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-001', name: 'Transportes Rápidos do Norte', clusterIds: ['emp-cluster-parceiros'],
     sector: 'transport', region: 'north',
     district: 'Braga', municipality: 'Braga', parish: 'São Victor',
     companySize: 'pequena', employees: 25, area: 600, revenue: 2.2,
@@ -199,7 +199,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-002', name: 'Marketing Digital 360', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-002', name: 'Marketing Digital 360', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'marketing', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Arroios',
     companySize: 'micro', employees: 8, area: 100, revenue: 0.85,
@@ -208,7 +208,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-par-np-003', name: 'Contabilidade Confiança', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-003', name: 'Contabilidade Confiança', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'contabilidade', region: 'north',
     district: 'Porto', municipality: 'Porto', parish: 'Bonfim',
     companySize: 'pequena', employees: 15, area: 180, revenue: 1.2,
@@ -217,7 +217,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-par-np-004', name: 'Design Criativo Lda', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-004', name: 'Design Criativo Lda', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'design', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Marvila',
     companySize: 'micro', employees: 5, area: 60, revenue: 0.35,
@@ -226,7 +226,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-005', name: 'Segurança Total SA', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-005', name: 'Segurança Total SA', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'seguranca', region: 'center',
     district: 'Lisboa', municipality: 'Loures', parish: 'Loures',
     companySize: 'media', employees: 120, area: 500, revenue: 8.5,
@@ -235,7 +235,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-par-np-006', name: 'IT Solutions Porto', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-006', name: 'IT Solutions Porto', clusterIds: ['emp-cluster-parceiros'],
     sector: 'technology', region: 'north',
     district: 'Porto', municipality: 'Matosinhos', parish: 'Matosinhos',
     companySize: 'pequena', employees: 22, area: 250, revenue: 2.5,
@@ -244,7 +244,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-007', name: 'Limpezas Industriais Pro', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-007', name: 'Limpezas Industriais Pro', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'limpeza', region: 'center',
     district: 'Setúbal', municipality: 'Setúbal', parish: 'Setúbal',
     companySize: 'pequena', employees: 45, area: 200, revenue: 1.8,
@@ -253,7 +253,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'em_progresso_simple',
   },
   {
-    id: 'emp-par-np-008', name: 'Formação Executiva', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-008', name: 'Formação Executiva', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'formacao', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Campolide',
     companySize: 'pequena', employees: 12, area: 300, revenue: 1.5,
@@ -262,7 +262,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-par-np-009', name: 'Traduções Globais', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-009', name: 'Traduções Globais', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'traducao', region: 'north',
     district: 'Porto', municipality: 'Porto', parish: 'Lordelo do Ouro',
     companySize: 'micro', employees: 6, area: 70, revenue: 0.45,
@@ -271,7 +271,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-010', name: 'Arquitetura Sustentável', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-010', name: 'Arquitetura Sustentável', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'arquitetura', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Estoril',
     companySize: 'pequena', employees: 10, area: 150, revenue: 1.2,
@@ -280,7 +280,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'registada_simple',
   },
   {
-    id: 'emp-par-np-011', name: 'Recursos Humanos 2000', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-011', name: 'Recursos Humanos 2000', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'rh', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Santo António',
     companySize: 'pequena', employees: 18, area: 200, revenue: 2.8,
@@ -289,7 +289,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-012', name: 'Eventos Corporativos Plus', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-012', name: 'Eventos Corporativos Plus', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'eventos', region: 'center',
     district: 'Lisboa', municipality: 'Oeiras', parish: 'Oeiras',
     companySize: 'pequena', employees: 14, area: 120, revenue: 1.5,
@@ -298,7 +298,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-par-np-013', name: 'Impressão Digital Express', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-013', name: 'Impressão Digital Express', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'grafica', region: 'north',
     district: 'Porto', municipality: 'Vila Nova de Gaia', parish: 'Mafamude',
     companySize: 'micro', employees: 8, area: 180, revenue: 0.55,
@@ -307,7 +307,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-014', name: 'Fotografia Profissional', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-014', name: 'Fotografia Profissional', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'fotografia', region: 'center',
     district: 'Lisboa', municipality: 'Lisboa', parish: 'Ajuda',
     companySize: 'micro', employees: 4, area: 80, revenue: 0.28,
@@ -316,7 +316,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-par-np-015', name: 'Catering Gourmet', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-015', name: 'Catering Gourmet', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'catering', region: 'center',
     district: 'Lisboa', municipality: 'Sintra', parish: 'Rio de Mouro',
     companySize: 'pequena', employees: 22, area: 350, revenue: 1.8,
@@ -325,7 +325,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'sem_interacao',
   },
   {
-    id: 'emp-par-np-016', name: 'Eletricidade Residencial', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-016', name: 'Eletricidade Residencial', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'eletricidade', region: 'north',
     district: 'Braga', municipality: 'Barcelos', parish: 'Barcelos',
     companySize: 'micro', employees: 6, area: 50, revenue: 0.32,
@@ -334,7 +334,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-017', name: 'Jardinagem Verde', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-017', name: 'Jardinagem Verde', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'jardinagem', region: 'center',
     district: 'Lisboa', municipality: 'Cascais', parish: 'Alcabideche',
     companySize: 'pequena', employees: 15, area: 100, revenue: 0.65,
@@ -344,7 +344,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     completedVia: 'simple',
   },
   {
-    id: 'emp-par-np-018', name: 'Manutenção Industrial', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-018', name: 'Manutenção Industrial', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'manutencao', region: 'center',
     district: 'Setúbal', municipality: 'Palmela', parish: 'Pinhal Novo',
     companySize: 'pequena', employees: 28, area: 400, revenue: 2.2,
@@ -353,7 +353,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'interessada',
   },
   {
-    id: 'emp-par-np-019', name: 'Armazenagem Central', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-019', name: 'Armazenagem Central', clusterIds: ['emp-cluster-parceiros'],
     sector: 'services', subsector: 'logistica', region: 'center',
     district: 'Lisboa', municipality: 'Loures', parish: 'Bobadela',
     companySize: 'media', employees: 55, area: 5000, revenue: 4.5,
@@ -362,7 +362,7 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
     onboardingStatus: 'por_contactar',
   },
   {
-    id: 'emp-par-np-020', name: 'Software Personalizado', clusterId: 'emp-cluster-parceiros',
+    id: 'emp-par-np-020', name: 'Software Personalizado', clusterIds: ['emp-cluster-parceiros'],
     sector: 'technology', region: 'north',
     district: 'Porto', municipality: 'Porto', parish: 'Ramalde',
     companySize: 'pequena', employees: 18, area: 200, revenue: 2.2,
@@ -373,8 +373,8 @@ export const empresaSuppliersWithoutFootprint: SupplierWithoutFootprint[] = [
 ];
 
 export const empresaWithoutFootprintCounts = {
-  fornecedores: empresaSuppliersWithoutFootprint.filter(s => s.clusterId === 'emp-cluster-fornecedores').length,
-  clientes: empresaSuppliersWithoutFootprint.filter(s => s.clusterId === 'emp-cluster-clientes').length,
-  parceiros: empresaSuppliersWithoutFootprint.filter(s => s.clusterId === 'emp-cluster-parceiros').length,
+  fornecedores: empresaSuppliersWithoutFootprint.filter(s => s.clusterIds.includes('emp-cluster-fornecedores')).length,
+  clientes: empresaSuppliersWithoutFootprint.filter(s => s.clusterIds.includes('emp-cluster-clientes')).length,
+  parceiros: empresaSuppliersWithoutFootprint.filter(s => s.clusterIds.includes('emp-cluster-parceiros')).length,
   total: empresaSuppliersWithoutFootprint.length,
 };

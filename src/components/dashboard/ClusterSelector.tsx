@@ -1,4 +1,4 @@
-import { TrendingDown, Settings, Pencil, Trash2, Plus, ArrowLeft } from "lucide-react";
+import { TrendingDown, Settings, Pencil, Trash2, Plus, ArrowLeft, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
@@ -24,7 +24,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -105,7 +107,24 @@ export function ClusterSelector({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteAction, setDeleteAction] = useState<DeleteAction>('move');
   const [targetClusterId, setTargetClusterId] = useState<string>('');
+  const [confirmationText, setConfirmationText] = useState('');
   const stickyRef = useRef<HTMLDivElement>(null);
+
+  // Calculate how many clusters have companies (for conditional "Todas" display)
+  const clustersWithCompanies = useMemo(() => {
+    return clusterOptions
+      .filter(c => c.value !== 'all')
+      .filter(c => (clusterCounts[c.value] || 0) > 0)
+      .length;
+  }, [clusterOptions, clusterCounts]);
+
+  // Filter visible cluster options - only show "Todas" when 2+ clusters have companies
+  const visibleClusterOptions = useMemo(() => {
+    if (clustersWithCompanies < 2) {
+      return clusterOptions.filter(c => c.value !== 'all');
+    }
+    return clusterOptions;
+  }, [clusterOptions, clustersWithCompanies]);
 
   // Check if cluster actions are enabled (handlers provided)
   const hasClusterActions = !!(onEdit || onDelete);
@@ -132,6 +151,7 @@ export function ClusterSelector({
   useEffect(() => {
     if (showDeleteConfirm) {
       setDeleteAction('move');
+      setConfirmationText('');
       // Set first available cluster as target
       const availableClusters = clusterOptions.filter(c => c.value !== 'all' && c.value !== selectedCluster);
       setTargetClusterId(availableClusters.length > 0 ? availableClusters[0].value : '');
@@ -251,7 +271,7 @@ export function ClusterSelector({
         <div className="flex justify-between items-center gap-4">
           {/* Left side - Cluster buttons */}
           <div data-tour="cluster-selector" className="flex flex-wrap gap-2">
-            {clusterOptions.map((option) => {
+            {visibleClusterOptions.map((option) => {
               const Icon = option.icon;
               const isSelected = selectedCluster === option.value;
               const canHaveActions = hasClusterActions && option.value !== 'all';
@@ -330,7 +350,7 @@ export function ClusterSelector({
                         {onEdit && onDelete && <DropdownMenuSeparator />}
                         {onDelete && (
                           <DropdownMenuItem
-                            className="text-danger focus:text-danger"
+                            className="text-danger focus:text-danger focus:bg-danger/10 data-[highlighted]:bg-danger data-[highlighted]:text-white"
                             onClick={(e) => {
                               e.stopPropagation();
                               setActionsDropdownOpen(false);
@@ -466,13 +486,41 @@ export function ClusterSelector({
               </div>
             )}
 
+            {/* Warning and confirmation input */}
+            <div className="space-y-3 pt-2 border-t">
+              {companiesInSelectedCluster > 0 && deleteAction === 'delete' && (
+                <Alert variant="destructive" className="bg-danger/5">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Esta ação é irreversível. Empresas com emails enviados, pegadas calculadas
+                    ou medidas atribuídas perderão esta informação permanentemente.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm-delete">
+                  Para confirmar, escreva <strong>{selectedClusterDef?.name}</strong>
+                </Label>
+                <Input
+                  id="confirm-delete"
+                  value={confirmationText}
+                  onChange={(e) => setConfirmationText(e.target.value)}
+                  placeholder={selectedClusterDef?.name}
+                />
+              </div>
+            </div>
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
                 Cancelar
               </Button>
               <Button
                 variant="destructive"
-                disabled={companiesInSelectedCluster > 0 && deleteAction === 'move' && !targetClusterId}
+                disabled={
+                  confirmationText !== selectedClusterDef?.name ||
+                  (companiesInSelectedCluster > 0 && deleteAction === 'move' && !targetClusterId)
+                }
                 onClick={() => {
                   if (onDelete) {
                     onDelete(
@@ -484,7 +532,9 @@ export function ClusterSelector({
                   setShowDeleteConfirm(false);
                 }}
               >
-                Eliminar
+                {companiesInSelectedCluster > 0 && deleteAction === 'move'
+                  ? "Mover e eliminar"
+                  : "Eliminar"}
               </Button>
             </DialogFooter>
           </DialogContent>

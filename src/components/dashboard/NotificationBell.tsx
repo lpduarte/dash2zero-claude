@@ -40,7 +40,7 @@ export const NotificationBell = ({ userType }: NotificationBellProps) => {
 
     // === MILESTONE NOTIFICATIONS (clusters reaching coverage goals) ===
     clusters.forEach(cluster => {
-      const clusterSuppliers = allSuppliers.filter(s => s.clusterId === cluster.id);
+      const clusterSuppliers = allSuppliers.filter(s => s.clusterIds?.includes(cluster.id));
       const totalInCluster = clusterSuppliers.length;
 
       if (totalInCluster === 0) return;
