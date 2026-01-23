@@ -14,7 +14,7 @@ import {
   EyeOff
 } from "lucide-react";
 import { Header } from "@/components/dashboard/Header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
@@ -209,11 +209,10 @@ export default function Pipeline() {
 
         {/* Progress Summary */}
         <Card className="mb-8 shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Progresso Geral</CardTitle>
-            <CardDescription>
-              {completedCount} de {totalItems} itens concluídos
-            </CardDescription>
+          <CardHeader>
+            <CardTitle className="text-lg">
+              Progresso Geral <span className="text-muted-foreground font-normal">— {completedCount}/{totalItems}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Stacked Progress Bar */}
