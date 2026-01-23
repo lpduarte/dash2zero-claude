@@ -2,14 +2,14 @@
   "metadata": {
     "project": "Dash2Zero",
     "client": "Get2C",
-    "lastUpdated": "2025-01-21",
+    "lastUpdated": "2026-01-23",
     "updatedBy": "LP"
   },
   "summary": {
-    "total": 13,
-    "completed": 0,
+    "total": 15,
+    "completed": 4,
     "inProgress": 0,
-    "pending": 13
+    "pending": 11
   },
   "categories": [
     {
@@ -37,7 +37,7 @@
       "title": "Bug: Acesso Clusters → Incentive",
       "description": "Corrigir navegação dos clusters para a página de incentivos",
       "category": "critical",
-      "status": "pending",
+      "status": "completed",
       "priority": 1,
       "briefing": "01-bug-clusters-incentive.md",
       "criteria": [
@@ -46,7 +46,7 @@
         "Contexto do cluster é passado para a página de incentivos"
       ],
       "dependencies": [],
-      "notes": ""
+      "notes": "Concluído em 3eaf142 - feat(clusters): add onboarding stats and incentive integration"
     },
     {
       "id": "02",
@@ -69,17 +69,18 @@
       "title": "Clusters: Importação de Empresas",
       "description": "Flow completo para importar empresas via ficheiro quando não existem clusters",
       "category": "critical",
-      "status": "pending",
+      "status": "completed",
       "priority": 3,
       "briefing": "03-clusters-importacao-empresas.md",
       "criteria": [
         "Empty state com CTA claro",
         "Upload de ficheiro CSV/Excel funcional",
         "Validação e preview antes de importar",
+        "Edição inline e ignorar inválidos",
         "Criação de cluster com empresas importadas"
       ],
       "dependencies": [],
-      "notes": ""
+      "notes": "Concluído em 6530c99 - feat: edição inline e ignorar inválidos no import CSV"
     },
     {
       "id": "04",
@@ -200,20 +201,20 @@
     },
     {
       "id": "11",
-      "title": "Melhorias de Clusters (Geral)",
-      "description": "Gestão de clusters, APIs, KPIs consistentes, alertas de emails",
+      "title": "Gestão de Clusters: CRUD e Movimentação",
+      "description": "CRUD completo de clusters e movimentação de empresas",
       "category": "important",
-      "status": "pending",
+      "status": "completed",
       "priority": 11,
       "briefing": "11-melhorias-clusters.md",
       "criteria": [
         "CRUD completo de clusters",
-        "KPIs com mesmo estilo do site",
-        "Alertas de emails problemáticos visíveis",
-        "Integração de API (se disponível)"
+        "Mover empresas entre clusters",
+        "Opção manter cópia ao mover",
+        "Edição inline de empresas"
       ],
       "dependencies": ["01", "03"],
-      "notes": "Resolver bug e importação antes"
+      "notes": "Concluído em commits d8fdddd, 02a25fe, a002915 - mover empresas entre clusters com opção manter cópia"
     },
     {
       "id": "12",
@@ -228,7 +229,7 @@
         "Associação de planos a empresas funcional"
       ],
       "dependencies": [],
-      "notes": ""
+      "notes": "Tour removida (a8c3b87) - manter apenas planos de melhoria"
     },
     {
       "id": "13",
@@ -245,6 +246,37 @@
       ],
       "dependencies": [],
       "notes": ""
+    },
+    {
+      "id": "14",
+      "title": "Clusters: KPIs, Alertas e API",
+      "description": "KPIs consistentes, alertas de emails e integração de API",
+      "category": "important",
+      "status": "pending",
+      "priority": 14,
+      "briefing": "14-clusters-kpis-api.md",
+      "criteria": [
+        "KPIs com mesmo estilo do site",
+        "Alertas de emails problemáticos visíveis",
+        "Integração de API (se disponível)"
+      ],
+      "dependencies": ["11"],
+      "notes": "Extraído do item 11 original - parte pendente"
+    },
+    {
+      "id": "15",
+      "title": "Títulos Dinâmicos das Páginas",
+      "description": "Títulos do browser mudam conforme a página ativa",
+      "category": "normal",
+      "status": "completed",
+      "priority": 15,
+      "briefing": "",
+      "criteria": [
+        "Título do browser atualiza em cada página",
+        "Formato consistente com nome da app"
+      ],
+      "dependencies": [],
+      "notes": "Concluído em 63bce1c - feat: adicionar títulos dinâmicos às tabs do browser"
     }
   ]
 }
