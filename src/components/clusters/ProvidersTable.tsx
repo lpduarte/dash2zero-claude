@@ -28,7 +28,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { SupplierAny, hasFootprint } from "@/types/supplierNew";
 import { onboardingStatusConfig, getStatusLabel, getStatusOrder, OnboardingStatus, CompletedVia } from "@/config/onboardingStatus";
 import { cn } from "@/lib/utils";
-import { Search, Filter, ChevronUp, ChevronDown, ChevronsUpDown, X, Trash2, Mail, Plus, CircleDot, UserPlus, ClipboardPaste, FileSpreadsheet } from "lucide-react";
+import { Search, Filter, ChevronUp, ChevronDown, ChevronsUpDown, X, Trash2, Mail, Plus, CircleDot, UserPlus, ClipboardPaste, FileSpreadsheet, ArrowRightLeft } from "lucide-react";
+import { MoveCompaniesDialog } from "./MoveCompaniesDialog";
+import { ClusterDefinition } from "@/types/clusterNew";
 import { ManualEntryTab, NewCompanyData } from "./tabs/ManualEntryTab";
 import { PasteDataTab } from "./tabs/PasteDataTab";
 import { FileImportTab } from "./tabs/FileImportTab";
@@ -37,11 +39,13 @@ interface ProvidersTableProps {
   companies: SupplierAny[];
   onUpdateCompany?: (companyId: string, field: 'name' | 'nif' | 'email', value: string) => void;
   onDeleteCompanies?: (companyIds: string[]) => void;
+  onMoveCompanies?: (companyIds: string[], targetClusterId: string) => void;
   onAddCompanies?: () => void;
   onAddCompaniesInline?: (companies: NewCompanyData[]) => void;
   onIncentivize?: () => void;
   hasNoClusters?: boolean;
   selectedClusterId?: string | null;
+  clusters?: ClusterDefinition[];
 }
 
 type EditableField = 'name' | 'nif' | 'email';
@@ -300,7 +304,7 @@ function StatusFilter({ statusFilters, setStatusFilters, statusCounts }: StatusF
 // Type for local edits storage
 type EditedValues = Record<string, { name?: string; nif?: string; email?: string }>;
 
-export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, onAddCompanies, onAddCompaniesInline, onIncentivize, hasNoClusters, selectedClusterId }: ProvidersTableProps) {
+export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, onMoveCompanies, onAddCompanies, onAddCompaniesInline, onIncentivize, hasNoClusters, selectedClusterId, clusters = [] }: ProvidersTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortState, setSortState] = useState<SortState>({
     field: 'status',
@@ -316,6 +320,9 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
 
   // Delete confirmation state
   const [deleteTarget, setDeleteTarget] = useState<string | 'bulk' | null>(null);
+
+  // Move dialog state
+  const [moveTarget, setMoveTarget] = useState<SupplierAny | 'bulk' | null>(null);
 
   // State to control inline add tabs visibility
   const [showInlineAdd, setShowInlineAdd] = useState(true);
@@ -447,6 +454,25 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
     if (!company) return '';
     const edited = editedValues[companyId];
     return edited?.name ?? company.name;
+  };
+
+  // Handle move dialog
+  const handleMove = (companyIds: string[], targetClusterId: string) => {
+    if (!onMoveCompanies) return;
+    onMoveCompanies(companyIds, targetClusterId);
+    setSelectedIds(new Set()); // Clear selection after move
+    setMoveTarget(null);
+  };
+
+  // Get companies for move dialog
+  const getCompaniesForMove = (): SupplierAny[] => {
+    if (moveTarget === 'bulk') {
+      return companies.filter(c => selectedIds.has(c.id));
+    }
+    if (moveTarget) {
+      return [moveTarget];
+    }
+    return [];
   };
 
   // Count companies by filter status (for filter display)
@@ -697,14 +723,26 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
                 />
               </SortableHeader>
               {/* Actions column */}
-              <TableHead className="w-10">
+              <TableHead className="w-20">
                 {selectedIds.size >= 2 && (
-                  <button
-                    onClick={() => setDeleteTarget('bulk')}
-                    className="p-1 rounded hover:bg-muted transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {onMoveCompanies && clusters.length > 1 && (
+                      <button
+                        onClick={() => setMoveTarget('bulk')}
+                        className="p-1 rounded hover:bg-muted transition-colors"
+                        title="Mover para outro cluster"
+                      >
+                        <ArrowRightLeft className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setDeleteTarget('bulk')}
+                      className="p-1 rounded hover:bg-muted transition-colors"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </button>
+                  </div>
                 )}
               </TableHead>
             </TableRow>
@@ -784,13 +822,25 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
                     </TooltipProvider>
                   </TableCell>
                   {/* Actions cell */}
-                  <TableCell className="w-10">
-                    <button
-                      onClick={() => setDeleteTarget(company.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted"
-                    >
-                      <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                    </button>
+                  <TableCell className="w-20">
+                    <div className="flex items-center gap-1">
+                      {onMoveCompanies && clusters.length > 1 && (
+                        <button
+                          onClick={() => setMoveTarget(company)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted"
+                          title="Mover para outro cluster"
+                        >
+                          <ArrowRightLeft className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setDeleteTarget(company.id)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );
@@ -823,6 +873,16 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Move companies dialog */}
+      <MoveCompaniesDialog
+        open={moveTarget !== null}
+        onOpenChange={(open) => !open && setMoveTarget(null)}
+        companies={getCompaniesForMove()}
+        currentClusterId={selectedClusterId ?? null}
+        clusters={clusters}
+        onMove={handleMove}
+      />
     </div>
   );
 }

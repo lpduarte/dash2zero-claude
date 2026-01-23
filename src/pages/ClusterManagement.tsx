@@ -15,6 +15,7 @@ import {
   addSupplierToCluster,
   removeSupplierFromCluster,
   deleteSuppliers,
+  moveSuppliersToCluster,
 } from "@/data/suppliers";
 import {
   getClustersByOwnerType,
@@ -201,6 +202,19 @@ export default function ClusterManagement() {
     refreshClusters();
   };
 
+  // Handler para mover empresas entre clusters
+  const handleMoveCompanies = (companyIds: string[], targetClusterId: string) => {
+    // Remove do cluster actual (se não for "Todas")
+    if (selectedClusterId && selectedClusterId !== 'all') {
+      companyIds.forEach(id => {
+        removeSupplierFromCluster(id, selectedClusterId, ownerType);
+      });
+    }
+    // Adiciona ao cluster destino
+    moveSuppliersToCluster(companyIds, targetClusterId, ownerType);
+    refreshClusters();
+  };
+
   // CRUD Handlers
   const handleCreateCluster = (input: CreateClusterInput) => {
     const newCluster = createCluster(input, ownerType);
@@ -326,9 +340,11 @@ export default function ClusterManagement() {
                 onAddCompanies={() => setAddCompaniesDialogOpen(true)}
                 onAddCompaniesInline={handleAddCompaniesInline}
                 onDeleteCompanies={handleDeleteCompanies}
+                onMoveCompanies={handleMoveCompanies}
                 onIncentivize={() => navigate(`/incentivo?cluster=${selectedClusterType}`)}
                 hasNoClusters={hasNoClusters}
                 selectedClusterId={selectedClusterId}
+                clusters={clusters}
               />
             </Card>
           </div>
