@@ -584,55 +584,47 @@ const StyleGuide = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-[#61DAFB]/10">
-                  <ReactIcon className="h-5 w-5 text-[#61DAFB]" />
-                </div>
-                <div>
-                  <span className="font-bold">React</span>
-                  <Badge variant="outline" className="ml-2 text-xs">19.2</Badge>
-                </div>
+              <div className="p-2 rounded-lg bg-[#61DAFB]/10 w-fit mb-3">
+                <ReactIcon className="h-5 w-5 text-[#61DAFB]" />
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-bold">React</span>
+                <Badge variant="outline" className="text-xs">19.2</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
                 Biblioteca principal para construção de interfaces
               </p>
             </Card>
             <Card className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-[#3178C6]/10">
-                  <TypeScriptIcon className="h-5 w-5 text-[#3178C6]" />
-                </div>
-                <div>
-                  <span className="font-bold">TypeScript</span>
-                  <Badge variant="outline" className="ml-2 text-xs">5.9</Badge>
-                </div>
+              <div className="p-2 rounded-lg bg-[#3178C6]/10 w-fit mb-3">
+                <TypeScriptIcon className="h-5 w-5 text-[#3178C6]" />
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-bold">TypeScript</span>
+                <Badge variant="outline" className="text-xs">5.9</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
                 Tipagem estática para código mais robusto
               </p>
             </Card>
             <Card className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-[#06B6D4]/10">
-                  <TailwindIcon className="h-5 w-5 text-[#06B6D4]" />
-                </div>
-                <div>
-                  <span className="font-bold">Tailwind CSS</span>
-                  <Badge variant="outline" className="ml-2 text-xs">3.4</Badge>
-                </div>
+              <div className="p-2 rounded-lg bg-[#06B6D4]/10 w-fit mb-3">
+                <TailwindIcon className="h-5 w-5 text-[#06B6D4]" />
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-bold">Tailwind CSS</span>
+                <Badge variant="outline" className="text-xs">3.4</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
                 Framework de utility classes para estilos
               </p>
             </Card>
             <Card className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-foreground/10">
-                  <ShadcnIcon className="h-5 w-5" />
-                </div>
-                <span className="font-bold">shadcn/ui</span>
+              <div className="p-2 rounded-lg bg-foreground/10 w-fit mb-3">
+                <ShadcnIcon className="h-5 w-5" />
               </div>
-              <p className="text-sm text-muted-foreground">
+              <span className="font-bold">shadcn/ui</span>
+              <p className="text-sm text-muted-foreground mt-2">
                 Componentes base acessíveis e customizáveis
               </p>
             </Card>
