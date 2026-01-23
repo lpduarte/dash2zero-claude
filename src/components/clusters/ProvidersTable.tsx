@@ -588,7 +588,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold">Empresas</h3>
+          <h3 className="font-bold">Adicione empresas a este cluster</h3>
         </div>
 
         <Tabs defaultValue="manual" className="w-full">
