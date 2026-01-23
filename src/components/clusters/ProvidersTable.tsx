@@ -505,14 +505,20 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
   // Empty state 1: No clusters created at all
   if (hasNoClusters) {
     return (
-      <Card className="border-2 border-dashed border-muted-foreground/30">
-        <div className="py-16 text-center">
-          <CircleDot className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-          <p className="text-muted-foreground">
-            Crie um cluster para começar a adicionar empresas
-          </p>
-        </div>
-      </Card>
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-10 text-muted-foreground/50">
+              <Checkbox disabled />
+            </TableHead>
+            <TableHead className="text-muted-foreground/50">Nome</TableHead>
+            <TableHead className="w-40 text-muted-foreground/50">NIF</TableHead>
+            <TableHead className="text-muted-foreground/50">Email</TableHead>
+            <TableHead className="text-muted-foreground/50">Estado</TableHead>
+            <TableHead className="w-10" />
+          </TableRow>
+        </TableHeader>
+      </Table>
     );
   }
 

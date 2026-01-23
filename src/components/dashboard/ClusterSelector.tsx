@@ -25,12 +25,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ImprovementPotential = 'high' | 'medium' | 'low';
 
+type DeleteAction = 'move' | 'delete';
+
 interface ClusterActionsProps {
   onEdit?: (cluster: ClusterDefinition) => void;
-  onDelete?: (cluster: ClusterDefinition) => void;
+  onDelete?: (cluster: ClusterDefinition, action?: DeleteAction, targetClusterId?: string) => void;
   onCreateNew?: () => void;
 }
 
@@ -44,6 +54,8 @@ interface ClusterSelectorProps extends ClusterActionsProps {
   suppliers: Supplier[];
   universalFilters: UniversalFilterState;
   onUniversalFiltersChange: (filters: UniversalFilterState) => void;
+  clusterOptions?: ReturnType<typeof getClusterConfig>;
+  clusters?: ClusterDefinition[];
 }
 
 const getPotentialConfig = (potential: ImprovementPotential, isSelected: boolean) => {
@@ -80,21 +92,52 @@ export function ClusterSelector({
   onEdit,
   onDelete,
   onCreateNew,
+  clusterOptions: externalOptions,
+  clusters: externalClusters,
 }: ClusterSelectorProps) {
   const { userType } = useUser();
-  const clusterOptions = getClusterConfig(userType);
+  // Use external options if provided, otherwise fetch internally
+  const clusterOptions = externalOptions ?? getClusterConfig(userType);
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [isStuck, setIsStuck] = useState(false);
   const [actionsDropdownOpen, setActionsDropdownOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteAction, setDeleteAction] = useState<DeleteAction>('move');
+  const [targetClusterId, setTargetClusterId] = useState<string>('');
   const stickyRef = useRef<HTMLDivElement>(null);
 
   // Check if cluster actions are enabled (handlers provided)
   const hasClusterActions = !!(onEdit || onDelete);
 
   // Get the selected cluster definition for actions
-  const selectedClusterDef = selectedCluster !== 'all' ? getClusterById(selectedCluster) : undefined;
+  // Use external clusters if provided, otherwise fetch from data store
+  const selectedClusterDef = useMemo(() => {
+    if (selectedCluster === 'all') return undefined;
+    if (externalClusters) {
+      return externalClusters.find(c => c.id === selectedCluster);
+    }
+    return getClusterById(selectedCluster);
+  }, [selectedCluster, externalClusters]);
+
+  // Get companies count in the selected cluster
+  const companiesInSelectedCluster = selectedCluster !== 'all' ? (clusterCounts[selectedCluster] || 0) : 0;
+
+  // Get other clusters for move target (excluding 'all' and the current cluster)
+  const otherClusters = useMemo(() => {
+    return clusterOptions.filter(c => c.value !== 'all' && c.value !== selectedCluster);
+  }, [clusterOptions, selectedCluster]);
+
+  // Reset delete dialog state when opening
+  useEffect(() => {
+    if (showDeleteConfirm) {
+      setDeleteAction('move');
+      // Set first available cluster as target
+      const availableClusters = clusterOptions.filter(c => c.value !== 'all' && c.value !== selectedCluster);
+      setTargetClusterId(availableClusters.length > 0 ? availableClusters[0].value : '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showDeleteConfirm]);
 
   // Close dropdown when cluster changes
   useEffect(() => {
@@ -174,17 +217,17 @@ export function ClusterSelector({
           {/* Botão Novo cluster */}
           <button
             onClick={onCreateNew}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-dashed border-primary text-primary hover:bg-primary/5 transition-all"
+            className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2 rounded-md text-sm font-normal border border-dashed border-primary text-primary hover:bg-primary/5 transition-colors"
           >
             <Plus className="h-4 w-4" />
-            <span className="font-normal">Novo cluster</span>
+            Novo cluster
           </button>
 
           {/* Seta animada + texto */}
           <div className="flex items-center gap-2 text-muted-foreground">
-            <ArrowLeft className="h-5 w-5 animate-pulse" />
+            <ArrowLeft className="h-5 w-5" style={{ animation: 'bounce-x 1s ease-in-out infinite' }} />
             <span className="text-sm">
-              Crie clusters para organizar empresas (ex: Fornecedores, Clientes, Parceiros)
+              Começe por criar clusters para organizar empresas (ex: Fornecedores, Clientes, Parceiros)
             </span>
           </div>
         </div>
@@ -352,18 +395,92 @@ export function ClusterSelector({
               <DialogTitle>Eliminar cluster</DialogTitle>
               <DialogDescription>
                 Tem a certeza que pretende eliminar o cluster "{selectedClusterDef.name}"?
-                Esta ação é irreversível. As empresas associadas serão mantidas,
-                mas perderão a associação a este cluster.
+                Esta ação é irreversível.
               </DialogDescription>
             </DialogHeader>
+
+            {companiesInSelectedCluster > 0 && (
+              <div className="space-y-4 py-2">
+                <p className="text-sm">
+                  Este cluster tem <strong>{companiesInSelectedCluster}</strong> empresa{companiesInSelectedCluster !== 1 ? 's' : ''} associada{companiesInSelectedCluster !== 1 ? 's' : ''}.
+                  O que deseja fazer com ela{companiesInSelectedCluster !== 1 ? 's' : ''}?
+                </p>
+
+                <div className="space-y-3">
+                  {/* Move option */}
+                  <div
+                    className={cn(
+                      "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
+                      deleteAction === 'move' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                    )}
+                    onClick={() => setDeleteAction('move')}
+                  >
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border-2 mt-0.5 flex items-center justify-center",
+                      deleteAction === 'move' ? "border-primary" : "border-muted-foreground"
+                    )}>
+                      {deleteAction === 'move' && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <Label className="cursor-pointer">Mover para outro cluster</Label>
+                      {deleteAction === 'move' && otherClusters.length > 0 && (
+                        <Select value={targetClusterId} onValueChange={setTargetClusterId}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccione o cluster de destino" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {otherClusters.map(cluster => (
+                              <SelectItem key={cluster.value} value={cluster.value}>
+                                {cluster.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {deleteAction === 'move' && otherClusters.length === 0 && (
+                        <p className="text-sm text-muted-foreground">Não existem outros clusters disponíveis.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Delete option */}
+                  <div
+                    className={cn(
+                      "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
+                      deleteAction === 'delete' ? "border-danger bg-danger/5" : "border-border hover:border-danger/50"
+                    )}
+                    onClick={() => setDeleteAction('delete')}
+                  >
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border-2 mt-0.5 flex items-center justify-center",
+                      deleteAction === 'delete' ? "border-danger" : "border-muted-foreground"
+                    )}>
+                      {deleteAction === 'delete' && <div className="w-2 h-2 rounded-full bg-danger" />}
+                    </div>
+                    <div>
+                      <Label className="cursor-pointer text-danger">Eliminar empresas</Label>
+                      <p className="text-xs text-muted-foreground mt-1">As empresas serão removidas permanentemente.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
                 Cancelar
               </Button>
               <Button
                 variant="destructive"
+                disabled={companiesInSelectedCluster > 0 && deleteAction === 'move' && !targetClusterId}
                 onClick={() => {
-                  if (onDelete) onDelete(selectedClusterDef);
+                  if (onDelete) {
+                    onDelete(
+                      selectedClusterDef,
+                      companiesInSelectedCluster > 0 ? deleteAction : undefined,
+                      deleteAction === 'move' ? targetClusterId : undefined
+                    );
+                  }
                   setShowDeleteConfirm(false);
                 }}
               >
@@ -377,5 +494,5 @@ export function ClusterSelector({
   );
 }
 
-export type { ImprovementPotential };
+export type { ImprovementPotential, DeleteAction };
 export type { ClusterType } from "@/config/clusters";

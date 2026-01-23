@@ -28,6 +28,22 @@ import {
   Coffee,
   Bed,
   Store,
+  Globe,
+  MapPin,
+  Package,
+  Plane,
+  Car,
+  Ship,
+  Train,
+  Warehouse,
+  Wrench,
+  HardHat,
+  Stethoscope,
+  GraduationCap,
+  Landmark,
+  TreePine,
+  Wheat,
+  Fish,
   LucideIcon,
 } from "lucide-react";
 import { ClusterDefinition, CreateClusterInput } from "@/types/clusterNew";
@@ -48,6 +64,7 @@ interface IconOption {
 }
 
 const iconOptions: IconOption[] = [
+  // Linha 1
   { id: "Building2", icon: Building2, label: "Edifício" },
   { id: "Users", icon: Users, label: "Utilizadores" },
   { id: "Handshake", icon: Handshake, label: "Parceria" },
@@ -56,6 +73,7 @@ const iconOptions: IconOption[] = [
   { id: "Factory", icon: Factory, label: "Fábrica" },
   { id: "Truck", icon: Truck, label: "Transporte" },
   { id: "ShoppingCart", icon: ShoppingCart, label: "Compras" },
+  // Linha 2
   { id: "Briefcase", icon: Briefcase, label: "Negócios" },
   { id: "Heart", icon: Heart, label: "Favoritos" },
   { id: "Leaf", icon: Leaf, label: "Sustentável" },
@@ -64,6 +82,24 @@ const iconOptions: IconOption[] = [
   { id: "Coffee", icon: Coffee, label: "Restauração" },
   { id: "Bed", icon: Bed, label: "Alojamento" },
   { id: "Store", icon: Store, label: "Loja" },
+  // Linha 3
+  { id: "Globe", icon: Globe, label: "Global" },
+  { id: "MapPin", icon: MapPin, label: "Localização" },
+  { id: "Package", icon: Package, label: "Logística" },
+  { id: "Plane", icon: Plane, label: "Aviação" },
+  { id: "Car", icon: Car, label: "Automóvel" },
+  { id: "Ship", icon: Ship, label: "Marítimo" },
+  { id: "Train", icon: Train, label: "Ferroviário" },
+  { id: "Warehouse", icon: Warehouse, label: "Armazém" },
+  // Linha 4
+  { id: "Wrench", icon: Wrench, label: "Manutenção" },
+  { id: "HardHat", icon: HardHat, label: "Construção" },
+  { id: "Stethoscope", icon: Stethoscope, label: "Saúde" },
+  { id: "GraduationCap", icon: GraduationCap, label: "Educação" },
+  { id: "Landmark", icon: Landmark, label: "Instituição" },
+  { id: "TreePine", icon: TreePine, label: "Florestal" },
+  { id: "Wheat", icon: Wheat, label: "Agricultura" },
+  { id: "Fish", icon: Fish, label: "Pesca" },
 ];
 
 export function CreateClusterDialog({
@@ -173,10 +209,9 @@ export function CreateClusterDialog({
                     onClick={() => setSelectedIcon(option.id)}
                     className={cn(
                       "flex items-center justify-center p-2.5 rounded-lg border transition-all",
-                      "hover:bg-primary/10 hover:border-primary/50",
                       selectedIcon === option.id
                         ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card border-border"
+                        : "bg-card border-border hover:bg-primary/10 hover:border-primary/50 hover:text-primary"
                     )}
                     title={option.label}
                   >

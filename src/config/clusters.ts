@@ -1,4 +1,9 @@
-import { Building2, Users, Handshake, ShieldCheck, Eye, LayoutGrid, Factory, Briefcase, ShoppingCart, Truck, Heart, Leaf, Zap, Home, Coffee, Bed, Store } from 'lucide-react';
+import {
+  Building2, Users, Handshake, ShieldCheck, Eye, LayoutGrid, Factory, Briefcase,
+  ShoppingCart, Truck, Heart, Leaf, Zap, Home, Coffee, Bed, Store,
+  Globe, MapPin, Package, Plane, Car, Ship, Train, Warehouse,
+  Wrench, HardHat, Stethoscope, GraduationCap, Landmark, TreePine, Wheat, Fish
+} from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { getClustersByOwnerType as getDynamicClusters } from '@/data/clusters';
 
@@ -32,9 +37,25 @@ const iconMap: Record<string, LucideIcon> = {
   Coffee,
   Bed,
   Store,
+  Globe,
+  MapPin,
+  Package,
+  Plane,
+  Car,
+  Ship,
+  Train,
+  Warehouse,
+  Wrench,
+  HardHat,
+  Stethoscope,
+  GraduationCap,
+  Landmark,
+  TreePine,
+  Wheat,
+  Fish,
 };
 
-const getIconByName = (iconName: string): LucideIcon => {
+export const getIconByName = (iconName: string): LucideIcon => {
   return iconMap[iconName] || LayoutGrid;
 };
 

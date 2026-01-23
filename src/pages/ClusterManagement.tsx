@@ -7,23 +7,27 @@ import { ClusterStats } from "@/components/clusters/ClusterStats";
 import { ProvidersTable } from "@/components/clusters/ProvidersTable";
 import { AddCompaniesDialog, NewCompanyData } from "@/components/clusters/AddCompaniesDialog";
 import { CreateClusterDialog } from "@/components/clusters/CreateClusterDialog";
-import { ClusterSelector } from "@/components/dashboard/ClusterSelector";
+import { ClusterSelector, DeleteAction } from "@/components/dashboard/ClusterSelector";
 import {
   getSuppliersWithFootprintByOwnerType,
   getSuppliersWithoutFootprintByOwnerType,
+  addSuppliersWithoutFootprint,
 } from "@/data/suppliers";
 import {
   getClustersByOwnerType,
   createCluster,
   updateCluster,
   deleteCluster,
+  getClusterCompanies,
+  moveCompaniesToCluster,
 } from "@/data/clusters";
 import { ClusterDefinition, CreateClusterInput } from "@/types/clusterNew";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
 import { SupplierWithoutFootprint, SupplierAny } from "@/types/supplierNew";
-import { CircleDot } from "lucide-react";
+import { CircleDot, LayoutGrid } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { getClusterConfig } from "@/config/clusters";
+import { getClusterConfig, getIconByName, ClusterConfig } from "@/config/clusters";
+import { cn } from "@/lib/utils";
 
 export default function ClusterManagement() {
   const { isMunicipio, userType } = useUser();
@@ -44,6 +48,11 @@ export default function ClusterManagement() {
   // Trigger para forçar refresh dos clusters
   const [clustersVersion, setClustersVersion] = useState(0);
   const refreshClusters = () => setClustersVersion(v => v + 1);
+
+  // Test state toggle (remover depois dos testes)
+  const [testEmptyState, setTestEmptyState] = useState(false);
+  // Sandbox clusters for test mode (not persisted to real data)
+  const [testClusters, setTestClusters] = useState<ClusterDefinition[]>([]);
 
   // Base suppliers - filtrados por ownerType
   const baseSuppliers = useMemo(() => {
@@ -92,8 +101,42 @@ export default function ClusterManagement() {
     return counts;
   }, [allCompanies, clusters]);
 
-  // State detection for empty states
-  const hasNoClusters = clusters.length === 0;
+  // Display cluster options (test mode uses sandbox clusters)
+  const displayClusterOptions = useMemo((): ClusterConfig[] => {
+    const allOption: ClusterConfig = {
+      value: 'all',
+      label: 'Todas',
+      labelPlural: 'Todas',
+      icon: LayoutGrid
+    };
+
+    if (testEmptyState) {
+      // In test mode, use testClusters
+      const testOptions = testClusters.map(c => ({
+        value: c.id,
+        label: c.name,
+        labelPlural: c.name,
+        icon: getIconByName(c.icon),
+      }));
+      return [allOption, ...testOptions];
+    }
+
+    // Normal mode - use real clusterOptions
+    return clusterOptions;
+  }, [testEmptyState, testClusters, clusterOptions]);
+
+  // Display cluster counts (test mode shows zeros)
+  const displayClusterCounts = useMemo(() => {
+    if (testEmptyState) {
+      const counts: Record<string, number> = { all: 0 };
+      testClusters.forEach(c => { counts[c.id] = 0; });
+      return counts;
+    }
+    return clusterCounts;
+  }, [testEmptyState, testClusters, clusterCounts]);
+
+  // State detection for empty states (based on display options)
+  const hasNoClusters = displayClusterOptions.filter(c => c.value !== 'all').length === 0;
   const selectedClusterId = selectedClusterType !== 'all' ? selectedClusterType : null;
 
   // Filter suppliers by selected cluster and universal filters
@@ -141,13 +184,31 @@ export default function ClusterManagement() {
   }, [allCompanies, selectedClusterType]);
 
   const handleAddCompanies = (companies: NewCompanyData[]) => {
-    console.log("Adding companies:", companies);
-    // TODO: Implement actual company addition logic
+    // Get the target cluster (use selected cluster if not 'all', otherwise empty string)
+    const targetClusterId = selectedClusterType !== 'all' ? selectedClusterType : '';
+
+    if (!targetClusterId) {
+      console.warn("No cluster selected for adding companies");
+      return;
+    }
+
+    // Add companies to the data layer
+    const inputs = companies.map(c => ({
+      name: c.name,
+      nif: c.nif,
+      email: c.email,
+      clusterId: targetClusterId,
+    }));
+
+    addSuppliersWithoutFootprint(inputs, ownerType);
+
+    // Trigger refresh to show new companies
+    refreshClusters();
   };
 
   const handleAddCompaniesInline = (companies: NewCompanyData[]) => {
-    console.log("Adding companies inline:", companies);
-    // TODO: Implement actual company addition logic
+    // Same logic as handleAddCompanies
+    handleAddCompanies(companies);
   };
 
   // CRUD Handlers
@@ -172,7 +233,16 @@ export default function ClusterManagement() {
     setEditingCluster(undefined);
   };
 
-  const handleDeleteCluster = (cluster: ClusterDefinition) => {
+  const handleDeleteCluster = (cluster: ClusterDefinition, action?: DeleteAction, targetClusterId?: string) => {
+    // If action is 'move' and target exists, move companies first
+    if (action === 'move' && targetClusterId) {
+      const companyIds = getClusterCompanies(cluster.id);
+      if (companyIds.length > 0) {
+        moveCompaniesToCluster(companyIds, cluster.id, targetClusterId);
+      }
+    }
+    // Note: if action is 'delete', the companies will be removed when deleteCluster removes memberships
+
     const success = deleteCluster(cluster.id);
     if (success) {
       if (selectedClusterType === cluster.id) {
@@ -180,6 +250,59 @@ export default function ClusterManagement() {
       }
       refreshClusters();
     }
+  };
+
+  // Sandbox handlers for test mode
+  const handleCreateTestCluster = (input: CreateClusterInput) => {
+    const newCluster: ClusterDefinition = {
+      id: `test-cluster-${Date.now()}`,
+      name: input.name,
+      icon: input.icon,
+      ownerId: ownerType === 'empresa' ? 'empresa-demo-001' : 'municipio-cascais-001',
+      ownerType,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isArchived: false,
+    };
+    setTestClusters(prev => [...prev, newCluster]);
+    // Automatically select the newly created test cluster
+    setSelectedClusterType(newCluster.id);
+  };
+
+  const handleEditTestCluster = (cluster: ClusterDefinition) => {
+    // Find the test cluster and set it for editing
+    const testCluster = testClusters.find(c => c.id === cluster.id);
+    if (testCluster) {
+      setEditingCluster(testCluster);
+      setCreateDialogOpen(true);
+    }
+  };
+
+  const handleUpdateTestCluster = (input: CreateClusterInput) => {
+    if (!editingCluster) return;
+    setTestClusters(prev => prev.map(c =>
+      c.id === editingCluster.id
+        ? { ...c, name: input.name, icon: input.icon, updatedAt: new Date() }
+        : c
+    ));
+    setEditingCluster(undefined);
+  };
+
+  const handleDeleteTestCluster = (cluster: ClusterDefinition, _action?: DeleteAction, _targetClusterId?: string) => {
+    // In test mode, we don't have real companies to move/delete
+    setTestClusters(prev => prev.filter(c => c.id !== cluster.id));
+    if (selectedClusterType === cluster.id) {
+      setSelectedClusterType('all');
+    }
+  };
+
+  const handleToggleTestMode = () => {
+    if (testEmptyState) {
+      // Exiting test mode - clear test clusters and reset selection
+      setTestClusters([]);
+      setSelectedClusterType('all');
+    }
+    setTestEmptyState(!testEmptyState);
   };
 
   const handleDialogClose = (open: boolean) => {
@@ -196,46 +319,63 @@ export default function ClusterManagement() {
       <main className="relative z-10 max-w-[1400px] mx-auto px-8 py-8">
         {/* Page Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <CircleDot className="h-6 w-6 text-primary" />
-            Gerir clusters
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Organize e monitorize os seus grupos de empresas
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <CircleDot className="h-6 w-6 text-primary" />
+                Gerir clusters
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Organize e monitorize os seus grupos de empresas
+              </p>
+            </div>
+
+            {/* Botão de teste - remover depois */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleToggleTestMode}
+            >
+              {testEmptyState ? 'Ver dados' : 'Ver estado vazio'}
+            </Button>
+          </div>
         </div>
 
         {/* Cluster Selector */}
         <ClusterSelector
           selectedCluster={selectedClusterType}
           onClusterChange={setSelectedClusterType}
-          clusterCounts={clusterCounts}
+          clusterCounts={displayClusterCounts}
           showPotential={false}
           showFilterButton={false}
           suppliers={baseSuppliers}
           universalFilters={universalFilters}
           onUniversalFiltersChange={setUniversalFilters}
-          onEdit={handleEditCluster}
-          onDelete={handleDeleteCluster}
+          onEdit={testEmptyState ? handleEditTestCluster : handleEditCluster}
+          onDelete={testEmptyState ? handleDeleteTestCluster : handleDeleteCluster}
           onCreateNew={() => setCreateDialogOpen(true)}
+          clusterOptions={displayClusterOptions}
+          clusters={testEmptyState ? testClusters : clusters}
         />
 
-        <div className="space-y-6">
-          <ClusterStats
-            selectedCluster={selectedClusterType}
-            companies={filteredAllCompanies}
-          />
-          <Card className="p-6 shadow-md">
-            <ProvidersTable
-              companies={filteredAllCompanies}
-              onAddCompanies={() => setAddCompaniesDialogOpen(true)}
-              onAddCompaniesInline={handleAddCompaniesInline}
-              onIncentivize={() => navigate(`/incentivo?cluster=${selectedClusterType}`)}
-              hasNoClusters={hasNoClusters}
-              selectedClusterId={selectedClusterId}
+        {!hasNoClusters && (
+          <div className="space-y-6">
+            <ClusterStats
+              selectedCluster={selectedClusterType}
+              companies={testEmptyState ? [] : filteredAllCompanies}
             />
-          </Card>
-        </div>
+            <Card className="p-6 shadow-md">
+              <ProvidersTable
+                companies={testEmptyState ? [] : filteredAllCompanies}
+                onAddCompanies={() => setAddCompaniesDialogOpen(true)}
+                onAddCompaniesInline={handleAddCompaniesInline}
+                onIncentivize={() => navigate(`/incentivo?cluster=${selectedClusterType}`)}
+                hasNoClusters={hasNoClusters}
+                selectedClusterId={selectedClusterId}
+              />
+            </Card>
+          </div>
+        )}
       </main>
 
       <AddCompaniesDialog
@@ -250,7 +390,10 @@ export default function ClusterManagement() {
       <CreateClusterDialog
         open={createDialogOpen}
         onOpenChange={handleDialogClose}
-        onSave={editingCluster ? handleUpdateCluster : handleCreateCluster}
+        onSave={testEmptyState
+          ? (editingCluster ? handleUpdateTestCluster : handleCreateTestCluster)
+          : (editingCluster ? handleUpdateCluster : handleCreateCluster)
+        }
         existingCluster={editingCluster}
       />
     </div>

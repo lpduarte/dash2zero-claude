@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SupplierAny, hasFootprint } from "@/types/supplierNew";
 
@@ -76,45 +76,9 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
 
   const showOnboardingSection = normalizedCompanies.length > 0 && selectedCluster;
 
-  // Empty state: show dashed funnel when no companies
+  // Empty state: render nothing when no companies
   if (normalizedCompanies.length === 0) {
-    return (
-      <div className="border rounded-lg p-4 bg-card shadow-md">
-        <p className="text-xs font-normal text-muted-foreground mb-4">Progresso de onboarding</p>
-
-        {/* Funil vazio com silhuetas dashed */}
-        <div className="space-y-3">
-          {/* Fase 1 - Pré-decisão */}
-          <div className="flex gap-1">
-            <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30 rounded-l-md" />
-            <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30" />
-            <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30 rounded-r-md" />
-          </div>
-
-          {/* Conector */}
-          <div className="flex justify-center">
-            <ChevronDown className="h-4 w-4 text-muted-foreground/30" />
-          </div>
-
-          {/* Fase 2 - Duas branches */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex gap-1">
-              <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30 rounded-l-md" />
-              <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30" />
-              <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30 rounded-r-md" />
-            </div>
-            <div className="flex gap-1">
-              <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30 rounded-l-md" />
-              <div className="h-6 flex-1 border-2 border-dashed border-muted-foreground/30 rounded-r-md" />
-            </div>
-          </div>
-        </div>
-
-        <p className="text-sm text-muted-foreground text-center mt-4">
-          Adicione empresas para visualizar o progresso
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (

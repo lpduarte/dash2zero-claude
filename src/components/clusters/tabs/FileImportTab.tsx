@@ -36,31 +36,88 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// Mock file parsing - in a real app this would use a library like xlsx
+// Detect separator used in CSV data
+function detectSeparator(text: string): string {
+  const firstLine = text.split("\n")[0];
+
+  // Tab is most common from Excel
+  if (firstLine.includes("\t")) return "\t";
+
+  // Semicolon is common in European CSVs
+  if (firstLine.includes(";")) return ";";
+
+  // Comma is the fallback
+  return ",";
+}
+
+// Parse CSV text into structured data
+function parseCSVText(text: string): ParsedRow[] {
+  const lines = text.trim().split("\n");
+  if (lines.length === 0) return [];
+
+  const separator = detectSeparator(text);
+  const rows: ParsedRow[] = [];
+
+  // Check if first line is a header
+  const firstLineLower = lines[0].toLowerCase();
+  const hasHeader = firstLineLower.includes("nome") ||
+                   firstLineLower.includes("nif") ||
+                   firstLineLower.includes("email");
+
+  const startIndex = hasHeader ? 1 : 0;
+
+  for (let i = startIndex; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    const cols = line.split(separator).map(c => c.trim());
+
+    // Skip if not enough columns
+    if (cols.length < 3) continue;
+
+    const errors: string[] = [];
+    const name = cols[0];
+    const nif = cols[1].replace(/\D/g, ""); // Remove non-digits
+    const email = cols[2];
+
+    if (!name) errors.push("Nome em falta");
+    if (!nif) errors.push("NIF em falta");
+    else if (!isValidNif(nif)) errors.push("NIF inválido");
+    if (!email) errors.push("Email em falta");
+    else if (!isValidEmail(email)) errors.push("Email inválido");
+
+    rows.push({
+      name,
+      nif,
+      email,
+      valid: errors.length === 0,
+      errors,
+    });
+  }
+
+  return rows;
+}
+
+// Parse file using FileReader
 function parseFile(file: File): Promise<ParsedRow[]> {
-  return new Promise((resolve) => {
-    // Simulate file processing
-    setTimeout(() => {
-      // For now, return mock data
-      // In production, you would use xlsx library to parse the file
-      const mockData: ParsedRow[] = [
-        {
-          name: "Empresa Exemplo 1, Lda",
-          nif: "123456789",
-          email: "contacto@exemplo1.pt",
-          valid: true,
-          errors: [],
-        },
-        {
-          name: "Empresa Exemplo 2, SA",
-          nif: "987654321",
-          email: "geral@exemplo2.pt",
-          valid: true,
-          errors: [],
-        },
-      ];
-      resolve(mockData);
-    }, 500);
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const rows = parseCSVText(text);
+        resolve(rows);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Erro ao ler ficheiro"));
+    };
+
+    reader.readAsText(file, "utf-8");
   });
 }
 
@@ -86,10 +143,8 @@ export function FileImportTab({ onAddCompanies, onClose }: FileImportTabProps) {
   };
 
   const handleFileSelect = async (selectedFile: File) => {
-    if (!selectedFile.name.endsWith(".xlsx") &&
-        !selectedFile.name.endsWith(".xls") &&
-        !selectedFile.name.endsWith(".csv")) {
-      toast.error("Por favor, selecione um ficheiro Excel (.xlsx, .xls) ou CSV");
+    if (!selectedFile.name.endsWith(".csv")) {
+      toast.error("Por favor, selecione um ficheiro CSV");
       return;
     }
 
@@ -186,7 +241,7 @@ export function FileImportTab({ onAddCompanies, onClose }: FileImportTabProps) {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".xlsx,.xls,.csv"
+          accept=".csv"
           onChange={handleFileChange}
           className="hidden"
         />
@@ -223,7 +278,7 @@ export function FileImportTab({ onAddCompanies, onClose }: FileImportTabProps) {
                 Arraste um ficheiro ou clique para selecionar
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Excel (.xlsx, .xls) ou CSV
+                Ficheiro CSV
               </p>
             </div>
           )}

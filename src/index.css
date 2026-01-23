@@ -483,3 +483,13 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     opacity: 0.65;
   }
 }
+
+/* Horizontal bounce animation for arrows */
+@keyframes bounce-x {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-4px);
+  }
+}
