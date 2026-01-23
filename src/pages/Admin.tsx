@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from "@/lib/usePageTitle";
 import {
   Building2,
   MapPin,
@@ -35,6 +36,7 @@ type ClientTypeFilter = 'todos' | 'municipio' | 'empresa';
 type StatusFilter = 'ativos' | 'arquivados' | 'todos';
 
 const Admin = () => {
+  usePageTitle("Administração");
   const navigate = useNavigate();
   const { setActiveClient } = useUser();
 
