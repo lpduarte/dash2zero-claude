@@ -6,10 +6,10 @@
     "updatedBy": "LP"
   },
   "summary": {
-    "total": 15,
+    "total": 14,
     "completed": 4,
     "inProgress": 0,
-    "pending": 11
+    "pending": 10
   },
   "categories": [
     {
@@ -244,22 +244,6 @@
       ],
       "dependencies": [],
       "notes": "Concluído em baa5fdf - atualização React 18 → 19"
-    },
-    {
-      "id": "14",
-      "title": "Clusters: KPIs, Alertas e API",
-      "description": "KPIs consistentes, alertas de emails e integração de API",
-      "category": "important",
-      "status": "pending",
-      "priority": 14,
-      "briefing": "14-clusters-kpis-api.md",
-      "criteria": [
-        { "text": "KPIs com mesmo estilo do site", "done": false },
-        { "text": "Alertas de emails problemáticos visíveis", "done": false },
-        { "text": "Integração de API (se disponível)", "done": false }
-      ],
-      "dependencies": ["11"],
-      "notes": "Extraído do item 11 original - parte pendente"
     },
     {
       "id": "15",
