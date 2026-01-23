@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/contexts/UserContext';
 import { Client } from '@/types/user';
 import { mockClients } from '@/data/mockClients';
+import { ClientFormDialog, ClientFormData } from '@/components/admin/ClientFormDialog';
 
 // Tipos de filtro
 type ClientTypeFilter = 'todos' | 'municipio' | 'empresa';
@@ -41,6 +42,10 @@ const Admin = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<ClientTypeFilter>('todos');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ativos');
+
+  // Estados do modal de cliente
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | undefined>(undefined);
 
   // Todos os clientes (incluindo arquivados para métricas)
   const allClients = mockClients;
@@ -103,8 +108,19 @@ const Admin = () => {
 
   // Editar cliente
   const handleEditClient = (client: Client) => {
-    // TODO: Abrir modal de edição (prompt 03)
-    console.log('Editar cliente:', client.id);
+    setEditingClient(client);
+  };
+
+  // Guardar cliente (criar ou editar)
+  const handleSaveClient = (data: ClientFormData) => {
+    if (editingClient) {
+      // TODO: Em produção, isto seria uma chamada API para atualizar
+      console.log('Atualizar cliente:', editingClient.id, data);
+    } else {
+      // TODO: Em produção, isto seria uma chamada API para criar
+      console.log('Criar cliente:', data);
+    }
+    setEditingClient(undefined);
   };
 
   // Arquivar/desarquivar cliente
@@ -124,7 +140,7 @@ const Admin = () => {
             <h2 className="text-2xl font-bold text-foreground">Administração Get2C</h2>
             <p className="text-muted-foreground mt-1">Gestão de clientes e visão global</p>
           </div>
-          <Button onClick={() => console.log('TODO: Abrir modal criar cliente')}>
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Novo cliente
           </Button>
@@ -247,6 +263,19 @@ const Admin = () => {
             <p className="text-muted-foreground">Tente ajustar os filtros ou criar um novo cliente.</p>
           </div>
         )}
+
+        {/* Modal Criar/Editar Cliente */}
+        <ClientFormDialog
+          open={isCreateDialogOpen || !!editingClient}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsCreateDialogOpen(false);
+              setEditingClient(undefined);
+            }
+          }}
+          client={editingClient}
+          onSave={handleSaveClient}
+        />
       </main>
     </div>
   );
