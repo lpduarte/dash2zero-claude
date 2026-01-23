@@ -28,3 +28,43 @@ src/
 ├── pages/         # Páginas da aplicação
 └── types/         # Definições TypeScript
 ```
+
+## Git
+
+No final de cada tarefa concluída, fazer commit e push automaticamente:
+
+### Formato do commit
+```
+<tipo>: <descrição curta em português>
+```
+
+### Tipos
+- `feat`: nova funcionalidade
+- `fix`: correção de bug
+- `refactor`: refatoração sem mudança de comportamento
+- `style`: alterações visuais/CSS/UI
+- `docs`: documentação
+- `chore`: manutenção (dependências, configs)
+
+### Exemplos
+- `feat: adicionar filtros avançados à página Incentive`
+- `fix: corrigir navegação clusters → incentive`
+- `style: ajustar cores dos badges de risco`
+- `refactor: extrair lógica de cálculo de risco para utils`
+- `chore: atualizar dependências`
+
+### Processo
+1. Após concluir uma tarefa, executar:
+   ```bash
+   git add -A
+   git commit -m "<tipo>: <descrição>"
+   git push origin main
+   ```
+2. Informar o utilizador do commit feito (mensagem e hash curto)
+3. Não pedir confirmação — fazer automaticamente
+
+### Notas
+- Uma tarefa = um commit (não fazer commits por cada ficheiro)
+- Descrição em português de Portugal
+- Manter descrição curta (<50 caracteres se possível)
+- Se houver erro no push, informar o utilizador
