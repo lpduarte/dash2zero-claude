@@ -8,8 +8,8 @@ import {
   ChevronDown,
   ChevronRight,
   Calendar,
-  User,
-  ListTodo
+  ListTodo,
+  Check
 } from "lucide-react";
 import { Header } from "@/components/dashboard/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,11 @@ import pipelineData from "@/data/pipeline.json";
 type Status = "completed" | "in-progress" | "pending" | "blocked";
 type Category = "critical" | "important" | "normal";
 
+interface Criterion {
+  text: string;
+  done: boolean;
+}
+
 interface PipelineItem {
   id: string;
   title: string;
@@ -29,7 +34,7 @@ interface PipelineItem {
   category: Category;
   status: Status;
   priority: number;
-  criteria: string[];
+  criteria: Criterion[];
   dependencies: string[];
 }
 
@@ -92,8 +97,14 @@ function PipelineItemCard({ item }: { item: PipelineItem }) {
               <ul className="space-y-1">
                 {item.criteria.map((criterion, index) => (
                   <li key={index} className="flex items-start gap-2 text-sm">
-                    <Circle className="h-3 w-3 mt-1.5 text-muted-foreground flex-shrink-0" />
-                    <span className="text-muted-foreground">{criterion}</span>
+                    {criterion.done ? (
+                      <Check className="h-3 w-3 mt-1.5 text-success flex-shrink-0" />
+                    ) : (
+                      <Circle className="h-3 w-3 mt-1.5 text-muted-foreground flex-shrink-0" />
+                    )}
+                    <span className={cn(
+                      criterion.done ? "text-success" : "text-muted-foreground"
+                    )}>{criterion.text}</span>
                   </li>
                 ))}
               </ul>

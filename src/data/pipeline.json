@@ -41,9 +41,9 @@
       "priority": 1,
       "briefing": "01-bug-clusters-incentive.md",
       "criteria": [
-        "Botão/link de acesso aos incentivos visível na página de clusters",
-        "Navegação funciona corretamente",
-        "Contexto do cluster é passado para a página de incentivos"
+        { "text": "Botão/link de acesso aos incentivos visível na página de clusters", "done": true },
+        { "text": "Navegação funciona corretamente", "done": true },
+        { "text": "Contexto do cluster é passado para a página de incentivos", "done": true }
       ],
       "dependencies": [],
       "notes": "Concluído em 3eaf142 - feat(clusters): add onboarding stats and incentive integration"
@@ -57,9 +57,9 @@
       "priority": 2,
       "briefing": "02-setup-administracao-utilizadores.md",
       "criteria": [
-        "Fluxo de criação de utilizadores documentado",
-        "Distinção clara entre tipos de utilizador",
-        "Página de definições de utilizador funcional"
+        { "text": "Fluxo de criação de utilizadores documentado", "done": false },
+        { "text": "Distinção clara entre tipos de utilizador", "done": false },
+        { "text": "Página de definições de utilizador funcional", "done": false }
       ],
       "dependencies": [],
       "notes": ""
@@ -73,11 +73,11 @@
       "priority": 3,
       "briefing": "03-clusters-importacao-empresas.md",
       "criteria": [
-        "Empty state com CTA claro",
-        "Upload de ficheiro CSV/Excel funcional",
-        "Validação e preview antes de importar",
-        "Edição inline e ignorar inválidos",
-        "Criação de cluster com empresas importadas"
+        { "text": "Empty state com CTA claro", "done": true },
+        { "text": "Upload de ficheiro CSV/Excel funcional", "done": true },
+        { "text": "Validação e preview antes de importar", "done": true },
+        { "text": "Edição inline e ignorar inválidos", "done": true },
+        { "text": "Criação de cluster com empresas importadas", "done": true }
       ],
       "dependencies": [],
       "notes": "Concluído em 6530c99 - feat: edição inline e ignorar inválidos no import CSV"
@@ -91,10 +91,10 @@
       "priority": 4,
       "briefing": "04-modal-infraestruturas.md",
       "criteria": [
-        "Modal usa variáveis do tema (sem hardcoded colors)",
-        "Toggle redesenhado",
-        "Município identificado automaticamente",
-        "Empty state com ícones e CTA adequado"
+        { "text": "Modal usa variáveis do tema (sem hardcoded colors)", "done": false },
+        { "text": "Toggle redesenhado", "done": false },
+        { "text": "Município identificado automaticamente", "done": false },
+        { "text": "Empty state com ícones e CTA adequado", "done": false }
       ],
       "dependencies": ["02"],
       "notes": "Depende do setup de utilizadores para contexto do município"
@@ -108,10 +108,10 @@
       "priority": 5,
       "briefing": "05-email-templates-remetente.md",
       "criteria": [
-        "Editor de blocos funcional",
-        "Opção de remetente Dash2Zero ou co-branded",
-        "Preview em tempo real",
-        "Gestão de emails com bounce acessível via KPI"
+        { "text": "Editor de blocos funcional", "done": false },
+        { "text": "Opção de remetente Dash2Zero ou co-branded", "done": false },
+        { "text": "Preview em tempo real", "done": false },
+        { "text": "Gestão de emails com bounce acessível via KPI", "done": false }
       ],
       "dependencies": [],
       "notes": ""
@@ -125,10 +125,10 @@
       "priority": 6,
       "briefing": "06-sneak-peak-simple.md",
       "criteria": [
-        "Comparação com média do setor funcional",
-        "UI diferente para acima/abaixo da média",
-        "CTA claro para o Simple",
-        "Números baseados em dados reais"
+        { "text": "Comparação com média do setor funcional", "done": false },
+        { "text": "UI diferente para acima/abaixo da média", "done": false },
+        { "text": "CTA claro para o Simple", "done": false },
+        { "text": "Números baseados em dados reais", "done": false }
       ],
       "dependencies": [],
       "notes": "Requer benchmarks por setor"
@@ -142,10 +142,10 @@
       "priority": 7,
       "briefing": "07-design-system-cores.md",
       "criteria": [
-        "Cores dos âmbitos funcionam com paleta atual",
-        "Variáveis CSS para todas as cores de âmbitos",
-        "Dark mode documentado no STYLE-GUIDE.md",
-        "Sem hardcoded colors no código"
+        { "text": "Cores dos âmbitos funcionam com paleta atual", "done": false },
+        { "text": "Variáveis CSS para todas as cores de âmbitos", "done": false },
+        { "text": "Dark mode documentado no STYLE-GUIDE.md", "done": false },
+        { "text": "Sem hardcoded colors no código", "done": false }
       ],
       "dependencies": [],
       "notes": ""
@@ -159,9 +159,9 @@
       "priority": 8,
       "briefing": "08-loading-animacoes.md",
       "criteria": [
-        "Skeleton components para principais elementos",
-        "Padrão de loading definido e documentado",
-        "Animações subtis implementadas onde relevante"
+        { "text": "Skeleton components para principais elementos", "done": false },
+        { "text": "Padrão de loading definido e documentado", "done": false },
+        { "text": "Animações subtis implementadas onde relevante", "done": false }
       ],
       "dependencies": [],
       "notes": ""
@@ -175,9 +175,9 @@
       "priority": 9,
       "briefing": "09-exportacao-dados.md",
       "criteria": [
-        "Export funcional em pelo menos uma página",
-        "Formatos CSV e Excel disponíveis",
-        "Feedback de progresso para exports grandes"
+        { "text": "Export funcional em pelo menos uma página", "done": false },
+        { "text": "Formatos CSV e Excel disponíveis", "done": false },
+        { "text": "Feedback de progresso para exports grandes", "done": false }
       ],
       "dependencies": [],
       "notes": ""
@@ -191,10 +191,10 @@
       "priority": 10,
       "briefing": "10-documentacao-metodologia.md",
       "criteria": [
-        "Secção sobre Incentivos adicionada",
-        "KPIs documentados",
-        "Boas práticas de email incluídas",
-        "Processo de envio explicado"
+        { "text": "Secção sobre Incentivos adicionada", "done": false },
+        { "text": "KPIs documentados", "done": false },
+        { "text": "Boas práticas de email incluídas", "done": false },
+        { "text": "Processo de envio explicado", "done": false }
       ],
       "dependencies": ["05"],
       "notes": "Documentar após implementar melhorias de email"
@@ -208,10 +208,10 @@
       "priority": 11,
       "briefing": "11-melhorias-clusters.md",
       "criteria": [
-        "CRUD completo de clusters",
-        "Mover empresas entre clusters",
-        "Opção manter cópia ao mover",
-        "Edição inline de empresas"
+        { "text": "CRUD completo de clusters", "done": true },
+        { "text": "Mover empresas entre clusters", "done": true },
+        { "text": "Opção manter cópia ao mover", "done": true },
+        { "text": "Edição inline de empresas", "done": true }
       ],
       "dependencies": ["01", "03"],
       "notes": "Concluído em commits d8fdddd, 02a25fe, a002915 - mover empresas entre clusters com opção manter cópia"
@@ -225,8 +225,8 @@
       "priority": 12,
       "briefing": "12-dashboard-planos.md",
       "criteria": [
-        "UI de planos de melhoria criada",
-        "Associação de planos a empresas funcional"
+        { "text": "UI de planos de melhoria criada", "done": false },
+        { "text": "Associação de planos a empresas funcional", "done": false }
       ],
       "dependencies": [],
       "notes": "Tour removida (a8c3b87) - manter apenas planos de melhoria"
@@ -240,9 +240,9 @@
       "priority": 13,
       "briefing": "13-questoes-tecnicas-sbti.md",
       "criteria": [
-        "Versão React verificada e documentada",
-        "Nível de integração SBTi definido",
-        "Implementação inicial SBTi (se decidido)"
+        { "text": "Versão React verificada e documentada", "done": false },
+        { "text": "Nível de integração SBTi definido", "done": false },
+        { "text": "Implementação inicial SBTi (se decidido)", "done": false }
       ],
       "dependencies": [],
       "notes": ""
@@ -256,9 +256,9 @@
       "priority": 14,
       "briefing": "14-clusters-kpis-api.md",
       "criteria": [
-        "KPIs com mesmo estilo do site",
-        "Alertas de emails problemáticos visíveis",
-        "Integração de API (se disponível)"
+        { "text": "KPIs com mesmo estilo do site", "done": false },
+        { "text": "Alertas de emails problemáticos visíveis", "done": false },
+        { "text": "Integração de API (se disponível)", "done": false }
       ],
       "dependencies": ["11"],
       "notes": "Extraído do item 11 original - parte pendente"
@@ -272,8 +272,8 @@
       "priority": 15,
       "briefing": "",
       "criteria": [
-        "Título do browser atualiza em cada página",
-        "Formato consistente com nome da app"
+        { "text": "Título do browser atualiza em cada página", "done": true },
+        { "text": "Formato consistente com nome da app", "done": true }
       ],
       "dependencies": [],
       "notes": "Concluído em 63bce1c - feat: adicionar títulos dinâmicos às tabs do browser"
