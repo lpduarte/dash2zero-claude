@@ -23,7 +23,11 @@
       "Bash(pkill:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nchore: configurar git automático e remover docs redundantes\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(brew install:*)",
+      "Bash(/opt/homebrew/bin/brew install:*)",
+      "Bash(/opt/homebrew/bin/gh auth login)",
+      "Bash(/opt/homebrew/bin/gh auth setup-git)"
     ]
   }
 }
