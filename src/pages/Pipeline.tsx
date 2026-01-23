@@ -244,22 +244,27 @@ export default function Pipeline() {
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-4 text-center">
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-success">{completedCount}</div>
-                <div className="text-xs text-muted-foreground">Concluídos</div>
+            {/* Legend */}
+            <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="h-2.5 w-2.5 rounded-full bg-success" />
+                <span className="text-muted-foreground">Concluídos</span>
+                <span className="font-bold">{completedCount}</span>
               </div>
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-danger">{criticalWipCount}</div>
-                <div className="text-xs text-muted-foreground">Críticos</div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="h-2.5 w-2.5 rounded-full bg-danger" />
+                <span className="text-muted-foreground">Críticos</span>
+                <span className="font-bold">{criticalWipCount}</span>
               </div>
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-warning">{importantWipCount}</div>
-                <div className="text-xs text-muted-foreground">Importantes</div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="h-2.5 w-2.5 rounded-full bg-warning" />
+                <span className="text-muted-foreground">Importantes</span>
+                <span className="font-bold">{importantWipCount}</span>
               </div>
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-muted-foreground">{normalWipCount}</div>
-                <div className="text-xs text-muted-foreground">Normais</div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="h-2.5 w-2.5 rounded-full bg-secondary" />
+                <span className="text-muted-foreground">Normais</span>
+                <span className="font-bold">{normalWipCount}</span>
               </div>
             </div>
           </CardContent>
