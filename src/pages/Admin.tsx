@@ -660,7 +660,7 @@ const MiniFunnelBar = ({ stats, showBranches = false }: MiniFunnelBarProps) => {
               </div>
             </div>
             {postTotal > 0 && (
-              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+              <ChevronRight className="h-4 w-4 text-border shrink-0" />
             )}
           </>
         );
