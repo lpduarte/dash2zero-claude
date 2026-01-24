@@ -281,8 +281,8 @@ const Admin = () => {
             <p className="text-xs font-normal text-muted-foreground mb-4">Progresso de onboarding global</p>
             <GlobalFunnelBar metrics={aggregatedMetrics.funnelTotals} />
           </div>
-          <div className={cn(elements.sectionCard, "flex-1 rounded-md flex flex-col hover:shadow-lg hover:border-primary/25 transition-all duration-200")}>
-            <div className="flex-1 min-h-0">
+          <div className={cn(elements.sectionCard, "flex-1 rounded-md flex flex-col hover:shadow-lg hover:border-primary/25 transition-all duration-200 overflow-visible")}>
+            <div className="flex-1 min-h-[80px] overflow-visible">
               <ActivityLineChart data={aggregatedMetrics.globalWeeklyCompletions} clientId="global" />
             </div>
             <Separator className="my-4" />
@@ -495,15 +495,15 @@ const ActivityLineChart = ({ data, clientId }: ActivityLineChartProps) => {
   const gradientId = `fillCompletions-${clientId}`;
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={chartData} margin={{ top: 8, right: 12, bottom: 4, left: 12 }}>
+    <ResponsiveContainer width="100%" height="100%" style={{ overflow: 'visible' }}>
+      <AreaChart data={chartData} margin={{ top: 6, right: 8, bottom: 2, left: 8 }} style={{ overflow: 'visible' }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="hsl(var(--status-complete))" stopOpacity={0.8} />
             <stop offset="95%" stopColor="hsl(var(--status-complete))" stopOpacity={0.1} />
           </linearGradient>
         </defs>
-        <YAxis domain={[0, 'dataMax + 2']} hide />
+        <YAxis domain={[0, 'dataMax + 1']} hide />
         <RechartsTooltip
           content={({ active, payload }) => {
             if (active && payload?.length) {
@@ -521,7 +521,7 @@ const ActivityLineChart = ({ data, clientId }: ActivityLineChartProps) => {
         />
         <Area
           dataKey="completions"
-          type="natural"
+          type="monotone"
           fill={`url(#${gradientId})`}
           fillOpacity={0.4}
           stroke="hsl(var(--status-complete))"
@@ -634,8 +634,8 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           </div>
         </div>
         {/* Gráfico à direita */}
-        <div className={cn("border rounded-md p-3 bg-card", shadows.sm)}>
-          <div className="h-12">
+        <div className={cn("border rounded-md p-3 bg-card overflow-visible", shadows.sm)}>
+          <div className="h-16 overflow-visible">
             {client.metrics.weeklyCompletions && (
               <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} />
             )}
