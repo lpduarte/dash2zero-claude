@@ -258,7 +258,7 @@ const Admin = () => {
                     <Cell fill="hsl(var(--primary-dark))" />
                   </Pie>
                   <RechartsTooltip
-                    position={{ x: -120, y: 27 }}
+                    position={{ x: -70, y: 27 }}
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
