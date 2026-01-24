@@ -145,8 +145,8 @@ export const Header = () => {
         />
       </div>
 
-      {/* Client Switcher - apenas para Get2C com cliente ativo */}
-      {isGet2C && activeClient && (
+      {/* Client Switcher - apenas para Get2C com cliente ativo (exceto em /admin) */}
+      {isGet2C && activeClient && location.pathname !== '/admin' && (
         <div className="max-w-[1400px] mx-auto px-8 pt-4">
           <div className="flex items-center justify-end">
             <div className="liquid-glass-container flex items-center gap-2 p-1.5 pr-2 rounded-full backdrop-blur-xl">
