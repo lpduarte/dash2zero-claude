@@ -238,10 +238,11 @@ const Admin = () => {
             <GlobalFunnelBar metrics={aggregatedMetrics.funnelTotals} />
           </div>
           <div className={cn(elements.sectionCard, "flex-1 rounded-md")}>
-            <p className="text-xs font-normal text-muted-foreground mb-4">Pegadas completadas</p>
             <div className="h-16">
               <ActivityLineChart data={aggregatedMetrics.globalWeeklyCompletions} clientId="global" />
             </div>
+            <Separator className="my-4" />
+            <p className="text-xs text-muted-foreground text-center">Pegadas completadas</p>
           </div>
         </div>
 
