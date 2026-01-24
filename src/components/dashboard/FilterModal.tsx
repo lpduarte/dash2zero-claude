@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Building2, MapPin, Landmark, ChevronDown, Filter, Briefcase } from "lucide-react";
 import { getSectorsWithCounts } from "@/data/sectors";
 import {
@@ -43,7 +43,7 @@ export function FilterModal({
 }: FilterModalProps) {
   const { user, isMunicipio } = useUser();
   const [localFilters, setLocalFilters] = useState<UniversalFilterState>(currentFilters);
-  const dialogContentRef = useRef<HTMLDivElement>(null);
+  const [dialogContainer, setDialogContainer] = useState<HTMLDivElement | null>(null);
 
   // Município fixo quando userType === 'municipio'
   const fixedMunicipality = isMunicipio ? user.municipality : undefined;
@@ -315,7 +315,7 @@ export function FilterModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent ref={dialogContentRef} className="sm:max-w-md max-w-[90vw]">
+      <DialogContent ref={(el) => setDialogContainer(el)} className="sm:max-w-md max-w-[90vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-muted">
@@ -339,26 +339,28 @@ export function FilterModal({
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent portalContainer={dialogContentRef.current} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2" align="start">
-                <div className="space-y-1">
-                  {sizeOptions.map(option => (
-                    <div
-                      key={option.value}
-                      className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
-                      onClick={() => toggleSize(option.value)}
-                    >
-                      <Checkbox
-                        checked={localFilters.companySize.includes(option.value)}
-                        onCheckedChange={() => toggleSize(option.value)}
-                      />
-                      <span className="text-sm flex-1">{option.label}</span>
-                      <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
-                        {option.count}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
+              {dialogContainer && (
+                <PopoverContent portalContainer={dialogContainer} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2" align="start">
+                  <div className="space-y-1">
+                    {sizeOptions.map(option => (
+                      <div
+                        key={option.value}
+                        className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
+                        onClick={() => toggleSize(option.value)}
+                      >
+                        <Checkbox
+                          checked={localFilters.companySize.includes(option.value)}
+                          onCheckedChange={() => toggleSize(option.value)}
+                        />
+                        <span className="text-sm flex-1">{option.label}</span>
+                        <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
+                          {option.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              )}
             </Popover>
           </div>
 
@@ -375,26 +377,28 @@ export function FilterModal({
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent portalContainer={dialogContentRef.current} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[300px] overflow-y-auto" align="start">
-                <div className="space-y-1">
-                  {sectorOptions.map(option => (
-                    <div
-                      key={option.value}
-                      className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
-                      onClick={() => toggleSector(option.value)}
-                    >
-                      <Checkbox
-                        checked={localFilters.sector.includes(option.value)}
-                        onCheckedChange={() => toggleSector(option.value)}
-                      />
-                      <span className="text-sm flex-1">{option.label}</span>
-                      <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
-                        {option.count}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
+              {dialogContainer && (
+                <PopoverContent portalContainer={dialogContainer} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[300px] overflow-y-auto" align="start">
+                  <div className="space-y-1">
+                    {sectorOptions.map(option => (
+                      <div
+                        key={option.value}
+                        className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
+                        onClick={() => toggleSector(option.value)}
+                      >
+                        <Checkbox
+                          checked={localFilters.sector.includes(option.value)}
+                          onCheckedChange={() => toggleSector(option.value)}
+                        />
+                        <span className="text-sm flex-1">{option.label}</span>
+                        <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
+                          {option.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              )}
             </Popover>
           </div>
 
@@ -418,26 +422,28 @@ export function FilterModal({
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent portalContainer={dialogContentRef.current} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
-                      <div className="space-y-1">
-                        {districtOptions.map(option => (
-                          <div
-                            key={option.value}
-                            className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
-                            onClick={() => toggleDistrict(option.value)}
-                          >
-                            <Checkbox
-                              checked={localFilters.district.includes(option.value)}
-                              onCheckedChange={() => toggleDistrict(option.value)}
-                            />
-                            <span className="text-sm flex-1">{option.label}</span>
-                            <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
-                              {option.count}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
+                    {dialogContainer && (
+                      <PopoverContent portalContainer={dialogContainer} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                        <div className="space-y-1">
+                          {districtOptions.map(option => (
+                            <div
+                              key={option.value}
+                              className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
+                              onClick={() => toggleDistrict(option.value)}
+                            >
+                              <Checkbox
+                                checked={localFilters.district.includes(option.value)}
+                                onCheckedChange={() => toggleDistrict(option.value)}
+                              />
+                              <span className="text-sm flex-1">{option.label}</span>
+                              <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
+                                {option.count}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    )}
                   </Popover>
                 </div>
 
@@ -455,26 +461,28 @@ export function FilterModal({
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent portalContainer={dialogContentRef.current} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
-                      <div className="space-y-1">
-                        {municipalityOptions.map(option => (
-                          <div
-                            key={option.value}
-                            className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
-                            onClick={() => toggleMunicipality(option.value)}
-                          >
-                            <Checkbox
-                              checked={localFilters.municipality.includes(option.value)}
-                              onCheckedChange={() => toggleMunicipality(option.value)}
-                            />
-                            <span className="text-sm flex-1">{option.label}</span>
-                            <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
-                              {option.count}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
+                    {dialogContainer && (
+                      <PopoverContent portalContainer={dialogContainer} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                        <div className="space-y-1">
+                          {municipalityOptions.map(option => (
+                            <div
+                              key={option.value}
+                              className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
+                              onClick={() => toggleMunicipality(option.value)}
+                            >
+                              <Checkbox
+                                checked={localFilters.municipality.includes(option.value)}
+                                onCheckedChange={() => toggleMunicipality(option.value)}
+                              />
+                              <span className="text-sm flex-1">{option.label}</span>
+                              <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
+                                {option.count}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    )}
                   </Popover>
                 </div>
 
@@ -492,7 +500,46 @@ export function FilterModal({
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent portalContainer={dialogContentRef.current} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                    {dialogContainer && (
+                      <PopoverContent portalContainer={dialogContainer} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                        <div className="space-y-1">
+                          {parishOptions.map(option => (
+                            <div
+                              key={option.value}
+                              className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
+                              onClick={() => toggleParish(option.value)}
+                            >
+                              <Checkbox
+                                checked={localFilters.parish.includes(option.value)}
+                                onCheckedChange={() => toggleParish(option.value)}
+                              />
+                              <span className="text-sm flex-1">{option.label}</span>
+                              <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
+                                {option.count}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                </div>
+              </div>
+            )}
+
+            {/* Para Município: só Freguesia */}
+            {isMunicipio && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Freguesia</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      <span className="text-sm">{getParishLabel()}</span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  {dialogContainer && (
+                    <PopoverContent portalContainer={dialogContainer} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
                       <div className="space-y-1">
                         {parishOptions.map(option => (
                           <div
@@ -512,42 +559,7 @@ export function FilterModal({
                         ))}
                       </div>
                     </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-            )}
-
-            {/* Para Município: só Freguesia */}
-            {isMunicipio && (
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Freguesia</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
-                      <span className="text-sm">{getParishLabel()}</span>
-                      <ChevronDown className="h-4 w-4 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent portalContainer={dialogContentRef.current} className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
-                    <div className="space-y-1">
-                      {parishOptions.map(option => (
-                        <div
-                          key={option.value}
-                          className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded-md cursor-pointer"
-                          onClick={() => toggleParish(option.value)}
-                        >
-                          <Checkbox
-                            checked={localFilters.parish.includes(option.value)}
-                            onCheckedChange={() => toggleParish(option.value)}
-                          />
-                          <span className="text-sm flex-1">{option.label}</span>
-                          <span className="bg-muted text-muted-foreground text-xs font-bold px-2 py-0.5 rounded-full min-w-[28px] text-center">
-                            {option.count}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </PopoverContent>
+                  )}
                 </Popover>
               </div>
             )}
