@@ -568,7 +568,10 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
   return (
     <div className={cn(
       elements.sectionCard,
-      "p-5 transition-all hover:shadow-lg"
+      "p-5 transition-all",
+      client.isArchived
+        ? "shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+        : "hover:shadow-lg"
     )}>
       {/* Header do card */}
       <div className="flex items-start gap-4 mb-4">
@@ -594,9 +597,6 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
         </div>
         <div className="min-w-0 flex-1 self-center">
           <h3 className="font-bold text-foreground text-lg line-clamp-1">{client.name}</h3>
-          {client.isArchived && (
-            <p className="text-sm text-warning">Arquivado</p>
-          )}
         </div>
         {/* Ícones: arquivo (se arquivado) + tipo */}
         <div className="flex items-center gap-1.5 shrink-0">
