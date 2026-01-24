@@ -222,7 +222,9 @@ const Admin = () => {
           <div className="border rounded-md shadow-md bg-card hover:shadow-lg hover:border-primary/25 transition-all duration-200 flex overflow-hidden">
             {/* Info */}
             <div className="flex-1 p-4 flex flex-col gap-3">
-              <p className="text-xs font-normal text-muted-foreground">Taxa de conversão</p>
+              <div className="flex items-center h-7">
+                <p className="text-xs font-normal text-muted-foreground">Taxa de conversão</p>
+              </div>
               <div>
                 <p className="text-2xl font-bold">{globalConversionRate}%</p>
                 <p className="text-xs text-muted-foreground mt-1">
