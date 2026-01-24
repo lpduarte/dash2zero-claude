@@ -762,11 +762,7 @@ const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: Mini
   const postTotal = simpleTotal + formularioTotal;
   const grandTotal = preTotal + postTotal;
 
-  if (grandTotal === 0) {
-    return <div className="h-2 bg-muted rounded-full" />;
-  }
-
-  // Versão arquivada: silhueta dashed da estrutura
+  // Versão arquivada: silhueta dashed da estrutura (mesmo com dados a zero)
   if (isArchived && showBranches) {
     return (
       <div className="flex items-center gap-2">
@@ -790,6 +786,10 @@ const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: Mini
         </div>
       </div>
     );
+  }
+
+  if (grandTotal === 0) {
+    return <div className="h-2 bg-muted rounded-full" />;
   }
 
   // Se não mostrar branches, usar barra simples agregada
