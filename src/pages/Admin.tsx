@@ -656,7 +656,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
       {/* Mini funil com ramificação */}
       <div className={cn("border rounded-md p-3 mb-4", shadows.sm, client.isArchived ? "bg-background" : "bg-card")}>
         <p className="text-xs text-muted-foreground mb-2">Onboarding</p>
-        <MiniFunnelBar stats={client.metrics.funnelStats} showBranches />
+        <MiniFunnelBar stats={client.metrics.funnelStats} showBranches isArchived={client.isArchived} />
       </div>
 
       {/* Botões em linha */}
@@ -752,9 +752,10 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
 interface MiniFunnelBarProps {
   stats: Client['metrics']['funnelStats'];
   showBranches?: boolean;
+  isArchived?: boolean;
 }
 
-const MiniFunnelBar = ({ stats, showBranches = false }: MiniFunnelBarProps) => {
+const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: MiniFunnelBarProps) => {
   const preTotal = stats.porContactar + stats.semInteracao + stats.interessada;
   const simpleTotal = stats.simple.registada + stats.simple.emProgresso + stats.simple.completo;
   const formularioTotal = stats.formulario.emProgresso + stats.formulario.completo;
@@ -763,6 +764,32 @@ const MiniFunnelBar = ({ stats, showBranches = false }: MiniFunnelBarProps) => {
 
   if (grandTotal === 0) {
     return <div className="h-2 bg-muted rounded-full" />;
+  }
+
+  // Versão arquivada: silhueta dashed da estrutura
+  if (isArchived && showBranches) {
+    return (
+      <div className="flex items-center gap-2">
+        {/* Fase pré-decisão - silhueta */}
+        <div className="flex-1">
+          <div className="h-2.5 rounded-sm border border-dashed border-muted-foreground/30" />
+        </div>
+
+        <ChevronRight className="h-4 w-4 text-muted-foreground/30 shrink-0" />
+
+        {/* Fase pós-decisão - dois ramos em silhueta */}
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center gap-1.5">
+            <div className="h-2.5 flex-1 rounded-sm border border-dashed border-muted-foreground/30" />
+            <span className="text-[10px] text-muted-foreground/30 font-bold shrink-0">S</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-2.5 flex-1 rounded-sm border border-dashed border-muted-foreground/30" />
+            <span className="text-[10px] text-muted-foreground/30 font-bold shrink-0">F</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Se não mostrar branches, usar barra simples agregada
