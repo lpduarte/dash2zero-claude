@@ -1387,7 +1387,7 @@ const Incentive = () => {
           {/* Right Column: Envio Inteligente + Email Compose */}
           <div className="flex flex-col gap-4 h-[700px]">
             {/* Super Wizard - Envio Inteligente */}
-            <div className="relative z-10 p-4 border rounded-lg shadow-md bg-gradient-to-r from-primary/5 to-primary/10">
+            <div className="relative z-10 p-4 border rounded-lg shadow-md bg-card bg-gradient-to-r from-primary/5 to-primary/10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg">
