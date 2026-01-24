@@ -576,7 +576,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
       {/* Header do card */}
       <div className="flex items-start gap-4 mb-4">
         {/* Avatar/Logo */}
-        <div className="w-14 h-14 rounded-md flex items-center justify-center overflow-hidden shrink-0 bg-card border shadow-md">
+        <div className={cn("w-14 h-14 rounded-md flex items-center justify-center overflow-hidden shrink-0 border shadow-md", client.isArchived ? "bg-background" : "bg-card")}>
           {client.logo ? (
             <img
               src={client.logo}
