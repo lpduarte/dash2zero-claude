@@ -26,14 +26,12 @@ export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersD
   if (!hasActiveFilters) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mt-3">
-      <span className="text-sm text-muted-foreground">Filtros ativos:</span>
+    <div className="flex flex-wrap items-center justify-end gap-2 mt-3">
       
       {filters.companySize.map(size => (
         <Badge
           key={`size-${size}`}
-          variant="secondary"
-          className="gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+          className="gap-2 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80 transition-colors border-transparent"
           onClick={() => onRemoveFilter('companySize', size)}
         >
           <Building2 className="h-3 w-3" />
@@ -45,8 +43,7 @@ export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersD
       {filters.sector.map(sector => (
         <Badge
           key={`sector-${sector}`}
-          variant="secondary"
-          className="gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+          className="gap-2 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80 transition-colors border-transparent"
           onClick={() => onRemoveFilter('sector', sector)}
         >
           <Briefcase className="h-3 w-3" />
@@ -58,8 +55,7 @@ export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersD
       {filters.district.map(district => (
         <Badge
           key={`district-${district}`}
-          variant="secondary"
-          className="gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+          className="gap-2 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80 transition-colors border-transparent"
           onClick={() => onRemoveFilter('district', district)}
         >
           <MapPin className="h-3 w-3" />
@@ -71,8 +67,7 @@ export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersD
       {filters.municipality.map(municipality => (
         <Badge
           key={`municipality-${municipality}`}
-          variant="secondary"
-          className="gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+          className="gap-2 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80 transition-colors border-transparent"
           onClick={() => onRemoveFilter('municipality', municipality)}
         >
           <Landmark className="h-3 w-3" />
@@ -84,8 +79,7 @@ export function ActiveFiltersDisplay({ filters, onRemoveFilter }: ActiveFiltersD
       {filters.parish.map(parish => (
         <Badge
           key={`parish-${parish}`}
-          variant="secondary"
-          className="gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+          className="gap-2 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80 transition-colors border-transparent"
           onClick={() => onRemoveFilter('parish', parish)}
         >
           <MapPin className="h-3 w-3" />
