@@ -391,20 +391,24 @@ const activityChartConfig = {
 // Componente: Gráfico de área de atividade (Recharts)
 interface ActivityLineChartProps {
   data: number[];
+  clientId: string;
 }
 
-const ActivityLineChart = ({ data }: ActivityLineChartProps) => {
+const ActivityLineChart = ({ data, clientId }: ActivityLineChartProps) => {
   // Converter array para formato recharts
   const chartData = data.map((value, index) => ({
     week: `S${index + 1}`,
     completions: value,
   }));
 
+  // ID único para evitar conflitos entre múltiplos gráficos
+  const gradientId = `fillCompletions-${clientId}`;
+
   return (
-    <ChartContainer config={activityChartConfig} className="h-8 w-full !aspect-auto">
+    <ChartContainer config={activityChartConfig} className="h-12 w-full !aspect-auto">
       <AreaChart data={chartData} margin={{ top: 2, right: 0, bottom: 0, left: 0 }}>
         <defs>
-          <linearGradient id="fillCompletions" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="var(--color-completions)" stopOpacity={0.8} />
             <stop offset="95%" stopColor="var(--color-completions)" stopOpacity={0.1} />
           </linearGradient>
@@ -412,7 +416,7 @@ const ActivityLineChart = ({ data }: ActivityLineChartProps) => {
         <Area
           dataKey="completions"
           type="natural"
-          fill="url(#fillCompletions)"
+          fill={`url(#${gradientId})`}
           fillOpacity={0.4}
           stroke="var(--color-completions)"
           strokeWidth={2}
@@ -500,11 +504,18 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           <p className={cn("text-xl font-bold", conversionColor)}>{conversionRate}%</p>
           <p className="text-xs text-muted-foreground">Conversão</p>
         </div>
-        <div className="bg-muted/50 rounded-lg p-3">
+        <div className="border rounded-lg p-3 bg-card">
+          <p className="text-xs text-muted-foreground mb-2">Atividade (12 semanas)</p>
           {client.metrics.weeklyCompletions && (
-            <ActivityLineChart data={client.metrics.weeklyCompletions} />
+            <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} />
           )}
-          <p className="text-xs text-muted-foreground text-center mt-1">Atividade</p>
+          <Separator className="my-2" />
+          <div className="flex items-center justify-center gap-1.5 text-xs">
+            <div className="h-2 w-2 rounded-full bg-status-complete" />
+            <span className="text-muted-foreground">
+              {client.metrics.weeklyCompletions?.reduce((a, b) => a + b, 0) || 0} pegadas
+            </span>
+          </div>
         </div>
       </div>
 
