@@ -37,8 +37,8 @@ export const mockClients: Client[] = [
   },
   {
     id: 'sintra',
-    name: 'Câmara Municipal de Sintra',
-    type: 'municipio',
+    name: 'SABSEG',
+    type: 'empresa',
     contactEmail: 'sustentabilidade@cm-sintra.pt',
     contactName: 'Dra. Maria Santos',
     createdAt: new Date('2024-03-01'),

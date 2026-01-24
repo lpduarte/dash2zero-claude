@@ -481,7 +481,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
             }
           </div>
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 self-center">
           <h3 className="font-bold text-foreground text-lg line-clamp-1">{client.name}</h3>
           {client.isArchived && (
             <p className="text-sm text-warning">Arquivado</p>
