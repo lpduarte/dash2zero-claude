@@ -321,7 +321,7 @@ const Admin = () => {
                 {/* Tipo */}
                 <div className="space-y-2 flex flex-col items-end">
                   <p className="text-xs font-bold text-muted-foreground">Por tipo</p>
-                  <div className="inline-flex rounded-md border border-input overflow-hidden">
+                  <div className="inline-flex rounded-lg bg-muted p-1 gap-1">
                     {([
                       { value: 'todos', label: 'Todos', icon: null },
                       { value: 'municipio', label: 'Municípios', icon: Landmark },
@@ -332,10 +332,10 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs rounded-none gap-1.5 relative",
+                          "h-7 text-xs gap-1.5 rounded-md",
                           typeFilter === opt.value
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground z-10 -m-px rounded-md"
-                            : "hover:bg-muted"
+                            ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                            : "bg-transparent hover:bg-background/50"
                         )}
                         onClick={() => setTypeFilter(opt.value)}
                       >
@@ -351,7 +351,7 @@ const Admin = () => {
                 {/* Status */}
                 <div className="space-y-2 flex flex-col items-end">
                   <p className="text-xs font-bold text-muted-foreground">Por status</p>
-                  <div className="inline-flex rounded-md border border-input overflow-hidden">
+                  <div className="inline-flex rounded-lg bg-muted p-1 gap-1">
                     {([
                       { value: 'ativos', label: 'Ativos', icon: null },
                       { value: 'arquivados', label: 'Arquivados', icon: Archive },
@@ -362,10 +362,10 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs rounded-none gap-1.5 relative",
+                          "h-7 text-xs gap-1.5 rounded-md",
                           statusFilter === opt.value
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground z-10 -m-px rounded-md"
-                            : "hover:bg-muted"
+                            ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                            : "bg-transparent hover:bg-background/50"
                         )}
                         onClick={() => setStatusFilter(opt.value)}
                       >
