@@ -233,11 +233,11 @@ const Admin = () => {
 
         {/* Funil Global + Gráfico Pegadas */}
         <div className="flex gap-4 mb-8">
-          <div className={cn(elements.sectionCard, "flex-1 rounded-md")}>
+          <div className={cn(elements.sectionCard, "flex-[2] rounded-md")}>
             <p className="text-xs font-normal text-muted-foreground mb-4">Progresso de onboarding global</p>
             <GlobalFunnelBar metrics={aggregatedMetrics.funnelTotals} />
           </div>
-          <div className={cn(elements.sectionCard, "w-48 rounded-md")}>
+          <div className={cn(elements.sectionCard, "flex-1 rounded-md")}>
             <p className="text-xs font-normal text-muted-foreground mb-4">Pegadas completadas</p>
             <div className="h-16">
               <ActivityLineChart data={aggregatedMetrics.globalWeeklyCompletions} clientId="global" />
