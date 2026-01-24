@@ -72,6 +72,8 @@ export interface Client {
       };
     };
     lastActivity?: Date;
+    emailBounces?: number;        // Emails com erro de entrega
+    weeklyCompletions?: number[]; // Pegadas completas por semana (últimas 12)
   };
 
   // Integração futura com ZeroPro

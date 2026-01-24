@@ -30,6 +30,8 @@ export const mockClients: Client[] = [
         },
       },
       lastActivity: new Date('2025-01-22'),
+      emailBounces: 3,
+      weeklyCompletions: [1, 2, 0, 1, 3, 2, 1, 0, 2, 1, 1, 2],
     },
   },
   {
@@ -60,6 +62,8 @@ export const mockClients: Client[] = [
         },
       },
       lastActivity: new Date('2025-01-21'),
+      emailBounces: 0,
+      weeklyCompletions: [0, 1, 1, 0, 0, 1, 2, 1, 0, 1, 0, 1],
     },
   },
   {
@@ -90,7 +94,9 @@ export const mockClients: Client[] = [
           completo: 1,
         },
       },
-      lastActivity: new Date('2025-01-19'),
+      lastActivity: new Date('2024-12-15'),
+      emailBounces: 5,
+      weeklyCompletions: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
     },
     zeroProIntegration: {
       enabled: false,
@@ -123,6 +129,8 @@ export const mockClients: Client[] = [
           completo: 0,
         },
       },
+      emailBounces: 0,
+      weeklyCompletions: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
   },
 ];

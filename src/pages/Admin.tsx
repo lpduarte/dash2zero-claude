@@ -10,21 +10,30 @@ import {
   Plus,
   Filter,
   Archive,
-  MoreHorizontal,
   ChevronRight,
   TowerControl,
+  LayoutDashboard,
+  Pencil,
+  AlertTriangle,
+  Clock,
+  TrendingDown,
+  Mail,
 } from 'lucide-react';
 import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/ui/kpi-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -275,7 +284,7 @@ const Admin = () => {
         </p>
 
         {/* Grid de Cards de Clientes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredClients.map(client => (
             <ClientCard
               key={client.id}
@@ -313,6 +322,89 @@ const Admin = () => {
   );
 };
 
+// Função auxiliar para calcular alertas do cliente
+const getClientAlerts = (client: Client, conversionRate: number) => {
+  const alerts: Array<{ type: string; message: string; icon: typeof AlertTriangle; color: string }> = [];
+
+  // Email bounces
+  if ((client.metrics.emailBounces ?? 0) > 0) {
+    alerts.push({
+      type: 'bounce',
+      message: `${client.metrics.emailBounces} emails falharam`,
+      icon: AlertTriangle,
+      color: 'text-destructive',
+    });
+  }
+
+  // Inatividade (> 14 dias)
+  if (client.metrics.lastActivity) {
+    const daysSince = Math.floor((Date.now() - client.metrics.lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+    if (daysSince > 14) {
+      alerts.push({
+        type: 'inactivity',
+        message: `Sem atividade há ${daysSince} dias`,
+        icon: Clock,
+        color: 'text-warning',
+      });
+    }
+  }
+
+  // Conversão crítica (< 10%)
+  if (conversionRate < 10 && conversionRate > 0) {
+    alerts.push({
+      type: 'conversion',
+      message: `Conversão crítica (${conversionRate}%)`,
+      icon: TrendingDown,
+      color: 'text-warning',
+    });
+  }
+
+  // Muitos por contactar (> 50)
+  if (client.metrics.funnelStats.porContactar > 50) {
+    alerts.push({
+      type: 'pending',
+      message: `${client.metrics.funnelStats.porContactar} empresas por contactar`,
+      icon: Mail,
+      color: 'text-muted-foreground',
+    });
+  }
+
+  return alerts;
+};
+
+// Componente: Sparkline de atividade
+interface ActivitySparklineProps {
+  data: number[];
+}
+
+const ActivitySparkline = ({ data }: ActivitySparklineProps) => {
+  const max = Math.max(...data, 1);
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-end gap-px h-8 cursor-help">
+            {data.map((value, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "w-1.5 rounded-t-sm transition-all",
+                  value > 0 ? "bg-status-complete" : "bg-muted"
+                )}
+                style={{ height: `${Math.max((value / max) * 100, 8)}%` }}
+              />
+            ))}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p>Pegadas completas por semana (últimas 12)</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 // Componente: Card de Cliente
 interface ClientCardProps {
   client: Client;
@@ -336,131 +428,274 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
     ? Math.round((completo / totalFunnel) * 100)
     : 0;
 
+  // Alertas
+  const alerts = getClientAlerts(client, conversionRate);
+
   // Cor condicional para conversão
   const conversionColor = conversionRate >= 30 ? 'text-success' : 'text-warning';
 
   return (
     <div className={cn(
-      "border rounded-lg p-4 bg-card shadow-sm transition-all hover:shadow-md",
+      "border rounded-lg p-5 bg-card shadow-sm transition-all hover:shadow-md",
       client.isArchived && "opacity-60"
     )}>
       {/* Header do card */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-4">
+          {/* Avatar/Logo maior (48px) */}
           <div className={cn(
-            "relative w-10 h-10 rounded-lg flex items-center justify-center",
+            "w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden shrink-0",
             client.type === 'municipio' ? "bg-primary/10" : "bg-secondary/50"
           )}>
-            {client.type === 'municipio'
-              ? <MapPin className="h-5 w-5 text-primary" />
-              : <Building2 className="h-5 w-5 text-secondary-foreground" />
-            }
-            {/* Badge de tipo no avatar */}
-            <div className={cn(
-              "absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white",
-              client.type === 'municipio' ? "bg-primary" : "bg-secondary-foreground"
-            )}>
-              {client.type === 'municipio' ? 'M' : 'E'}
+            {client.logo ? (
+              <img
+                src={client.logo}
+                alt={client.name}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <div className={cn(client.logo && "hidden")}>
+              {client.type === 'municipio'
+                ? <MapPin className="h-6 w-6 text-primary" />
+                : <Building2 className="h-6 w-6 text-secondary-foreground" />
+              }
             </div>
           </div>
-          <div>
+          <div className="min-w-0">
             <h3 className="font-bold text-foreground line-clamp-1">{client.name}</h3>
-            <p className="text-xs text-muted-foreground">
-              {client.type === 'municipio' ? 'Município' : 'Empresa'}
-              {client.isArchived && <span className="text-warning ml-2">· Arquivado</span>}
-            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-muted-foreground">
+                {client.type === 'municipio' ? 'Município' : 'Empresa'}
+              </span>
+              {client.isArchived && (
+                <span className="text-xs text-warning">· Arquivado</span>
+              )}
+              {alerts.length > 0 && (
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex items-center gap-1 text-xs text-warning cursor-help">
+                        <AlertTriangle className="h-3 w-3" />
+                        {alerts.length} {alerts.length === 1 ? 'alerta' : 'alertas'}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <ul className="space-y-1">
+                        {alerts.map((alert, idx) => (
+                          <li key={idx} className={cn("flex items-center gap-2 text-xs", alert.color)}>
+                            <alert.icon className="h-3 w-3" />
+                            {alert.message}
+                          </li>
+                        ))}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
           </div>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onEnter}>
-              Entrar como cliente
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onEdit}>
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onToggleArchive}>
-              {client.isArchived ? 'Desarquivar' : 'Arquivar'}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Botões de ação visíveis */}
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Archive className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {client.isArchived ? 'Desarquivar cliente?' : 'Arquivar cliente?'}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {client.isArchived
+                    ? `Tem a certeza que quer desarquivar "${client.name}"? O cliente voltará a aparecer na lista de clientes ativos.`
+                    : `Tem a certeza que quer arquivar "${client.name}"? O cliente deixará de aparecer na lista principal.`
+                  }
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onToggleArchive}>
+                  {client.isArchived ? 'Desarquivar' : 'Arquivar'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
-      {/* Métricas rápidas - simplificado para Empresas + Conversão */}
-      <div className="grid grid-cols-2 gap-2 mb-4 text-center">
-        <div className="bg-muted/50 rounded-md p-2">
-          <p className="text-lg font-bold text-foreground">{client.metrics.totalCompanies}</p>
-          <p className="text-xs text-muted-foreground">Empresas</p>
+      {/* Métricas + Sparkline */}
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-4">
+          <div className="text-center">
+            <p className="text-lg font-bold text-foreground">{client.metrics.totalCompanies}</p>
+            <p className="text-xs text-muted-foreground">Empresas</p>
+          </div>
+          <div className="text-center">
+            <p className={cn("text-lg font-bold", conversionColor)}>{conversionRate}%</p>
+            <p className="text-xs text-muted-foreground">Conversão</p>
+          </div>
         </div>
-        <div className="bg-muted/50 rounded-md p-2">
-          <p className={cn("text-lg font-bold", conversionColor)}>{conversionRate}%</p>
-          <p className="text-xs text-muted-foreground">Conversão</p>
-        </div>
+        {client.metrics.weeklyCompletions && (
+          <ActivitySparkline data={client.metrics.weeklyCompletions} />
+        )}
       </div>
 
-      {/* Mini funil */}
+      {/* Mini funil com ramificação */}
       <div className="mb-4">
-        <p className="text-xs text-muted-foreground mb-2">Progresso de onboarding</p>
-        <MiniFunnelBar stats={client.metrics.funnelStats} />
+        <MiniFunnelBar stats={client.metrics.funnelStats} showBranches />
       </div>
 
-      {/* Botão principal - mais proeminente */}
+      {/* Botão principal */}
       <Button
         variant="default"
         className="w-full gap-2"
         onClick={onEnter}
         disabled={client.isArchived}
       >
-        Entrar
-        <ChevronRight className="h-4 w-4" />
+        <LayoutDashboard className="h-4 w-4" />
+        Dashboard
       </Button>
     </div>
   );
 };
 
-// Componente: Mini Funil (dentro do card) - simplificado sem ramificação
+// Componente: Mini Funil com ramificação opcional
 interface MiniFunnelBarProps {
   stats: Client['metrics']['funnelStats'];
+  showBranches?: boolean;
 }
 
-const MiniFunnelBar = ({ stats }: MiniFunnelBarProps) => {
-  // Calcular totais agregados
-  const registada = stats.simple.registada;
-  const emProgresso = stats.simple.emProgresso + stats.formulario.emProgresso;
-  const completo = stats.simple.completo + stats.formulario.completo;
+const MiniFunnelBar = ({ stats, showBranches = false }: MiniFunnelBarProps) => {
+  const preTotal = stats.porContactar + stats.semInteracao + stats.interessada;
+  const simpleTotal = stats.simple.registada + stats.simple.emProgresso + stats.simple.completo;
+  const formularioTotal = stats.formulario.emProgresso + stats.formulario.completo;
+  const postTotal = simpleTotal + formularioTotal;
+  const grandTotal = preTotal + postTotal;
 
-  const total = stats.porContactar + stats.semInteracao + stats.interessada +
-                registada + emProgresso + completo;
-
-  if (total === 0) {
+  if (grandTotal === 0) {
     return <div className="h-2 bg-muted rounded-full" />;
   }
 
-  const segments = [
-    { key: 'porContactar', value: stats.porContactar, color: 'bg-status-pending' },
-    { key: 'semInteracao', value: stats.semInteracao, color: 'bg-status-contacted' },
-    { key: 'interessada', value: stats.interessada, color: 'bg-status-interested' },
-    { key: 'registada', value: registada, color: 'bg-status-registered' },
-    { key: 'emProgresso', value: emProgresso, color: 'bg-status-progress' },
-    { key: 'completo', value: completo, color: 'bg-status-complete' },
-  ].filter(s => s.value > 0);
+  // Se não mostrar branches, usar barra simples agregada
+  if (!showBranches) {
+    const segments = [
+      { key: 'porContactar', value: stats.porContactar, color: 'bg-status-pending' },
+      { key: 'semInteracao', value: stats.semInteracao, color: 'bg-status-contacted' },
+      { key: 'interessada', value: stats.interessada, color: 'bg-status-interested' },
+      { key: 'registada', value: stats.simple.registada, color: 'bg-status-registered' },
+      { key: 'emProgresso', value: stats.simple.emProgresso + stats.formulario.emProgresso, color: 'bg-status-progress' },
+      { key: 'completo', value: stats.simple.completo + stats.formulario.completo, color: 'bg-status-complete' },
+    ].filter(s => s.value > 0);
+
+    return (
+      <div className="h-2 flex gap-px rounded-full overflow-hidden">
+        {segments.map((segment) => (
+          <div
+            key={segment.key}
+            className={cn(segment.color)}
+            style={{ width: `${(segment.value / grandTotal) * 100}%` }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Com ramificação
+  const leftPercent = postTotal === 0 ? 100 : preTotal === 0 ? 0 : (preTotal / grandTotal) * 100;
+  const rightPercent = preTotal === 0 ? 100 : postTotal === 0 ? 0 : (postTotal / grandTotal) * 100;
 
   return (
-    <div className="h-2 flex gap-px rounded-full overflow-hidden">
-      {segments.map((segment) => (
-        <div
-          key={segment.key}
-          className={cn(segment.color)}
-          style={{ width: `${(segment.value / total) * 100}%` }}
-        />
-      ))}
+    <div className="flex items-center gap-1">
+      {/* Fase pré-decisão */}
+      {preTotal > 0 && (() => {
+        const preSegments = [
+          { key: 'pending', value: stats.porContactar, color: 'bg-status-pending' },
+          { key: 'contacted', value: stats.semInteracao, color: 'bg-status-contacted' },
+          { key: 'interested', value: stats.interessada, color: 'bg-status-interested' },
+        ].filter(s => s.value > 0);
+
+        return (
+          <>
+            <div style={{ width: `${leftPercent}%` }}>
+              <div className="h-2 flex gap-px rounded-l-full overflow-hidden">
+                {preSegments.map((segment) => (
+                  <div
+                    key={segment.key}
+                    className={cn(segment.color)}
+                    style={{ width: `${(segment.value / preTotal) * 100}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+            {postTotal > 0 && (
+              <ChevronRight className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+            )}
+          </>
+        );
+      })()}
+
+      {/* Fase pós-decisão com ramificação */}
+      {postTotal > 0 && (
+        <div style={{ width: `${rightPercent}%` }} className="space-y-0.5">
+          {/* Ramo Simple */}
+          {simpleTotal > 0 && (() => {
+            const simpleSegments = [
+              { key: 'registered', value: stats.simple.registada, color: 'bg-status-registered' },
+              { key: 'progress', value: stats.simple.emProgresso, color: 'bg-status-progress' },
+              { key: 'complete', value: stats.simple.completo, color: 'bg-status-complete' },
+            ].filter(s => s.value > 0);
+
+            return (
+              <div className="flex items-center gap-1">
+                <div className="h-2 flex gap-px rounded-r-full overflow-hidden flex-1">
+                  {simpleSegments.map((segment) => (
+                    <div
+                      key={segment.key}
+                      className={cn(segment.color)}
+                      style={{ width: `${(segment.value / simpleTotal) * 100}%` }}
+                    />
+                  ))}
+                </div>
+                <span className="text-[10px] text-muted-foreground font-bold shrink-0">S</span>
+              </div>
+            );
+          })()}
+
+          {/* Ramo Formulário */}
+          {formularioTotal > 0 && (() => {
+            const formularioSegments = [
+              { key: 'progress', value: stats.formulario.emProgresso, color: 'bg-status-progress' },
+              { key: 'complete', value: stats.formulario.completo, color: 'bg-status-complete' },
+            ].filter(s => s.value > 0);
+
+            return (
+              <div className="flex items-center gap-1">
+                <div className="h-2 flex gap-px rounded-r-full overflow-hidden flex-1">
+                  {formularioSegments.map((segment) => (
+                    <div
+                      key={segment.key}
+                      className={cn(segment.color)}
+                      style={{ width: `${(segment.value / formularioTotal) * 100}%` }}
+                    />
+                  ))}
+                </div>
+                <span className="text-[10px] text-muted-foreground font-bold shrink-0">F</span>
+              </div>
+            );
+          })()}
+        </div>
+      )}
     </div>
   );
 };
