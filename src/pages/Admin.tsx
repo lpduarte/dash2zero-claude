@@ -321,7 +321,7 @@ const Admin = () => {
                 {/* Tipo */}
                 <div className="space-y-2 flex flex-col items-end">
                   <p className="text-xs font-bold text-muted-foreground">Por tipo</p>
-                  <div className="inline-flex rounded-md">
+                  <div className="inline-flex rounded-md border border-input">
                     {([
                       { value: 'todos', label: 'Todos', icon: null },
                       { value: 'municipio', label: 'Municípios', icon: Landmark },
@@ -332,9 +332,10 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs rounded-none gap-1.5",
+                          "h-7 text-xs rounded-none gap-1.5 border-0",
                           i === 0 && "rounded-l-md",
                           i === arr.length - 1 && "rounded-r-md",
+                          i !== 0 && "border-l border-input",
                           typeFilter === opt.value && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                         )}
                         onClick={() => setTypeFilter(opt.value)}
@@ -351,7 +352,7 @@ const Admin = () => {
                 {/* Status */}
                 <div className="space-y-2 flex flex-col items-end">
                   <p className="text-xs font-bold text-muted-foreground">Por status</p>
-                  <div className="inline-flex rounded-md">
+                  <div className="inline-flex rounded-md border border-input">
                     {([
                       { value: 'ativos', label: 'Ativos', icon: null },
                       { value: 'arquivados', label: 'Arquivados', icon: Archive },
@@ -362,9 +363,10 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs rounded-none gap-1.5",
+                          "h-7 text-xs rounded-none gap-1.5 border-0",
                           i === 0 && "rounded-l-md",
                           i === arr.length - 1 && "rounded-r-md",
+                          i !== 0 && "border-l border-input",
                           statusFilter === opt.value && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                         )}
                         onClick={() => setStatusFilter(opt.value)}
