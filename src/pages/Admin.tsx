@@ -497,10 +497,12 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className={cn("border bg-card rounded-md p-3 text-center", shadows.sm)}>
           <p className="text-xl font-bold text-foreground">{client.metrics.totalCompanies}</p>
+          <Separator className="my-2 -mx-3 w-[calc(100%+1.5rem)]" />
           <p className="text-xs text-muted-foreground">Empresas</p>
         </div>
         <div className={cn("border bg-card rounded-md p-3 text-center", shadows.sm)}>
           <p className={cn("text-xl font-bold", conversionColor)}>{conversionRate}%</p>
+          <Separator className="my-2 -mx-3 w-[calc(100%+1.5rem)]" />
           <p className="text-xs text-muted-foreground">Conversão</p>
         </div>
         <div className={cn("border rounded-md p-3 bg-card", shadows.sm)}>
