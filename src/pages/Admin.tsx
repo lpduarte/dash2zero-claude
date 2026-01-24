@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from "@/lib/usePageTitle";
 import {
@@ -482,6 +482,16 @@ interface ActivityLineChartProps {
 }
 
 const ActivityLineChart = ({ data, clientId, isArchived = false }: ActivityLineChartProps) => {
+  const [isReady, setIsReady] = useState(false);
+
+  // Aguardar que o layout estabilize antes de renderizar o gráfico
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, []);
+
   // Adicionar pequeno offset para evitar valores exactamente 0
   // Isto previne que a linha toque no fundo absoluto do gráfico
   const chartData = data.map((value, index) => {
@@ -497,6 +507,10 @@ const ActivityLineChart = ({ data, clientId, isArchived = false }: ActivityLineC
 
   const gradientId = `fillCompletions-${clientId}`;
   const chartColor = isArchived ? 'hsl(var(--muted-foreground))' : 'hsl(var(--status-complete))';
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%" style={{ overflow: 'visible' }}>
