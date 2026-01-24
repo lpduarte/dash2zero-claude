@@ -51,7 +51,7 @@ import { useUser } from '@/contexts/UserContext';
 import { Client } from '@/types/user';
 import { mockClients } from '@/data/mockClients';
 import { ClientFormDialog, ClientFormData } from '@/components/admin/ClientFormDialog';
-import { Area, AreaChart, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip as RechartsTooltip, PieChart, Pie, Cell } from 'recharts';
 
 // Tipos de filtro
 type ClientTypeFilter = 'todos' | 'municipio' | 'empresa';
@@ -146,6 +146,13 @@ const Admin = () => {
     return Math.round((totalCompleto / total) * 100);
   }, [aggregatedMetrics]);
 
+  // Totais Simple vs Formulário para donut chart
+  const simpleTotal = aggregatedMetrics.funnelTotals.simple.registada +
+                      aggregatedMetrics.funnelTotals.simple.emProgresso +
+                      aggregatedMetrics.funnelTotals.simple.completo;
+  const formularioTotal = aggregatedMetrics.funnelTotals.formulario.emProgresso +
+                          aggregatedMetrics.funnelTotals.formulario.completo;
+
   // Entrar num cliente
   const handleEnterClient = (client: Client) => {
     setActiveClient(client);
@@ -211,15 +218,67 @@ const Admin = () => {
             icon={Users}
             unit={`Em ${aggregatedMetrics.totalClusters} clusters`}
           />
-          <KPICard
-            title="Taxa de conversão"
-            value={`${globalConversionRate}%`}
-            icon={TrendingUp}
-            iconColor={globalConversionRate >= 30 ? "text-success" : "text-warning"}
-            iconBgColor={globalConversionRate >= 30 ? "bg-success/10" : "bg-warning/10"}
-            valueColor={globalConversionRate >= 30 ? "text-success" : "text-warning"}
-            unit={`${aggregatedMetrics.funnelTotals.simple.completo + aggregatedMetrics.funnelTotals.formulario.completo} cálculos completos`}
-          />
+          {/* Card composto: Taxa de conversão + Donut chart */}
+          <div className="border rounded-lg shadow-md flex overflow-hidden">
+            {/* Info */}
+            <div className="flex-1 p-4 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-normal text-muted-foreground">Taxa de conversão</p>
+                <div className="p-1.5 rounded bg-primary/10">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{globalConversionRate}%</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {aggregatedMetrics.funnelTotals.simple.completo + aggregatedMetrics.funnelTotals.formulario.completo} cálculos completos
+                </p>
+              </div>
+            </div>
+
+            {/* Separador */}
+            <div className="w-px bg-border" />
+
+            {/* Donut chart Simple vs Formulário */}
+            <div className="w-[110px] flex items-center justify-center">
+              <ResponsiveContainer width={94} height={94}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Simple', value: simpleTotal, color: 'hsl(var(--primary))' },
+                      { name: 'Formulário', value: formularioTotal, color: 'hsl(var(--primary-dark))' },
+                    ]}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={24}
+                    outerRadius={44}
+                    stroke="hsl(var(--card))"
+                    strokeWidth={1}
+                  >
+                    <Cell fill="hsl(var(--primary))" />
+                    <Cell fill="hsl(var(--primary-dark))" />
+                  </Pie>
+                  <RechartsTooltip
+                    position={{ x: -120, y: 27 }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-card border rounded-lg shadow-lg p-2 text-xs">
+                            <p className="font-bold">{data.name}</p>
+                            <p className="text-muted-foreground">{data.value} empresas</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
           <KPICard
             title="Por contactar"
             value={aggregatedMetrics.funnelTotals.porContactar}
