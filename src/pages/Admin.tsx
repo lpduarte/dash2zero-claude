@@ -225,7 +225,7 @@ const Admin = () => {
         </div>
 
         {/* Funil Global Agregado */}
-        <div className={cn(elements.sectionCard, "mb-8")}>
+        <div className={cn(elements.sectionCard, "mb-8 rounded-md")}>
           <p className="text-xs font-normal text-muted-foreground mb-4">Progresso de onboarding global</p>
           <GlobalFunnelBar metrics={aggregatedMetrics.funnelTotals} />
         </div>
@@ -498,15 +498,15 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
 
       {/* Métricas em mini-cards */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className={cn("border bg-card rounded-lg p-3 text-center", shadows.sm)}>
+        <div className={cn("border bg-card rounded-md p-3 text-center", shadows.sm)}>
           <p className="text-xl font-bold text-foreground">{client.metrics.totalCompanies}</p>
           <p className="text-xs text-muted-foreground">Empresas</p>
         </div>
-        <div className={cn("border bg-card rounded-lg p-3 text-center", shadows.sm)}>
+        <div className={cn("border bg-card rounded-md p-3 text-center", shadows.sm)}>
           <p className={cn("text-xl font-bold", conversionColor)}>{conversionRate}%</p>
           <p className="text-xs text-muted-foreground">Conversão</p>
         </div>
-        <div className={cn("border rounded-lg p-3 bg-card", shadows.sm)}>
+        <div className={cn("border rounded-md p-3 bg-card", shadows.sm)}>
           <div className="h-12">
             {client.metrics.weeklyCompletions && (
               <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} />
@@ -519,7 +519,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
 
       {/* Alertas em card */}
       {alerts.length > 0 && (
-        <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 mb-4">
+        <div className="bg-warning/10 border border-warning/20 rounded-md p-3 mb-4">
           <div className="flex items-center gap-4 flex-wrap text-xs">
             {alerts.map((alert, idx) => (
               <span key={idx} className={cn("flex items-center gap-1.5", alert.color)}>
