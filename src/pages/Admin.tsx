@@ -690,6 +690,13 @@ const MiniFunnelBar = ({ stats, showBranches = false }: MiniFunnelBarProps) => {
               </div>
             );
           })()}
+          {/* Ramo Simple vazio */}
+          {simpleTotal === 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="h-2.5 flex-1 rounded-sm border border-dashed border-muted-foreground/30" />
+              <span className="text-[10px] text-muted-foreground/50 font-bold shrink-0">S</span>
+            </div>
+          )}
 
           {/* Ramo Formulário */}
           {formularioTotal > 0 && (() => {
@@ -719,6 +726,13 @@ const MiniFunnelBar = ({ stats, showBranches = false }: MiniFunnelBarProps) => {
               </div>
             );
           })()}
+          {/* Ramo Formulário vazio */}
+          {formularioTotal === 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="h-2.5 flex-1 rounded-sm border border-dashed border-muted-foreground/30" />
+              <span className="text-[10px] text-muted-foreground/50 font-bold shrink-0">F</span>
+            </div>
+          )}
         </div>
       )}
     </div>
