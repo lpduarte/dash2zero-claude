@@ -583,7 +583,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
             <img
               src={client.logo}
               alt={client.name}
-              className={cn("w-full h-full object-contain p-2 dark:invert", client.isArchived && "opacity-30 grayscale")}
+              className={cn("w-full h-full object-contain p-2 dark:invert", client.isArchived && "opacity-50 grayscale")}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
@@ -592,8 +592,8 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           ) : null}
           <div className={cn(client.logo && "hidden")}>
             {client.type === 'municipio'
-              ? <MapPin className={cn("h-7 w-7", client.isArchived ? "text-muted-foreground/50" : "text-primary")} />
-              : <Building2 className={cn("h-7 w-7", client.isArchived ? "text-muted-foreground/50" : "text-secondary-foreground")} />
+              ? <MapPin className={cn("h-7 w-7", client.isArchived ? "text-muted-foreground" : "text-primary")} />
+              : <Building2 className={cn("h-7 w-7", client.isArchived ? "text-muted-foreground" : "text-secondary-foreground")} />
             }
           </div>
         </div>
@@ -607,10 +607,10 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
               <Archive className="h-4 w-4 text-warning" />
             </div>
           )}
-          <div className="p-1.5 rounded bg-primary/10">
+          <div className={cn("p-1.5 rounded", client.isArchived ? "bg-muted-foreground/10" : "bg-primary/10")}>
             {client.type === 'municipio'
-              ? <Landmark className="h-4 w-4 text-primary" />
-              : <Building2 className="h-4 w-4 text-primary" />
+              ? <Landmark className={cn("h-4 w-4", client.isArchived ? "text-muted-foreground" : "text-primary")} />
+              : <Building2 className={cn("h-4 w-4", client.isArchived ? "text-muted-foreground" : "text-primary")} />
             }
           </div>
         </div>
