@@ -1,14 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   ChevronDown,
-  ArrowLeft,
   Building2,
   MapPin,
   Search,
   Check,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
@@ -40,7 +37,6 @@ interface AdminSubheaderContentProps {
 }
 
 const AdminSubheaderContent = ({ client }: AdminSubheaderContentProps) => {
-  const navigate = useNavigate();
   const { setActiveClient, clients } = useUser();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -63,12 +59,6 @@ const AdminSubheaderContent = ({ client }: AdminSubheaderContentProps) => {
     setSearchQuery('');
   };
 
-  // Voltar ao admin
-  const handleBackToAdmin = () => {
-    setActiveClient(null);
-    navigate('/admin');
-  };
-
   return (
     <div
       className={cn(
@@ -80,19 +70,17 @@ const AdminSubheaderContent = ({ client }: AdminSubheaderContentProps) => {
       )}
     >
       <div className="max-w-[1400px] mx-auto px-8">
-        <div className="flex items-center justify-between h-12">
-          {/* Lado esquerdo: Cliente ativo + switcher */}
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">A ver como:</span>
+        <div className="flex items-center justify-end h-12">
+          {/* Dropdown alinhado à direita com estilo liquid-glass */}
+          <div className="liquid-glass-container flex items-center gap-2 p-1.5 pr-2 rounded-full backdrop-blur-xl">
+            <span className="text-sm text-muted-foreground pl-2">A ver como:</span>
 
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
+                <button
                   className={cn(
-                    "h-8 gap-2 px-3",
-                    "bg-primary/5 hover:bg-primary/10",
-                    "border border-primary/20"
+                    "liquid-glass-btn inactive relative flex items-center gap-2 h-8 px-3 rounded-full text-sm overflow-hidden border border-transparent",
+                    "hover:bg-primary/10"
                   )}
                 >
                   {client.type === 'municipio'
@@ -102,16 +90,16 @@ const AdminSubheaderContent = ({ client }: AdminSubheaderContentProps) => {
                   <span className="font-bold max-w-[200px] truncate">
                     {client.name}
                   </span>
-                  <Badge variant="outline" className="text-xs ml-1">
+                  <Badge variant="outline" className="text-xs">
                     {client.type === 'municipio' ? 'Município' : 'Empresa'}
                   </Badge>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                </Button>
+                </button>
               </PopoverTrigger>
 
               <PopoverContent
                 className="w-80 p-0"
-                align="start"
+                align="end"
                 sideOffset={8}
               >
                 {/* Pesquisa */}
@@ -168,33 +156,9 @@ const AdminSubheaderContent = ({ client }: AdminSubheaderContentProps) => {
                     )}
                   </div>
                 </ScrollArea>
-
-                {/* Footer com link para admin */}
-                <div className="p-2 border-t bg-muted/30">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                    onClick={handleBackToAdmin}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Ver todos os clientes
-                  </Button>
-                </div>
               </PopoverContent>
             </Popover>
           </div>
-
-          {/* Lado direito: Botão voltar */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground"
-            onClick={handleBackToAdmin}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Voltar à administração
-          </Button>
         </div>
       </div>
     </div>
