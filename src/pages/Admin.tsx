@@ -202,7 +202,7 @@ const Admin = () => {
             icon={Building2}
             iconColor="text-primary"
             iconBgColor="bg-primary/10"
-            unit={`${aggregatedMetrics.totalMunicipios} municípios · ${aggregatedMetrics.totalEmpresas} empresas`}
+            unit={`${aggregatedMetrics.totalMunicipios} ${aggregatedMetrics.totalMunicipios === 1 ? 'município' : 'municípios'} · ${aggregatedMetrics.totalEmpresas} ${aggregatedMetrics.totalEmpresas === 1 ? 'empresa' : 'empresas'}`}
           />
           <KPICard
             title="Empresas registadas"
