@@ -183,7 +183,7 @@ const Overview = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <AdminSubheader />
-      <main className="relative z-10 max-w-[1400px] mx-auto px-8 py-8">
+      <main className="relative z-10 max-w-[1400px] mx-auto px-8 pt-4 pb-8">
         <ClusterSelector
           selectedCluster={selectedCluster}
           onClusterChange={setSelectedCluster}
