@@ -20,6 +20,8 @@ import {
   TrendingDown,
   Mail,
   MailWarning,
+  Trash2,
+  UserCheck,
 } from 'lucide-react';
 import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/ui/kpi-card';
@@ -652,48 +654,89 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
       </div>
 
       {/* Botões em linha */}
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={onEdit}>
-          <Pencil className="h-4 w-4" />
-          Editar
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Archive className="h-4 w-4" />
-              Arquivar
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {client.isArchived ? 'Desarquivar cliente?' : 'Arquivar cliente?'}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {client.isArchived
-                  ? `Tem a certeza que quer desarquivar "${client.name}"? O cliente voltará a aparecer na lista de clientes ativos.`
-                  : `Tem a certeza que quer arquivar "${client.name}"? O cliente deixará de aparecer na lista principal.`
-                }
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={onToggleArchive}>
-                {client.isArchived ? 'Desarquivar' : 'Arquivar'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        <Button
-          variant="default"
-          size="sm"
-          className="flex-1"
-          onClick={onEnter}
-          disabled={client.isArchived}
-        >
-          <BarChart3 className="h-4 w-4" />
-          Dashboard
-        </Button>
+      <div className={cn("flex items-center gap-2", client.isArchived && "justify-between")}>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onEdit}>
+            <Pencil className="h-4 w-4" />
+            Editar
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                {client.isArchived ? (
+                  <>
+                    <UserCheck className="h-4 w-4" />
+                    Reativar
+                  </>
+                ) : (
+                  <>
+                    <Archive className="h-4 w-4" />
+                    Arquivar
+                  </>
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {client.isArchived ? 'Reativar cliente?' : 'Arquivar cliente?'}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {client.isArchived
+                    ? `Tem a certeza que quer reativar "${client.name}"? O cliente voltará a aparecer na lista de clientes ativos.`
+                    : `Tem a certeza que quer arquivar "${client.name}"? O cliente deixará de aparecer na lista principal.`
+                  }
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onToggleArchive}>
+                  {client.isArchived ? 'Reativar' : 'Arquivar'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+        {client.isArchived ? (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <Trash2 className="h-4 w-4" />
+                Eliminar
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Eliminar cliente?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem a certeza que quer eliminar permanentemente "{client.name}"? Esta ação não pode ser revertida.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => {
+                    // TODO: Implementar eliminação
+                    console.log('Eliminar cliente:', client.id);
+                  }}
+                >
+                  Eliminar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            className="flex-1"
+            onClick={onEnter}
+          >
+            <BarChart3 className="h-4 w-4" />
+            Dashboard
+          </Button>
+        )}
       </div>
     </div>
   );
