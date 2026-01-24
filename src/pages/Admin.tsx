@@ -36,12 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -311,49 +306,60 @@ const Admin = () => {
             />
           </div>
 
-          <div className="flex gap-2">
-            {/* Filtro por tipo */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="h-4 w-4" />
-                  {typeFilter === 'todos' ? 'Todos os tipos' : typeFilter === 'municipio' ? 'Municípios' : 'Empresas'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTypeFilter('todos')}>
-                  Todos os tipos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTypeFilter('municipio')}>
-                  Municípios
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTypeFilter('empresa')}>
-                  Empresas
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Filter className="h-4 w-4" />
+                Filtros
+                {(typeFilter !== 'todos' || statusFilter !== 'ativos') && (
+                  <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 text-xs">
+                    {[typeFilter !== 'todos', statusFilter !== 'ativos'].filter(Boolean).length}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56">
+              <div className="space-y-4">
+                {/* Tipo */}
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-muted-foreground">Tipo</p>
+                  <div className="flex flex-wrap gap-1">
+                    {(['todos', 'municipio', 'empresa'] as const).map((type) => (
+                      <Button
+                        key={type}
+                        variant={typeFilter === type ? 'default' : 'outline'}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setTypeFilter(type)}
+                      >
+                        {type === 'todos' ? 'Todos' : type === 'municipio' ? 'Municípios' : 'Empresas'}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Filtro por status */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Archive className="h-4 w-4" />
-                  {statusFilter === 'ativos' ? 'Ativos' : statusFilter === 'arquivados' ? 'Arquivados' : 'Todos'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setStatusFilter('ativos')}>
-                  Ativos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('arquivados')}>
-                  Arquivados
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('todos')}>
-                  Todos
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                <Separator />
+
+                {/* Status */}
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-muted-foreground">Status</p>
+                  <div className="flex flex-wrap gap-1">
+                    {(['ativos', 'arquivados', 'todos'] as const).map((status) => (
+                      <Button
+                        key={status}
+                        variant={statusFilter === status ? 'default' : 'outline'}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setStatusFilter(status)}
+                      >
+                        {status === 'ativos' ? 'Ativos' : status === 'arquivados' ? 'Arquivados' : 'Todos'}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Grid de Cards de Clientes */}
