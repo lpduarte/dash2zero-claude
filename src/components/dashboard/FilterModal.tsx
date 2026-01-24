@@ -331,7 +331,7 @@ export function FilterModal({
               <Building2 className="h-4 w-4 text-primary" />
               Dimensão da empresa
             </div>
-            <Popover>
+            <Popover modal={false}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
                   <span className="text-sm">{getSizeLabel()}</span>
@@ -367,7 +367,7 @@ export function FilterModal({
               <Briefcase className="h-4 w-4 text-primary" />
               Atividade da empresa
             </div>
-            <Popover>
+            <Popover modal={false}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
                   <span className="text-sm">{getSectorLabel()}</span>
@@ -410,7 +410,7 @@ export function FilterModal({
                 {/* Distrito */}
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Distrito</Label>
-                  <Popover>
+                  <Popover modal={false}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-between">
                         <span className="text-sm">{getDistrictLabel()}</span>
@@ -443,7 +443,7 @@ export function FilterModal({
                 {/* Município */}
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Município</Label>
-                  <Popover>
+                  <Popover modal={false}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -480,7 +480,7 @@ export function FilterModal({
                 {/* Freguesia */}
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Freguesia</Label>
-                  <Popover>
+                  <Popover modal={false}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -520,7 +520,7 @@ export function FilterModal({
             {isMunicipio && (
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Freguesia</Label>
-                <Popover>
+                <Popover modal={false}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-between">
                       <span className="text-sm">{getParishLabel()}</span>
