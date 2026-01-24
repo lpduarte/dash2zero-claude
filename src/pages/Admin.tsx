@@ -458,11 +458,8 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
     )}>
       {/* Header do card */}
       <div className="flex items-start gap-4 mb-4">
-        {/* Avatar/Logo maior (80px) */}
-        <div className={cn(
-          "w-20 h-20 rounded-xl flex items-center justify-center overflow-hidden shrink-0",
-          client.type === 'municipio' ? "bg-primary/10" : "bg-secondary/50"
-        )}>
+        {/* Avatar/Logo */}
+        <div className="w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden shrink-0 bg-card shadow-inner">
           {client.logo ? (
             <img
               src={client.logo}
@@ -476,8 +473,8 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           ) : null}
           <div className={cn(client.logo && "hidden")}>
             {client.type === 'municipio'
-              ? <MapPin className="h-10 w-10 text-primary" />
-              : <Building2 className="h-10 w-10 text-secondary-foreground" />
+              ? <MapPin className="h-7 w-7 text-primary" />
+              : <Building2 className="h-7 w-7 text-secondary-foreground" />
             }
           </div>
         </div>
