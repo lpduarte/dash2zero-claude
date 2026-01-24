@@ -1,15 +1,39 @@
-import { useState, useEffect } from "react";
-import { Leaf, BarChart3, CircleDot, Moon, Sun, TowerControl } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Leaf, BarChart3, CircleDot, Moon, Sun, TowerControl, ChevronDown, Building2, MapPin, Search, Check } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { UserTypeToggle } from "./UserTypeToggle";
 import { useUser } from "@/contexts/UserContext";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Client } from "@/types/user";
 
 export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userType, setUserType, isGet2C, activeClient } = useUser();
+  const { userType, setUserType, isGet2C, activeClient, clients, setActiveClient } = useUser();
   const [darkMode, setDarkMode] = useState(false);
+  const [clientSwitcherOpen, setClientSwitcherOpen] = useState(false);
+  const [clientSearchQuery, setClientSearchQuery] = useState('');
+
+  // Filtrar clientes para o dropdown
+  const filteredClients = useMemo(() => {
+    if (!clientSearchQuery.trim()) return clients;
+    const query = clientSearchQuery.toLowerCase();
+    return clients.filter(c =>
+      c.name.toLowerCase().includes(query) ||
+      c.contactEmail.toLowerCase().includes(query)
+    );
+  }, [clients, clientSearchQuery]);
+
+  // Trocar de cliente
+  const handleSelectClient = (selectedClient: Client) => {
+    setActiveClient(selectedClient);
+    setClientSwitcherOpen(false);
+    setClientSearchQuery('');
+  };
 
   // Redirecionar Get2C sem cliente ativo para /admin
   useEffect(() => {
@@ -127,6 +151,101 @@ export const Header = () => {
           }}
         />
       </div>
+
+      {/* Client Switcher - apenas para Get2C com cliente ativo */}
+      {isGet2C && activeClient && (
+        <div className="max-w-[1400px] mx-auto px-8 pt-4">
+          <div className="flex items-center justify-end">
+            <div className="liquid-glass-container flex items-center gap-2 p-1.5 pr-2 rounded-full backdrop-blur-xl">
+              <span className="text-sm text-muted-foreground pl-2">A ver como:</span>
+
+              <Popover open={clientSwitcherOpen} onOpenChange={setClientSwitcherOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    className={cn(
+                      "liquid-glass-btn inactive relative flex items-center gap-2 h-8 px-3 rounded-full text-sm overflow-hidden border border-transparent",
+                      "hover:bg-primary/10"
+                    )}
+                  >
+                    {activeClient.type === 'municipio'
+                      ? <MapPin className="h-4 w-4 text-primary" />
+                      : <Building2 className="h-4 w-4 text-primary" />
+                    }
+                    <span className="font-bold max-w-[200px] truncate">
+                      {activeClient.name}
+                    </span>
+                    <Badge variant="outline" className="text-xs">
+                      {activeClient.type === 'municipio' ? 'Município' : 'Empresa'}
+                    </Badge>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+
+                <PopoverContent
+                  className="w-80 p-0"
+                  align="end"
+                  sideOffset={8}
+                >
+                  {/* Pesquisa */}
+                  <div className="p-3 border-b">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Pesquisar cliente..."
+                        value={clientSearchQuery}
+                        onChange={(e) => setClientSearchQuery(e.target.value)}
+                        className="pl-9 h-9"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Lista de clientes */}
+                  <ScrollArea className="max-h-[300px]">
+                    <div className="p-2">
+                      {filteredClients.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Nenhum cliente encontrado
+                        </p>
+                      ) : (
+                        filteredClients.map(c => (
+                          <button
+                            key={c.id}
+                            onClick={() => handleSelectClient(c)}
+                            className={cn(
+                              "w-full flex items-center gap-3 p-2 rounded-md text-left",
+                              "hover:bg-muted transition-colors",
+                              c.id === activeClient.id && "bg-primary/5"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-8 h-8 rounded-md flex items-center justify-center shrink-0",
+                              c.type === 'municipio' ? "bg-primary/10" : "bg-muted"
+                            )}>
+                              {c.type === 'municipio'
+                                ? <MapPin className="h-4 w-4 text-primary" />
+                                : <Building2 className="h-4 w-4 text-muted-foreground" />
+                              }
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-sm truncate">{c.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {c.metrics.totalCompanies} empresas · {c.metrics.totalClusters} clusters
+                              </p>
+                            </div>
+                            {c.id === activeClient.id && (
+                              <Check className="h-4 w-4 text-primary shrink-0" />
+                            )}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
