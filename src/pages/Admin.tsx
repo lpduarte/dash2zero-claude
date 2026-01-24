@@ -491,11 +491,11 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
 
       {/* Métricas em mini-cards */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className={cn("bg-muted/50 rounded-lg p-3 text-center", shadows.sm)}>
+        <div className={cn("bg-card rounded-lg p-3 text-center", shadows.sm)}>
           <p className="text-xl font-bold text-foreground">{client.metrics.totalCompanies}</p>
           <p className="text-xs text-muted-foreground">Empresas</p>
         </div>
-        <div className={cn("bg-muted/50 rounded-lg p-3 text-center", shadows.sm)}>
+        <div className={cn("bg-card rounded-lg p-3 text-center", shadows.sm)}>
           <p className={cn("text-xl font-bold", conversionColor)}>{conversionRate}%</p>
           <p className="text-xs text-muted-foreground">Conversão</p>
         </div>

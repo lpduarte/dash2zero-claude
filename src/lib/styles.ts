@@ -348,7 +348,7 @@ export const iconSizes = {
 export const elements = {
   // Cards
   /** Card principal de secção */
-  sectionCard: 'p-6 border rounded-lg shadow-md',
+  sectionCard: 'p-6 border rounded-lg shadow-md bg-card',
   /** Card de KPI */
   kpiCard: 'p-4 border rounded-md shadow-md bg-card hover:shadow-lg hover:border-primary/25 transition-all duration-200',
   /** Card dentro de outro card */
