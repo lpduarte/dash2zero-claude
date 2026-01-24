@@ -565,7 +565,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
   const alerts = getClientAlerts(client, conversionRate);
 
   // Cor condicional para conversão
-  const conversionColor = conversionRate >= 30 ? 'text-success' : 'text-warning';
+  const conversionColor = 'text-foreground';
 
   return (
     <div className={cn(
