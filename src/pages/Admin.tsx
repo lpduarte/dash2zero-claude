@@ -485,13 +485,10 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           )}
         </div>
         {/* Ícone tipo (estilo KPI) */}
-        <div className={cn(
-          "p-1.5 rounded shrink-0",
-          client.type === 'municipio' ? "bg-primary/10" : "bg-muted"
-        )}>
+        <div className="p-1.5 rounded shrink-0 bg-primary/10">
           {client.type === 'municipio'
             ? <Landmark className="h-4 w-4 text-primary" />
-            : <Building2 className="h-4 w-4 text-muted-foreground" />
+            : <Building2 className="h-4 w-4 text-primary" />
           }
         </div>
       </div>
