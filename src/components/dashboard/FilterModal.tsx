@@ -338,7 +338,7 @@ export function FilterModal({
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[calc(100vw-4rem)] sm:w-[380px] p-2" align="start">
+              <PopoverContent className="z-[100] w-[calc(100vw-4rem)] sm:w-[380px] p-2" align="start">
                 <div className="space-y-1">
                   {sizeOptions.map(option => (
                     <div
@@ -374,7 +374,7 @@ export function FilterModal({
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[300px] overflow-y-auto" align="start">
+              <PopoverContent className="z-[100] w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[300px] overflow-y-auto" align="start">
                 <div className="space-y-1">
                   {sectorOptions.map(option => (
                     <div
@@ -417,7 +417,7 @@ export function FilterModal({
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                    <PopoverContent className="z-[100] w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
                       <div className="space-y-1">
                         {districtOptions.map(option => (
                           <div
@@ -454,7 +454,7 @@ export function FilterModal({
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                    <PopoverContent className="z-[100] w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
                       <div className="space-y-1">
                         {municipalityOptions.map(option => (
                           <div
@@ -491,7 +491,7 @@ export function FilterModal({
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                    <PopoverContent className="z-[100] w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
                       <div className="space-y-1">
                         {parishOptions.map(option => (
                           <div
@@ -527,7 +527,7 @@ export function FilterModal({
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
+                  <PopoverContent className="z-[100] w-[calc(100vw-4rem)] sm:w-[380px] p-2 max-h-[250px] overflow-y-auto" align="start">
                     <div className="space-y-1">
                       {parishOptions.map(option => (
                         <div
