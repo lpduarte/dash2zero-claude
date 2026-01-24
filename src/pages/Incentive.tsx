@@ -107,7 +107,7 @@ const getNextAction = (status: string): string => {
 
 const Incentive = () => {
   usePageTitle("Incentivo");
-  const { isMunicipio } = useUser();
+  const { isMunicipio, isGet2C, activeClient } = useUser();
   const [searchParams] = useSearchParams();
 
   // Read URL params for deep linking from Clusters page
@@ -669,7 +669,7 @@ const Incentive = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="relative z-10 max-w-[1400px] mx-auto px-8 pt-4 pb-8">
+      <main className={cn("relative z-10 max-w-[1400px] mx-auto px-8", isGet2C && activeClient ? "pt-4 pb-8" : "py-8")}>
         {/* Page Title */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">

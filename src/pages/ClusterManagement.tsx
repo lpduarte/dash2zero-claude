@@ -27,12 +27,13 @@ import { ClusterDefinition, CreateClusterInput } from "@/types/clusterNew";
 import { Supplier, UniversalFilterState } from "@/types/supplier";
 import { SupplierWithoutFootprint, SupplierAny } from "@/types/supplierNew";
 import { CircleDot } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { getClusterConfig } from "@/config/clusters";
 
 export default function ClusterManagement() {
   usePageTitle("Clusters");
-  const { isMunicipio, userType } = useUser();
+  const { isMunicipio, userType, isGet2C, activeClient } = useUser();
   const navigate = useNavigate();
   const ownerType = isMunicipio ? 'municipio' : 'empresa';
 
@@ -300,7 +301,7 @@ export default function ClusterManagement() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="relative z-10 max-w-[1400px] mx-auto px-8 pt-4 pb-8">
+      <main className={cn("relative z-10 max-w-[1400px] mx-auto px-8", isGet2C && activeClient ? "pt-4 pb-8" : "py-8")}>
         {/* Page Title */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">

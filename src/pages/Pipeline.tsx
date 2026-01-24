@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/contexts/UserContext";
 import pipelineData from "@/data/pipeline.json";
 
 const STORAGE_KEY = "pipeline-hide-completed";
@@ -136,6 +137,7 @@ function PipelineItemCard({ item }: { item: PipelineItem }) {
 
 export default function Pipeline() {
   usePageTitle("Pipeline");
+  const { isGet2C, activeClient } = useUser();
   const { metadata, summary, items } = pipelineData;
 
   const [hideCompleted, setHideCompleted] = useState(() => {
@@ -171,7 +173,7 @@ export default function Pipeline() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="relative z-10 max-w-[1400px] mx-auto px-8 pt-4 pb-8">
+      <main className={cn("relative z-10 max-w-[1400px] mx-auto px-8", isGet2C && activeClient ? "pt-4 pb-8" : "py-8")}>
         {/* Page Title */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">

@@ -86,7 +86,7 @@ const calculateImprovementPotential = (suppliers: Supplier[], isMunicipio: boole
 
 const Overview = () => {
   usePageTitle("Dashboard");
-  const { user, isMunicipio } = useUser();
+  const { user, isMunicipio, isGet2C, activeClient } = useUser();
   const [selectedCluster, setSelectedCluster] = useState<string>('all');
   const [universalFilters, setUniversalFilters] = useState<UniversalFilterState>({
     companySize: [],
@@ -181,7 +181,7 @@ const Overview = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="relative z-10 max-w-[1400px] mx-auto px-8 pt-4 pb-8">
+      <main className={cn("relative z-10 max-w-[1400px] mx-auto px-8", isGet2C && activeClient ? "pt-4 pb-8" : "py-8")}>
         <ClusterSelector
           selectedCluster={selectedCluster}
           onClusterChange={setSelectedCluster}
