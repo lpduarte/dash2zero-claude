@@ -8,7 +8,7 @@ import {
   Users,
   TrendingUp,
   Search,
-  Plus,
+  UserPlus,
   Filter,
   Archive,
   ChevronRight,
@@ -191,10 +191,6 @@ const Admin = () => {
             </h2>
             <p className="text-muted-foreground mt-1">Gestão de clientes e visão global</p>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo cliente
-          </Button>
         </div>
 
         {/* KPIs Globais */}
@@ -310,7 +306,7 @@ const Admin = () => {
             <PopoverTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <Filter className="h-4 w-4" />
-                Filtros
+                Filtrar
                 {(typeFilter !== 'todos' || statusFilter !== 'ativos') && (
                   <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 text-xs">
                     {[typeFilter !== 'todos', statusFilter !== 'ativos'].filter(Boolean).length}
@@ -322,7 +318,7 @@ const Admin = () => {
               <div className="flex flex-col items-end space-y-4">
                 {/* Tipo */}
                 <div className="space-y-2 flex flex-col items-end">
-                  <p className="text-xs font-bold text-muted-foreground">Tipo</p>
+                  <p className="text-xs font-bold text-muted-foreground">Por tipo</p>
                   <div className="inline-flex rounded-md">
                     {([
                       { value: 'todos', label: 'Todos', icon: null },
@@ -352,7 +348,7 @@ const Admin = () => {
 
                 {/* Status */}
                 <div className="space-y-2 flex flex-col items-end">
-                  <p className="text-xs font-bold text-muted-foreground">Status</p>
+                  <p className="text-xs font-bold text-muted-foreground">Por status</p>
                   <div className="inline-flex rounded-md">
                     {([
                       { value: 'ativos', label: 'Ativos', icon: null },
@@ -380,6 +376,11 @@ const Admin = () => {
               </div>
             </PopoverContent>
           </Popover>
+
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Novo cliente
+          </Button>
         </div>
 
         {/* Grid de Cards de Clientes */}
