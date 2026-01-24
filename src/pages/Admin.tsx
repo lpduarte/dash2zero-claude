@@ -505,16 +505,13 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           <p className="text-xs text-muted-foreground">Conversão</p>
         </div>
         <div className="border rounded-lg p-3 bg-card">
-          <p className="text-xs text-muted-foreground mb-2">Atividade (12 semanas)</p>
           {client.metrics.weeklyCompletions && (
             <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} />
           )}
-          <Separator className="my-2" />
+          <Separator className="my-2 -mx-3 w-[calc(100%+1.5rem)]" />
           <div className="flex items-center justify-center gap-1.5 text-xs">
             <div className="h-2 w-2 rounded-full bg-status-complete" />
-            <span className="text-muted-foreground">
-              {client.metrics.weeklyCompletions?.reduce((a, b) => a + b, 0) || 0} pegadas
-            </span>
+            <span className="text-muted-foreground">Atividade</span>
           </div>
         </div>
       </div>
