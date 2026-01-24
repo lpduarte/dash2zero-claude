@@ -599,12 +599,19 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
             <p className="text-sm text-warning">Arquivado</p>
           )}
         </div>
-        {/* Ícone tipo (estilo KPI) */}
-        <div className="p-1.5 rounded shrink-0 bg-primary/10">
-          {client.type === 'municipio'
-            ? <Landmark className="h-4 w-4 text-primary" />
-            : <Building2 className="h-4 w-4 text-primary" />
-          }
+        {/* Ícones: arquivo (se arquivado) + tipo */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {client.isArchived && (
+            <div className="p-1.5 rounded bg-warning/10">
+              <Archive className="h-4 w-4 text-warning" />
+            </div>
+          )}
+          <div className="p-1.5 rounded bg-primary/10">
+            {client.type === 'municipio'
+              ? <Landmark className="h-4 w-4 text-primary" />
+              : <Building2 className="h-4 w-4 text-primary" />
+            }
+          </div>
         </div>
       </div>
 
