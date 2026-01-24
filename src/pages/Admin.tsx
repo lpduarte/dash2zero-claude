@@ -332,9 +332,9 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs rounded-none gap-1.5",
+                          "h-7 text-xs rounded-none gap-1.5 relative",
                           typeFilter === opt.value
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground z-10 -m-px rounded-md"
                             : "hover:bg-muted"
                         )}
                         onClick={() => setTypeFilter(opt.value)}
@@ -362,9 +362,9 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs rounded-none gap-1.5",
+                          "h-7 text-xs rounded-none gap-1.5 relative",
                           statusFilter === opt.value
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground z-10 -m-px rounded-md"
                             : "hover:bg-muted"
                         )}
                         onClick={() => setStatusFilter(opt.value)}
