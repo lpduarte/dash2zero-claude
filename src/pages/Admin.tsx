@@ -299,7 +299,7 @@ const Admin = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Pesquisar por nome ou email..."
+              placeholder="Pesquisar pelo nome de cliente..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -318,21 +318,30 @@ const Admin = () => {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-56">
+            <PopoverContent align="end" className="w-auto">
               <div className="space-y-4">
                 {/* Tipo */}
                 <div className="space-y-2">
                   <p className="text-xs font-bold text-muted-foreground">Tipo</p>
-                  <div className="flex flex-wrap gap-1">
-                    {(['todos', 'municipio', 'empresa'] as const).map((type) => (
+                  <div className="inline-flex rounded-md border">
+                    {([
+                      { value: 'todos', label: 'Todos', icon: null },
+                      { value: 'municipio', label: 'Municípios', icon: Landmark },
+                      { value: 'empresa', label: 'Empresas', icon: Building2 },
+                    ] as const).map((opt, i, arr) => (
                       <Button
-                        key={type}
-                        variant={typeFilter === type ? 'default' : 'outline'}
+                        key={opt.value}
+                        variant={typeFilter === opt.value ? 'default' : 'ghost'}
                         size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => setTypeFilter(type)}
+                        className={cn(
+                          "h-7 text-xs rounded-none border-0 gap-1.5",
+                          i === 0 && "rounded-l-md",
+                          i === arr.length - 1 && "rounded-r-md"
+                        )}
+                        onClick={() => setTypeFilter(opt.value)}
                       >
-                        {type === 'todos' ? 'Todos' : type === 'municipio' ? 'Municípios' : 'Empresas'}
+                        {opt.icon && <opt.icon className="h-3.5 w-3.5" />}
+                        {opt.label}
                       </Button>
                     ))}
                   </div>
@@ -343,16 +352,25 @@ const Admin = () => {
                 {/* Status */}
                 <div className="space-y-2">
                   <p className="text-xs font-bold text-muted-foreground">Status</p>
-                  <div className="flex flex-wrap gap-1">
-                    {(['ativos', 'arquivados', 'todos'] as const).map((status) => (
+                  <div className="inline-flex rounded-md border">
+                    {([
+                      { value: 'ativos', label: 'Ativos', icon: null },
+                      { value: 'arquivados', label: 'Arquivados', icon: Archive },
+                      { value: 'todos', label: 'Todos', icon: null },
+                    ] as const).map((opt, i, arr) => (
                       <Button
-                        key={status}
-                        variant={statusFilter === status ? 'default' : 'outline'}
+                        key={opt.value}
+                        variant={statusFilter === opt.value ? 'default' : 'ghost'}
                         size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => setStatusFilter(status)}
+                        className={cn(
+                          "h-7 text-xs rounded-none border-0 gap-1.5",
+                          i === 0 && "rounded-l-md",
+                          i === arr.length - 1 && "rounded-r-md"
+                        )}
+                        onClick={() => setStatusFilter(opt.value)}
                       >
-                        {status === 'ativos' ? 'Ativos' : status === 'arquivados' ? 'Arquivados' : 'Todos'}
+                        {opt.icon && <opt.icon className="h-3.5 w-3.5" />}
+                        {opt.label}
                       </Button>
                     ))}
                   </div>
