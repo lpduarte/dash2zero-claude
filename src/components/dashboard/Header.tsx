@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Leaf, BarChart3, CircleDot, Moon, Sun, TowerControl, ChevronDown, Building2, MapPin, Search, Check } from "lucide-react";
+import { Leaf, BarChart3, CircleDot, Moon, Sun, TowerControl, ChevronDown, Building2, Landmark, Search, Check } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { UserTypeToggle } from "./UserTypeToggle";
@@ -149,9 +149,7 @@ export const Header = () => {
       {isGet2C && activeClient && location.pathname !== '/admin' && (
         <div className="px-8 pt-4">
           <div className="max-w-[1400px] mx-auto flex items-center justify-end">
-            <div className="liquid-glass-container flex items-center gap-2 p-1.5 pr-2 rounded-full backdrop-blur-xl">
-              <span className="text-sm text-muted-foreground pl-2">A ver como:</span>
-
+            <div className="liquid-glass-container flex items-center gap-2 p-1.5 rounded-full backdrop-blur-xl">
               <Popover open={clientSwitcherOpen} onOpenChange={setClientSwitcherOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -161,15 +159,12 @@ export const Header = () => {
                     )}
                   >
                     {activeClient.type === 'municipio'
-                      ? <MapPin className="h-4 w-4 text-primary" />
+                      ? <Landmark className="h-4 w-4 text-primary" />
                       : <Building2 className="h-4 w-4 text-primary" />
                     }
                     <span className="font-bold max-w-[200px] truncate">
                       {activeClient.name}
                     </span>
-                    <Badge variant="outline" className="text-xs">
-                      {activeClient.type === 'municipio' ? 'Município' : 'Empresa'}
-                    </Badge>
                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </button>
                 </PopoverTrigger>
@@ -215,7 +210,7 @@ export const Header = () => {
                               c.type === 'municipio' ? "bg-primary/10" : "bg-muted"
                             )}>
                               {c.type === 'municipio'
-                                ? <MapPin className="h-4 w-4 text-primary" />
+                                ? <Landmark className="h-4 w-4 text-primary" />
                                 : <Building2 className="h-4 w-4 text-muted-foreground" />
                               }
                             </div>
