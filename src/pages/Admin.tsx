@@ -478,9 +478,10 @@ const getClientAlerts = (client: Client, conversionRate: number) => {
 interface ActivityLineChartProps {
   data: number[];
   clientId: string;
+  isArchived?: boolean;
 }
 
-const ActivityLineChart = ({ data, clientId }: ActivityLineChartProps) => {
+const ActivityLineChart = ({ data, clientId, isArchived = false }: ActivityLineChartProps) => {
   // Adicionar pequeno offset para evitar valores exactamente 0
   // Isto previne que a linha toque no fundo absoluto do gráfico
   const chartData = data.map((value, index) => {
@@ -495,14 +496,15 @@ const ActivityLineChart = ({ data, clientId }: ActivityLineChartProps) => {
   });
 
   const gradientId = `fillCompletions-${clientId}`;
+  const chartColor = isArchived ? 'hsl(var(--muted-foreground))' : 'hsl(var(--status-complete))';
 
   return (
     <ResponsiveContainer width="100%" height="100%" style={{ overflow: 'visible' }}>
       <AreaChart data={chartData} margin={{ top: 4, right: 3, bottom: 0, left: 3 }} style={{ overflow: 'visible' }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="hsl(var(--status-complete))" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="hsl(var(--status-complete))" stopOpacity={0.1} />
+            <stop offset="5%" stopColor={chartColor} stopOpacity={isArchived ? 0.4 : 0.8} />
+            <stop offset="95%" stopColor={chartColor} stopOpacity={0.1} />
           </linearGradient>
         </defs>
         <YAxis domain={[0, 'dataMax + 1']} hide />
@@ -526,7 +528,7 @@ const ActivityLineChart = ({ data, clientId }: ActivityLineChartProps) => {
           type="monotone"
           fill={`url(#${gradientId})`}
           fillOpacity={0.4}
-          stroke="hsl(var(--status-complete))"
+          stroke={chartColor}
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -620,15 +622,15 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
         <div className="grid grid-cols-2 gap-3 col-span-2">
           <div className={cn("border rounded-md px-3 py-2 flex items-center justify-between", shadows.sm, client.isArchived ? "bg-background" : "bg-card")}>
             <span className="text-xs text-muted-foreground">Empresas</span>
-            <span className="text-sm font-bold text-foreground">{client.metrics.totalCompanies}</span>
+            <span className={cn("text-sm font-bold", client.isArchived ? "text-muted-foreground" : "text-foreground")}>{client.metrics.totalCompanies}</span>
           </div>
           <div className={cn("border rounded-md px-3 py-2 flex items-center justify-between", shadows.sm, client.isArchived ? "bg-background" : "bg-card")}>
             <span className="text-xs text-muted-foreground">Conversão</span>
-            <span className={cn("text-sm font-bold", conversionColor)}>{conversionRate}%</span>
+            <span className={cn("text-sm font-bold", client.isArchived ? "text-muted-foreground" : conversionColor)}>{conversionRate}%</span>
           </div>
           <div className={cn("border rounded-md px-3 py-2 flex items-center justify-between", shadows.sm, client.isArchived ? "bg-background" : "bg-card")}>
             <span className="text-xs text-muted-foreground">Último acesso</span>
-            <span className="text-sm font-bold text-foreground">
+            <span className={cn("text-sm font-bold", client.isArchived ? "text-muted-foreground" : "text-foreground")}>
               {client.metrics.lastActivity
                 ? `há ${Math.floor((Date.now() - client.metrics.lastActivity.getTime()) / (1000 * 60 * 60 * 24))}d`
                 : '—'}
@@ -636,7 +638,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           </div>
           <div className={cn("border rounded-md px-3 py-2 flex items-center justify-between", shadows.sm, client.isArchived ? "bg-background" : "bg-card")}>
             <span className="text-xs text-muted-foreground">Alertas</span>
-            <span className={cn("text-sm font-bold", alerts.length > 0 ? "text-warning" : "text-success")}>
+            <span className={cn("text-sm font-bold", client.isArchived ? "text-muted-foreground" : (alerts.length > 0 ? "text-warning" : "text-success"))}>
               {alerts.length > 0 ? alerts.length : 'OK'}
             </span>
           </div>
@@ -645,7 +647,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
         <div className={cn("border rounded-md p-3 overflow-visible", shadows.sm, client.isArchived ? "bg-background" : "bg-card")}>
           <div className="h-16 overflow-visible -mx-1">
             {client.metrics.weeklyCompletions && (
-              <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} />
+              <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} isArchived={client.isArchived} />
             )}
           </div>
           <Separator className="my-2 -mx-3 w-[calc(100%+1.5rem)]" />
