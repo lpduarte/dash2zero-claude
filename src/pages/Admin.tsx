@@ -494,18 +494,34 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
       </div>
 
       {/* Métricas em mini-cards */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className={cn("border bg-card rounded-md p-3 text-center", shadows.sm)}>
-          <p className="text-xl font-bold text-foreground">{client.metrics.totalCompanies}</p>
-          <Separator className="my-2 -mx-3 w-[calc(100%+1.5rem)]" />
-          <p className="text-xs text-muted-foreground">Empresas</p>
+      <div className="flex gap-3 mb-4">
+        {/* Grelha 2x2 */}
+        <div className="grid grid-cols-2 gap-2 flex-1">
+          <div className={cn("border bg-card rounded-md px-3 py-2 flex items-center justify-between", shadows.sm)}>
+            <span className="text-xs text-muted-foreground">Empresas</span>
+            <span className="text-sm font-bold text-foreground">{client.metrics.totalCompanies}</span>
+          </div>
+          <div className={cn("border bg-card rounded-md px-3 py-2 flex items-center justify-between", shadows.sm)}>
+            <span className="text-xs text-muted-foreground">Conversão</span>
+            <span className={cn("text-sm font-bold", conversionColor)}>{conversionRate}%</span>
+          </div>
+          <div className={cn("border bg-card rounded-md px-3 py-2 flex items-center justify-between", shadows.sm)}>
+            <span className="text-xs text-muted-foreground">Último acesso</span>
+            <span className="text-sm font-bold text-foreground">
+              {client.metrics.lastActivity
+                ? `há ${Math.floor((Date.now() - client.metrics.lastActivity.getTime()) / (1000 * 60 * 60 * 24))}d`
+                : '—'}
+            </span>
+          </div>
+          <div className={cn("border bg-card rounded-md px-3 py-2 flex items-center justify-between", shadows.sm)}>
+            <span className="text-xs text-muted-foreground">Alertas</span>
+            <span className={cn("text-sm font-bold", alerts.length > 0 ? "text-warning" : "text-success")}>
+              {alerts.length > 0 ? alerts.length : 'OK'}
+            </span>
+          </div>
         </div>
-        <div className={cn("border bg-card rounded-md p-3 text-center", shadows.sm)}>
-          <p className={cn("text-xl font-bold", conversionColor)}>{conversionRate}%</p>
-          <Separator className="my-2 -mx-3 w-[calc(100%+1.5rem)]" />
-          <p className="text-xs text-muted-foreground">Conversão</p>
-        </div>
-        <div className={cn("border rounded-md p-3 bg-card", shadows.sm)}>
+        {/* Gráfico à direita */}
+        <div className={cn("border rounded-md p-3 bg-card w-32", shadows.sm)}>
           <div className="h-12">
             {client.metrics.weeklyCompletions && (
               <ActivityLineChart data={client.metrics.weeklyCompletions} clientId={client.id} />
@@ -515,20 +531,6 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           <p className="text-xs text-muted-foreground text-center">Pegadas completadas</p>
         </div>
       </div>
-
-      {/* Alertas em card */}
-      {alerts.length > 0 && (
-        <div className="bg-warning/10 border border-warning/20 rounded-md p-3 mb-4">
-          <div className="flex items-center gap-4 flex-wrap text-xs">
-            {alerts.map((alert, idx) => (
-              <span key={idx} className={cn("flex items-center gap-1.5", alert.color)}>
-                <alert.icon className="h-3.5 w-3.5" />
-                {alert.message}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Mini funil com ramificação */}
       <div className={cn("border bg-card rounded-md p-3 mb-4", shadows.sm)}>
