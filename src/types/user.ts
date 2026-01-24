@@ -60,9 +60,16 @@ export interface Client {
       porContactar: number;
       semInteracao: number;
       interessada: number;
-      registada: number;
-      emProgresso: number;
-      completo: number;
+      // Breakdown pós-decisão por via (Simple ou Formulário)
+      simple: {
+        registada: number;
+        emProgresso: number;
+        completo: number;
+      };
+      formulario: {
+        emProgresso: number;
+        completo: number;
+      };
     };
     lastActivity?: Date;
   };
