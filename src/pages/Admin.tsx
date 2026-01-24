@@ -568,8 +568,7 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
   return (
     <div className={cn(
       elements.sectionCard,
-      "p-5 transition-all hover:shadow-lg",
-      client.isArchived && "opacity-60"
+      "p-5 transition-all hover:shadow-lg"
     )}>
       {/* Header do card */}
       <div className="flex items-start gap-4 mb-4">
