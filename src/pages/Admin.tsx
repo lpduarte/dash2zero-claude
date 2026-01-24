@@ -321,7 +321,7 @@ const Admin = () => {
                 {/* Tipo */}
                 <div className="space-y-2 flex flex-col items-end">
                   <p className="text-xs font-bold text-muted-foreground">Por tipo</p>
-                  <div className="inline-flex rounded-lg bg-muted p-1 gap-1">
+                  <div className="inline-flex rounded-lg p-1 gap-1">
                     {([
                       { value: 'todos', label: 'Todos', icon: null },
                       { value: 'municipio', label: 'Municípios', icon: Landmark },
@@ -351,7 +351,7 @@ const Admin = () => {
                 {/* Status */}
                 <div className="space-y-2 flex flex-col items-end">
                   <p className="text-xs font-bold text-muted-foreground">Por status</p>
-                  <div className="inline-flex rounded-lg bg-muted p-1 gap-1">
+                  <div className="inline-flex rounded-lg p-1 gap-1">
                     {([
                       { value: 'ativos', label: 'Ativos', icon: null },
                       { value: 'arquivados', label: 'Arquivados', icon: Archive },
