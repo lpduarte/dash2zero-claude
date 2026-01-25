@@ -268,18 +268,22 @@ export const ClientFormDialog = ({
             {/* Nome */}
             <div className="space-y-2">
               <Label htmlFor="name">Nome do cliente *</Label>
-              <Input
-                id="name"
-                placeholder={
-                  formData.type === 'municipio'
-                    ? 'Ex: Câmara Municipal de Valdouros'
-                    : formData.type === 'empresa'
-                      ? 'Ex: Iberotejo'
-                      : ''
-                }
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              />
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="name"
+                  placeholder={
+                    formData.type === 'municipio'
+                      ? 'Ex: Câmara Municipal de Valdouros'
+                      : formData.type === 'empresa'
+                        ? 'Ex: Iberotejo'
+                        : ''
+                  }
+                  className="pl-10"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
             </div>
 
             {/* Email de acesso */}
@@ -294,21 +298,6 @@ export const ClientFormDialog = ({
                   className="pl-10"
                   value={formData.contactEmail}
                   onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            {/* Nome do contacto */}
-            <div className="space-y-2">
-              <Label htmlFor="contactName">Nome do contacto</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="contactName"
-                  placeholder="Nome da pessoa responsável"
-                  className="pl-10"
-                  value={formData.contactName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contactName: e.target.value }))}
                 />
               </div>
             </div>
