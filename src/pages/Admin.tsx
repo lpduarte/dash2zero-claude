@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Search,
   UserPlus,
+  UserSearch,
   Filter,
   Archive,
   ChevronRight,
@@ -401,7 +402,7 @@ const Admin = () => {
         {/* Estado vazio */}
         {filteredClients.length === 0 && (
           <div className="text-center py-12">
-            <Building2 className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+            <UserSearch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-bold text-foreground mb-1">Nenhum cliente encontrado</h3>
             <p className="text-muted-foreground">Tente ajustar os filtros ou criar um novo cliente.</p>
           </div>
