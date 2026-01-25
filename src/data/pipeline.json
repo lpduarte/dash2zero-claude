@@ -2,14 +2,14 @@
   "metadata": {
     "project": "Dash2Zero",
     "client": "Get2C",
-    "lastUpdated": "2026-01-23",
+    "lastUpdated": "2026-01-25",
     "updatedBy": "LP"
   },
   "summary": {
     "total": 14,
-    "completed": 4,
+    "completed": 5,
     "inProgress": 0,
-    "pending": 10
+    "pending": 9
   },
   "categories": [
     {
@@ -53,16 +53,18 @@
       "title": "Setup e Administração de Utilizadores",
       "description": "Clarificar e implementar fluxo de criação de utilizadores (empresa vs município)",
       "category": "critical",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
       "briefing": "02-setup-administracao-utilizadores.md",
       "criteria": [
-        { "text": "Fluxo de criação de utilizadores documentado", "done": false },
-        { "text": "Distinção clara entre tipos de utilizador", "done": false },
-        { "text": "Página de definições de utilizador funcional", "done": false }
+        { "text": "Fluxo de criação de clientes com validações", "done": true },
+        { "text": "Distinção clara entre tipos (Município vs Empresa)", "done": true },
+        { "text": "Validação de email e campos obrigatórios", "done": true },
+        { "text": "Perfis de permissões com toggle", "done": true },
+        { "text": "Upload de logótipo opcional", "done": true }
       ],
       "dependencies": [],
-      "notes": ""
+      "notes": "Concluído em commits 84ea58f → f58d87a - melhorias ao formulário de criação de cliente"
     },
     {
       "id": "03",
