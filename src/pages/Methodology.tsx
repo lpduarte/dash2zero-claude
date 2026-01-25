@@ -6,7 +6,8 @@ import {
   BookOpen, Building2, Factory, TrendingDown,
   Info, BarChart3, Landmark,
   Briefcase, FileSpreadsheet, CheckCircle2,
-  Leaf, Scale, Library
+  Leaf, Scale, Library, Layers, LayoutDashboard,
+  Mail, Send, Upload, Users, AlertTriangle, Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,9 +16,9 @@ import { cn } from "@/lib/utils";
 // ============================================
 const METHODOLOGY_VERSION = {
   major: 1,
-  minor: 4,
+  minor: 5,
   patch: 0,
-  date: "2026-01-19",
+  date: "2026-01-25",
 };
 
 const getVersionString = () => `v${METHODOLOGY_VERSION.major}.${METHODOLOGY_VERSION.minor}.${METHODOLOGY_VERSION.patch}`;
@@ -35,6 +36,10 @@ const sections = [
   { id: 'intensidades', label: 'Fatores de Intensidade', icon: Scale },
   { id: 'dados', label: 'Dados a Recolher', icon: FileSpreadsheet },
   { id: 'onboarding', label: 'Fluxo de Onboarding', icon: CheckCircle2 },
+  { id: 'clusters', label: 'Gestão de Clusters', icon: Layers },
+  { id: 'dashboard', label: 'Painel de Controlo', icon: LayoutDashboard },
+  { id: 'incentivos', label: 'Incentivos', icon: Mail },
+  { id: 'email', label: 'Boas Práticas de Email', icon: Send },
   { id: 'bibliografia', label: 'Bibliografia', icon: Library },
 ];
 
@@ -1076,6 +1081,651 @@ export default function Methodology() {
                   A configuração dos estados de onboarding está centralizada em <code className="text-xs bg-muted px-1 py-0.5 rounded">src/config/onboardingStatus.ts</code>.
                   Esta configuração é utilizada em toda a aplicação para garantir consistência visual e descritiva.
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Gestão de Clusters === */}
+          <SectionHeader
+            id="clusters"
+            title="Gestão de Clusters"
+            icon={Layers}
+            description="Organização e gestão de grupos de empresas"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              Os clusters permitem organizar empresas em grupos lógicos para facilitar a gestão,
+              análise e comunicação. Cada cluster pode representar uma região, setor, programa ou
+              qualquer outro critério de agrupamento.
+            </p>
+
+            {/* Importação de Empresas */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-primary/10">
+                  <Upload className="h-4 w-4 text-primary" />
+                </div>
+                <h3 className="font-semibold">Importação de Empresas</h3>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                Existem 3 métodos para adicionar empresas a um cluster:
+              </p>
+
+              <div className="grid gap-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge className="shrink-0">1</Badge>
+                  <div>
+                    <p className="font-bold">Importação CSV</p>
+                    <p className="text-sm text-muted-foreground">
+                      Carregar um ficheiro CSV com as colunas: Nome, NIF, Email.
+                      O sistema valida automaticamente o formato e os dados.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge className="shrink-0">2</Badge>
+                  <div>
+                    <p className="font-bold">Colar Dados</p>
+                    <p className="text-sm text-muted-foreground">
+                      Copiar dados de uma folha de cálculo (Excel, Google Sheets) e colar
+                      directamente na interface. O sistema detecta automaticamente as colunas.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge className="shrink-0">3</Badge>
+                  <div>
+                    <p className="font-bold">Entrada Manual</p>
+                    <p className="text-sm text-muted-foreground">
+                      Adicionar empresas uma a uma através de um formulário.
+                      Útil para pequenas adições ou correções.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 p-3 bg-success/5 rounded-lg border border-success/20">
+                <Info className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                <p className="text-sm text-muted-foreground">
+                  <strong>Segurança:</strong> A importação nunca é destrutiva. Novos dados são
+                  adicionados ou actualizados, mas nunca eliminados automaticamente.
+                </p>
+              </div>
+            </div>
+
+            {/* Regras de Deduplicação */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-blue-500/10">
+                  <Users className="h-4 w-4 text-blue-500" />
+                </div>
+                <h3 className="font-semibold">Regras de Deduplicação</h3>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                O sistema utiliza o NIF como identificador único universal para evitar duplicações:
+              </p>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Cenário</th>
+                      <th className="text-left py-2 font-bold">Comportamento</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4">NIF não existe no sistema</td>
+                      <td className="py-2 text-muted-foreground">Nova empresa é criada e associada ao cluster</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4">NIF já existe noutro cluster</td>
+                      <td className="py-2 text-muted-foreground">Empresa é adicionada ao novo cluster (pertence a ambos)</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4">NIF já existe no mesmo cluster</td>
+                      <td className="py-2 text-muted-foreground">Dados são actualizados (nome, email) se diferentes</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex items-start gap-2 p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-sm text-muted-foreground">
+                  <strong>Multi-cluster:</strong> Uma empresa pode pertencer a múltiplos clusters
+                  simultaneamente. As contagens são sempre por NIF único, evitando dupla contagem
+                  nas estatísticas globais.
+                </p>
+              </div>
+            </div>
+
+            {/* Operações de Clusters */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Operações de Clusters</h3>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-success/10 border border-success/30">
+                  <Badge className="bg-success shrink-0">Criar</Badge>
+                  <div>
+                    <p className="text-sm font-bold">Criar Cluster</p>
+                    <p className="text-xs text-muted-foreground">
+                      Definir um nome e seleccionar um ícone identificativo.
+                      O cluster fica imediatamente disponível para receber empresas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                  <Badge className="bg-blue-500 shrink-0">Mover</Badge>
+                  <div>
+                    <p className="text-sm font-bold">Mover Empresas</p>
+                    <p className="text-xs text-muted-foreground">
+                      Transferir empresas entre clusters. Opção "manter cópia" permite
+                      que a empresa permaneça no cluster original e seja adicionada ao destino.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-danger/10 border border-danger/30">
+                  <Badge variant="destructive" className="shrink-0">Eliminar</Badge>
+                  <div>
+                    <p className="text-sm font-bold">Eliminar Cluster</p>
+                    <p className="text-xs text-muted-foreground">
+                      Duas opções disponíveis:<br />
+                      <strong>Opção 1:</strong> Mover todas as empresas para outro cluster antes de eliminar.<br />
+                      <strong>Opção 2:</strong> Eliminar referências (apenas empresas "órfãs" são removidas do sistema).
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Protecção de Dados */}
+            <div className="border rounded-lg p-4 space-y-4 bg-warning/5 border-warning/20">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-warning" />
+                <h3 className="font-semibold">Protecção de Dados</h3>
+              </div>
+
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  <strong>Empresas com pegada calculada são imutáveis:</strong> Não podem ser
+                  eliminadas nem ter os seus dados de emissões alterados para garantir a
+                  integridade histórica.
+                </p>
+                <p>
+                  <strong>Eliminação de cluster não apaga empresas partilhadas:</strong> Empresas
+                  que pertencem a múltiplos clusters mantêm-se no sistema através das outras associações.
+                </p>
+                <p>
+                  <strong>Apenas empresas "órfãs" são removidas:</strong> Empresas que só pertencem
+                  ao cluster a ser eliminado são efectivamente removidas do sistema.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Painel de Controlo === */}
+          <SectionHeader
+            id="dashboard"
+            title="Painel de Controlo"
+            icon={LayoutDashboard}
+            description="Dashboard de análise e monitorização de emissões"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              O Painel de Controlo (Dashboard) oferece uma visão consolidada das emissões de carbono
+              do seu portfolio de empresas, com métricas, gráficos e ferramentas de análise.
+            </p>
+
+            {/* Métricas Principais */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Métricas Principais (KPIs)</h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Métrica</th>
+                      <th className="text-left py-2 pr-4 font-bold">Descrição</th>
+                      <th className="text-left py-2 font-bold">Unidade</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Emissões Totais</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Soma de todas as emissões das empresas</td>
+                      <td className="py-2 text-muted-foreground">t CO₂e</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Potencial de Melhoria</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Redução possível com optimizações</td>
+                      <td className="py-2 text-muted-foreground">Alto/Médio/Baixo</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Média por Facturação</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Intensidade de carbono por euro gerado</td>
+                      <td className="py-2 text-muted-foreground">t CO₂e/€</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Média por Colaborador</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Intensidade de carbono por pessoa</td>
+                      <td className="py-2 text-muted-foreground">t CO₂e/colaborador</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Média por Área</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Intensidade de carbono por metro quadrado</td>
+                      <td className="py-2 text-muted-foreground">t CO₂e/m²</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* 5 Separadores */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Separadores do Dashboard</h3>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <Badge className="shrink-0">1</Badge>
+                  <div>
+                    <p className="font-bold">Visão Geral</p>
+                    <p className="text-sm text-muted-foreground">
+                      KPIs principais, cobertura de dados, lista de empresas críticas (acima da média)
+                      e top performers (mais eficientes).
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge variant="secondary" className="shrink-0">2</Badge>
+                  <div>
+                    <p className="font-bold">Empresas</p>
+                    <p className="text-sm text-muted-foreground">
+                      Lista completa de empresas com filtros avançados, pesquisa por nome/NIF,
+                      ordenação por múltiplos critérios, e visualização em grid ou tabela.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge variant="secondary" className="shrink-0">3</Badge>
+                  <div>
+                    <p className="font-bold">Detalhes de Emissões</p>
+                    <p className="text-sm text-muted-foreground">
+                      Gráficos de distribuição por âmbito (Scope 1, 2, 3), comparações
+                      temporais e análise de evolução das emissões.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge variant="secondary" className="shrink-0">4</Badge>
+                  <div>
+                    <p className="font-bold">Análise por Actividade</p>
+                    <p className="text-sm text-muted-foreground">
+                      Heatmap região×sector para identificar concentrações de emissões,
+                      benchmarking sectorial comparando com médias nacionais.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Badge variant="secondary" className="shrink-0">5</Badge>
+                  <div>
+                    <p className="font-bold">Análise Financeira</p>
+                    <p className="text-sm text-muted-foreground">
+                      Ranking por eficiência financeira (FE = emissões/facturação),
+                      gráfico Pareto 80/20 identificando empresas responsáveis pela maioria das emissões.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filtros Disponíveis */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Filtros Disponíveis</h3>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Cluster</p>
+                  <p className="text-xs text-muted-foreground">Grupo de empresas</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Dimensão</p>
+                  <p className="text-xs text-muted-foreground">Micro, Pequena, Média, Grande</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Sector</p>
+                  <p className="text-xs text-muted-foreground">Código CAE</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Região</p>
+                  <p className="text-xs text-muted-foreground">Distrito, Município, Freguesia</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Diferenças por Tipo de Utilizador */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="border rounded-lg p-4 space-y-3 bg-blue-500/5 border-blue-500/20">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-blue-500" />
+                  <h3 className="font-semibold">Vista Empresa</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Foco na gestão de fornecedores e cadeia de valor:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Análise de fornecedores por emissões</li>
+                  <li>Alternativas mais eficientes</li>
+                  <li>Impacto de substituição</li>
+                  <li>Optimização de Scope 3</li>
+                </ul>
+              </div>
+
+              <div className="border rounded-lg p-4 space-y-3 bg-purple-500/5 border-purple-500/20">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-4 w-4 text-purple-500" />
+                  <h3 className="font-semibold">Vista Município</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Foco na gestão territorial e políticas públicas:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Empresas de risco no território</li>
+                  <li>Emissões acima da média sectorial</li>
+                  <li>Infraestruturas de descarbonização</li>
+                  <li>Programas de incentivo</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* KPIs de Infraestruturas (Municípios) */}
+            <div className="border rounded-lg p-4 space-y-4 bg-purple-500/5 border-purple-500/20">
+              <div className="flex items-center gap-2">
+                <Landmark className="h-4 w-4 text-purple-500" />
+                <h3 className="font-semibold">KPIs de Infraestruturas (Municípios)</h3>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                Indicadores de infraestruturas de apoio à descarbonização no território:
+              </p>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {[
+                  "Postos de carregamento",
+                  "Ecopontos",
+                  "Estações de bicicletas",
+                  "Contentores orgânicos",
+                  "Ciclovias (km)",
+                  "Paragens de transporte público",
+                  "Qualidade do ar",
+                ].map((item) => (
+                  <div key={item} className="p-2 rounded bg-muted/30">
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Incentivos === */}
+          <SectionHeader
+            id="incentivos"
+            title="Incentivos"
+            icon={Mail}
+            description="Sistema de campanhas e acompanhamento de empresas"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              O módulo de Incentivos permite criar campanhas de email, acompanhar o progresso
+              das empresas no funil de onboarding e optimizar as taxas de conversão.
+            </p>
+
+            {/* Funil de Onboarding */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Funil de Onboarding (7 Fases)</h3>
+
+              <div className="space-y-2">
+                {[
+                  { num: "1", name: "Por Contactar", desc: "Nunca recebeu email", color: "bg-status-pending" },
+                  { num: "2", name: "Sem Interação", desc: "Recebeu mas não clicou", color: "bg-status-contacted" },
+                  { num: "3", name: "Interessada", desc: "Clicou no link", color: "bg-status-interested" },
+                  { num: "4", name: "Registada/Simple", desc: "Criou conta na plataforma", color: "bg-status-registered" },
+                  { num: "5", name: "Em Progresso/Simple", desc: "Iniciou cálculo no Simple", color: "bg-status-progress" },
+                  { num: "6", name: "Em Progresso/Formulário", desc: "Iniciou formulário manual", color: "bg-status-progress" },
+                  { num: "7", name: "Completo", desc: "Pegada calculada com sucesso", color: "bg-status-complete" },
+                ].map((phase) => (
+                  <div key={phase.num} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                    <Badge className={cn("shrink-0", phase.color)}>{phase.num}</Badge>
+                    <div className="flex-1">
+                      <span className="font-bold text-sm">{phase.name}</span>
+                      <span className="text-muted-foreground text-sm ml-2">— {phase.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Métricas de Campanha */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Métricas de Campanha</h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Métrica</th>
+                      <th className="text-left py-2 pr-4 font-bold">Benchmark</th>
+                      <th className="text-left py-2 font-bold">Significado</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Taxa de Conversão</td>
+                      <td className="py-2 pr-4 text-muted-foreground">—</td>
+                      <td className="py-2 text-muted-foreground">% que completou cálculo</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Time to Value</td>
+                      <td className="py-2 pr-4 text-muted-foreground">~12 dias</td>
+                      <td className="py-2 text-muted-foreground">Dias até conclusão</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Open Rate</td>
+                      <td className="py-2 pr-4 text-muted-foreground">&gt;20%</td>
+                      <td className="py-2 text-muted-foreground">% emails abertos</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Click-to-Open (CTOR)</td>
+                      <td className="py-2 pr-4 text-muted-foreground">&gt;30%</td>
+                      <td className="py-2 text-muted-foreground">% cliques entre aberturas</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Bounce Rate</td>
+                      <td className="py-2 pr-4 text-muted-foreground">&lt;2%</td>
+                      <td className="py-2 text-muted-foreground">% não entregues</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Spam Rate</td>
+                      <td className="py-2 pr-4 text-muted-foreground">&lt;0.1%</td>
+                      <td className="py-2 text-muted-foreground">% marcados como spam</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Envio Inteligente */}
+            <div className="border rounded-lg p-4 space-y-4 bg-success/5 border-success/20">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-success" />
+                <h3 className="font-semibold">Envio Inteligente</h3>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                O sistema de envio inteligente optimiza automaticamente as campanhas:
+              </p>
+
+              <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
+                <li>Agrupa empresas por template recomendado</li>
+                <li>Associação automática baseada no estado de onboarding</li>
+                <li>Optimiza taxa de conversão com base em dados históricos</li>
+                <li>Evita saturação de contactos</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* === SECTION: Boas Práticas de Email === */}
+          <SectionHeader
+            id="email"
+            title="Boas Práticas de Email"
+            icon={Send}
+            description="Recomendações para campanhas de email efectivas"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              Seguir estas boas práticas maximiza a eficácia das campanhas de email
+              e protege a reputação do domínio de envio.
+            </p>
+
+            {/* Templates Disponíveis */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Templates Disponíveis</h3>
+
+              <div className="grid gap-3">
+                {[
+                  { num: "1", name: "Convite Inicial", desc: "Primeiro contacto, explica benefícios do cálculo da pegada" },
+                  { num: "2", name: "Lembrete", desc: "Follow-up amigável para empresas sem interação" },
+                  { num: "3", name: "Benefícios", desc: "Detalha vantagens competitivas da descarbonização" },
+                  { num: "4", name: "Urgente", desc: "Foco em requisitos regulamentares e prazos" },
+                  { num: "5", name: "Personalizado", desc: "Template em branco para mensagens customizadas" },
+                ].map((template) => (
+                  <div key={template.num} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <Badge variant="secondary" className="shrink-0">{template.num}</Badge>
+                    <div>
+                      <p className="font-bold text-sm">{template.name}</p>
+                      <p className="text-xs text-muted-foreground">{template.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Gestão de Bounces */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Gestão de Bounces</h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Tipo</th>
+                      <th className="text-left py-2 pr-4 font-bold">Causa</th>
+                      <th className="text-left py-2 font-bold">Acção</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4">
+                        <Badge variant="destructive">Hard Bounce</Badge>
+                      </td>
+                      <td className="py-2 pr-4 text-muted-foreground">Email inválido, domínio inexistente</td>
+                      <td className="py-2 text-muted-foreground">Remover da lista imediatamente</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4">
+                        <Badge className="bg-warning text-warning-foreground">Soft Bounce</Badge>
+                      </td>
+                      <td className="py-2 pr-4 text-muted-foreground">Caixa cheia, servidor temporariamente indisponível</td>
+                      <td className="py-2 text-muted-foreground">Retry em 24-48h (máx. 3 tentativas)</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4">
+                        <Badge variant="outline">Spam</Badge>
+                      </td>
+                      <td className="py-2 pr-4 text-muted-foreground">Marcado como spam pelo destinatário</td>
+                      <td className="py-2 text-muted-foreground">Remover imediatamente da lista</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Indicadores de Saturação */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <h3 className="font-semibold">Indicadores de Saturação</h3>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                O sistema indica visualmente o nível de saturação de cada contacto:
+              </p>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <div className="w-3 h-3 rounded-full bg-gray-400 mx-auto mb-2" />
+                  <p className="font-bold text-sm">0 emails</p>
+                  <p className="text-xs text-muted-foreground">Por contactar</p>
+                </div>
+                <div className="p-3 rounded-lg bg-blue-500/10 text-center">
+                  <div className="w-3 h-3 rounded-full bg-blue-500 mx-auto mb-2" />
+                  <p className="font-bold text-sm">1 email</p>
+                  <p className="text-xs text-muted-foreground">Contactado</p>
+                </div>
+                <div className="p-3 rounded-lg bg-warning/10 text-center">
+                  <div className="w-3 h-3 rounded-full bg-warning mx-auto mb-2" />
+                  <p className="font-bold text-sm">2 emails</p>
+                  <p className="text-xs text-muted-foreground">Atenção</p>
+                </div>
+                <div className="p-3 rounded-lg bg-danger/10 text-center">
+                  <div className="w-3 h-3 rounded-full bg-danger mx-auto mb-2" />
+                  <p className="font-bold text-sm">3+ emails</p>
+                  <p className="text-xs text-muted-foreground">Saturado</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Recomendações */}
+            <div className="border rounded-lg p-4 space-y-4 bg-primary/5 border-primary/20">
+              <h3 className="font-semibold">Recomendações</h3>
+
+              <div className="grid gap-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Espaçamento:</strong> Manter ~25 dias entre envios para o mesmo destinatário
+                  </p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Bounce rate:</strong> Monitorizar e manter abaixo de 5%
+                  </p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-danger mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Spam rate crítico:</strong> &gt;0.5% representa risco de bloqueio do domínio
+                  </p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Envio Inteligente:</strong> Utilizar para optimização automática baseada em dados
+                  </p>
+                </div>
               </div>
             </div>
           </div>
