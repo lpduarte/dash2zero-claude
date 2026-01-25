@@ -139,7 +139,7 @@ export const ClientFormDialog = ({
 
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Step Indicator */}
-          <div className="flex items-center justify-center gap-2 py-4">
+          <div className="flex items-start justify-center gap-2 py-4">
             <button
               type="button"
               onClick={() => setActiveTab('dados')}
@@ -160,7 +160,7 @@ export const ClientFormDialog = ({
             </button>
 
             <div className={cn(
-              "h-0.5 w-16 mx-2 transition-colors",
+              "h-0.5 w-16 mx-2 mt-6 transition-colors",
               activeTab === 'permissoes' ? "bg-primary/40" : "bg-border"
             )} />
 

@@ -1185,17 +1185,17 @@ const StyleGuide = () => {
 
               return (
                 <Card className="p-6">
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-start justify-center gap-2">
                     {steps.map((step, idx) => {
                       const StepIcon = step.icon;
                       const state = getStepState(step.number);
 
                       return (
-                        <div key={step.number} className="flex items-center">
+                        <div key={step.number} className="flex items-start">
                           {idx > 0 && (
                             <div
                               className={cn(
-                                "h-0.5 w-16 mx-2 transition-colors",
+                                "h-0.5 w-16 mx-2 mt-6 transition-colors",
                                 step.number <= demoStep ? "bg-primary/40" : "bg-border"
                               )}
                             />
