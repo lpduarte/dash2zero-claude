@@ -18,7 +18,7 @@ import {
   Mail,
   User,
   Eye,
-  Info,
+  SquareDashedKanban,
   ImageIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -338,14 +338,11 @@ export const ClientFormDialog = ({
             </div>
 
             {/* Nota sobre Get2Zero Pro */}
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-dashed">
-              <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-bold text-foreground">Integração Get2Zero Pro</p>
-                <p className="text-sm text-muted-foreground">
-                  Em breve: sincronização de dados de âmbito 3 com o ZeroPro.
-                </p>
-              </div>
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border border-dashed">
+              <SquareDashedKanban className="h-5 w-5 text-muted-foreground shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                Em breve — integração com o Get2Zero Pro para sincronização de dados de Âmbito 3
+              </p>
             </div>
           </div>
           )}
