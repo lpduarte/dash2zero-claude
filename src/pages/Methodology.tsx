@@ -7,7 +7,8 @@ import {
   Info, BarChart3, Landmark,
   Briefcase, FileSpreadsheet, CheckCircle2,
   Leaf, Scale, Library, Layers, LayoutDashboard,
-  Mail, Send, Upload, Users, AlertTriangle, Clock
+  Mail, Send, Upload, Users, AlertTriangle, Clock,
+  TowerControl
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ import { cn } from "@/lib/utils";
 // ============================================
 const METHODOLOGY_VERSION = {
   major: 1,
-  minor: 5,
+  minor: 6,
   patch: 0,
   date: "2026-01-25",
 };
@@ -37,7 +38,8 @@ const sections = [
   { id: 'dados', label: 'Dados a Recolher', icon: FileSpreadsheet },
   { id: 'onboarding', label: 'Fluxo de Onboarding', icon: CheckCircle2 },
   { id: 'clusters', label: 'Gestão de Clusters', icon: Layers },
-  { id: 'dashboard', label: 'Painel de Controlo', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'admin', label: 'Painel de Controlo', icon: TowerControl },
   { id: 'incentivos', label: 'Incentivos', icon: Mail },
   { id: 'email', label: 'Boas Práticas de Email', icon: Send },
   { id: 'bibliografia', label: 'Bibliografia', icon: Library },
@@ -1269,17 +1271,17 @@ export default function Methodology() {
             </div>
           </div>
 
-          {/* === SECTION: Painel de Controlo === */}
+          {/* === SECTION: Dashboard === */}
           <SectionHeader
             id="dashboard"
-            title="Painel de Controlo"
+            title="Dashboard"
             icon={LayoutDashboard}
-            description="Dashboard de análise e monitorização de emissões"
+            description="Análise e monitorização de emissões de carbono"
           />
 
           <div className="space-y-6">
             <p className="text-muted-foreground">
-              O Painel de Controlo (Dashboard) oferece uma visão consolidada das emissões de carbono
+              O Dashboard oferece uma visão consolidada das emissões de carbono
               do seu portfolio de empresas, com métricas, gráficos e ferramentas de análise.
             </p>
 
@@ -1473,6 +1475,226 @@ export default function Methodology() {
                     <span className="text-sm">{item}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Painel de Controlo === */}
+          <SectionHeader
+            id="admin"
+            title="Painel de Controlo"
+            icon={TowerControl}
+            description="Gestão de clientes, permissões e métricas globais (apenas Get2C)"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              O Painel de Controlo é a área de administração exclusiva para utilizadores Get2C.
+              Permite gerir clientes, definir permissões de acesso e monitorizar métricas agregadas
+              de toda a plataforma.
+            </p>
+
+            {/* Acesso */}
+            <div className="border rounded-lg p-4 space-y-3 bg-card">
+              <h3 className="font-semibold">Acesso</h3>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Disponível apenas para utilizadores do tipo <strong>Get2C</strong></li>
+                <li>Acessível via menu "Painel de controlo" no header</li>
+                <li>Rota protegida: utilizadores não-Get2C são redirecionados</li>
+              </ul>
+            </div>
+
+            {/* Gestão de Clientes */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Gestão de Clientes</h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Criar Cliente</p>
+                  <p className="text-xs text-muted-foreground">Nome, email, tipo (Município/Empresa), logótipo</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Editar Cliente</p>
+                  <p className="text-xs text-muted-foreground">Alterar dados e permissões existentes</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Arquivar/Reactivar</p>
+                  <p className="text-xs text-muted-foreground">Ocultar clientes sem eliminar dados</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Eliminar</p>
+                  <p className="text-xs text-muted-foreground">Remover permanentemente (apenas arquivados)</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Perfis de Permissões */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Perfis de Permissões</h3>
+              <p className="text-sm text-muted-foreground">
+                Três perfis pré-definidos para configuração rápida:
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <Badge className="shrink-0 bg-blue-500">1</Badge>
+                  <div>
+                    <p className="font-bold">Visualização</p>
+                    <p className="text-sm text-muted-foreground">
+                      Apenas consulta. Dashboard completo, clusters e incentivos só leitura, sem pipeline.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                  <Badge className="shrink-0 bg-amber-500">2</Badge>
+                  <div>
+                    <p className="font-bold">Gestão Parcial</p>
+                    <p className="text-sm text-muted-foreground">
+                      Pode criar/editar clusters, enviar emails. Não pode eliminar nem gerir templates.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-500/5 border border-green-500/20">
+                  <Badge className="shrink-0 bg-green-500">3</Badge>
+                  <div>
+                    <p className="font-bold">Gestão Completa</p>
+                    <p className="text-sm text-muted-foreground">
+                      Acesso total a todas as funcionalidades, incluindo eliminação e gestão de templates.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Permissões Granulares */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Permissões Granulares</h3>
+              <p className="text-sm text-muted-foreground">
+                Além dos perfis, cada permissão pode ser configurada individualmente:
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Módulo</th>
+                      <th className="text-left py-2 font-bold">Permissões Disponíveis</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Dashboard</td>
+                      <td className="py-2 text-muted-foreground">Ver KPIs, gráficos, detalhes, usar filtros</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Clusters</td>
+                      <td className="py-2 text-muted-foreground">Ver KPIs/lista, criar, editar, eliminar, gerir empresas</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Incentivos</td>
+                      <td className="py-2 text-muted-foreground">Ver KPIs/funil/lista, enviar emails, gerir templates</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Pipeline</td>
+                      <td className="py-2 text-muted-foreground">Ver, editar</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Métricas Globais */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Métricas Globais</h3>
+              <p className="text-sm text-muted-foreground">
+                O painel apresenta métricas agregadas de todos os clientes activos:
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Total Clientes</p>
+                  <p className="text-xs text-muted-foreground">Municípios + Empresas</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Empresas Registadas</p>
+                  <p className="text-xs text-muted-foreground">Todas as empresas</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Taxa de Conversão</p>
+                  <p className="text-xs text-muted-foreground">% cálculos completos</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30 text-center">
+                  <p className="font-bold text-sm">Por Contactar</p>
+                  <p className="text-xs text-muted-foreground">Aguardam 1º email</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Visualizações */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Visualizações</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <Badge variant="secondary" className="shrink-0">1</Badge>
+                  <div>
+                    <p className="font-bold text-sm">Funil Global de Onboarding</p>
+                    <p className="text-xs text-muted-foreground">
+                      Visualização ramificada: Por Contactar → Sem Interação → Interessada,
+                      depois bifurca para Simple e Formulário.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Badge variant="secondary" className="shrink-0">2</Badge>
+                  <div>
+                    <p className="font-bold text-sm">Gráfico de Actividade</p>
+                    <p className="text-xs text-muted-foreground">
+                      Pegadas concluídas por semana (últimas 12 semanas) em todos os clientes.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Badge variant="secondary" className="shrink-0">3</Badge>
+                  <div>
+                    <p className="font-bold text-sm">Distribuição Simple/Formulário</p>
+                    <p className="text-xs text-muted-foreground">
+                      Gráfico circular mostrando proporção de cada tipo de cálculo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Cards de Cliente */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Cards de Cliente</h3>
+              <p className="text-sm text-muted-foreground">
+                Cada cliente é apresentado num card com:
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Logótipo, nome e tipo (Município/Empresa)</li>
+                <li>Mini-métricas: empresas, conversão, última actividade</li>
+                <li>Sparkline de actividade semanal</li>
+                <li>Mini-funil de onboarding</li>
+                <li>Alertas (bounces de email)</li>
+                <li>Acções: Editar, Arquivar, Dashboard</li>
+              </ul>
+            </div>
+
+            {/* Pesquisa e Filtros */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-semibold">Pesquisa e Filtros</h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <p className="font-bold text-sm mb-2">Pesquisa</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Por nome do cliente</li>
+                    <li>Por email de contacto</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold text-sm mb-2">Filtros</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Por tipo: Todos, Municípios, Empresas</li>
+                    <li>Por estado: Activos, Arquivados, Todos</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
