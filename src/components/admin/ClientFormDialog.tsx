@@ -139,43 +139,46 @@ export const ClientFormDialog = ({
 
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Step Indicator */}
-          <div className="flex items-center justify-center gap-3 py-4">
+          <div className="flex items-center justify-center gap-2 py-4">
             <button
               type="button"
               onClick={() => setActiveTab('dados')}
-              className="flex flex-col items-center gap-1.5"
+              className="flex flex-col items-center gap-2"
             >
               <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                "w-12 h-12 rounded-full flex items-center justify-center transition-all",
                 activeTab === 'dados'
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  : "bg-background text-muted-foreground border-2 border-border hover:border-primary/50 hover:bg-primary/10"
               )}>
                 <User className="h-5 w-5" />
               </div>
               <span className={cn(
-                "text-xs font-bold",
+                "text-sm font-bold",
                 activeTab === 'dados' ? "text-primary" : "text-muted-foreground"
               )}>Dados</span>
             </button>
 
-            <div className="h-px w-12 bg-border" />
+            <div className={cn(
+              "h-0.5 w-16 mx-2 transition-colors",
+              activeTab === 'permissoes' ? "bg-primary/40" : "bg-border"
+            )} />
 
             <button
               type="button"
               onClick={() => setActiveTab('permissoes')}
-              className="flex flex-col items-center gap-1.5"
+              className="flex flex-col items-center gap-2"
             >
               <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                "w-12 h-12 rounded-full flex items-center justify-center transition-all",
                 activeTab === 'permissoes'
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  : "bg-background text-muted-foreground border-2 border-border hover:border-primary/50 hover:bg-primary/10"
               )}>
                 <Eye className="h-5 w-5" />
               </div>
               <span className={cn(
-                "text-xs font-bold",
+                "text-sm font-bold",
                 activeTab === 'permissoes' ? "text-primary" : "text-muted-foreground"
               )}>Permissões</span>
             </button>

@@ -7,7 +7,8 @@ import {
   Table2, PieChart, Star, Moon, Sun, Factory, Building2,
   Zap, TrendingUp, TrendingDown, Download, Filter, Search, Settings,
   Info, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
-  Eye, Mail, Users, Leaf, Copy, Code, Truck, Plus, MessageSquare
+  Eye, Mail, Users, Leaf, Copy, Code, Truck, Plus, MessageSquare,
+  ListOrdered, User, Euro, FileText
 } from "lucide-react";
 
 // ============================================
@@ -107,6 +108,7 @@ const sections = [
   { id: 'inputs', label: 'Inputs', icon: FormInput },
   { id: 'select', label: 'Select', icon: ListFilter },
   { id: 'dialogs', label: 'Dialogs', icon: MessageSquare },
+  { id: 'steps', label: 'Steps', icon: ListOrdered },
   { id: 'kpi-cards', label: 'KPI Cards', icon: BarChart3 },
   { id: 'tabs', label: 'Tabs', icon: Columns },
   { id: 'tabelas', label: 'Tabelas', icon: Table2 },
@@ -1146,6 +1148,153 @@ const StyleGuide = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </div>
+        </div>
+
+        {/* === SECÇÃO: STEPS === */}
+        <SectionHeader
+          id="steps"
+          title="Steps"
+          icon={ListOrdered}
+          description="Indicadores de progresso em fluxos multi-etapa"
+        />
+
+        <div className="space-y-8">
+          {/* Exemplo interactivo */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Step Indicator</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Usado em modais e fluxos com várias etapas. Cada step tem um círculo com ícone, label em baixo, e linhas conectoras.
+            </p>
+
+            {(() => {
+              const [demoStep, setDemoStep] = useState(2);
+
+              const steps = [
+                { number: 1, title: 'Análise', icon: BarChart3 },
+                { number: 2, title: 'Medidas', icon: Zap },
+                { number: 3, title: 'Financiamento', icon: Euro },
+                { number: 4, title: 'Resumo', icon: FileText },
+              ];
+
+              const getStepState = (stepNumber: number) => {
+                if (stepNumber < demoStep) return 'completed';
+                if (stepNumber === demoStep) return 'current';
+                return 'pending';
+              };
+
+              return (
+                <Card className="p-6">
+                  <div className="flex items-center justify-center gap-2">
+                    {steps.map((step, idx) => {
+                      const StepIcon = step.icon;
+                      const state = getStepState(step.number);
+
+                      return (
+                        <div key={step.number} className="flex items-center">
+                          {idx > 0 && (
+                            <div
+                              className={cn(
+                                "h-0.5 w-16 mx-2 transition-colors",
+                                step.number <= demoStep ? "bg-primary/40" : "bg-border"
+                              )}
+                            />
+                          )}
+
+                          <button
+                            onClick={() => setDemoStep(step.number)}
+                            className="flex flex-col items-center gap-2 transition-all cursor-pointer"
+                          >
+                            <div
+                              className={cn(
+                                "w-12 h-12 rounded-full flex items-center justify-center transition-all",
+                                state === 'current'
+                                  ? "bg-primary text-primary-foreground"
+                                  : state === 'completed'
+                                    ? "bg-primary/20 text-primary border-2 border-primary/30"
+                                    : "bg-background text-muted-foreground border-2 border-border",
+                                state !== 'current' && "hover:border-primary/50 hover:bg-primary/10"
+                              )}
+                            >
+                              <StepIcon className="h-5 w-5" />
+                            </div>
+
+                            <span
+                              className={cn(
+                                "text-sm font-bold transition-colors",
+                                state === 'current'
+                                  ? "text-primary"
+                                  : state === 'completed'
+                                    ? "text-primary/70"
+                                    : "text-muted-foreground"
+                              )}
+                            >
+                              {step.title}
+                            </span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-xs text-muted-foreground text-center mt-6">
+                    Clica nos steps para mudar o estado activo
+                  </p>
+                </Card>
+              );
+            })()}
+          </div>
+
+          {/* Estados */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Estados</h3>
+            <div className="grid grid-cols-3 gap-6">
+              <Card className="p-4 text-center">
+                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-3">
+                  <User className="h-5 w-5" />
+                </div>
+                <p className="font-bold text-sm">Current</p>
+                <p className="text-xs text-muted-foreground mt-1">bg-primary</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <div className="w-12 h-12 rounded-full bg-primary/20 text-primary border-2 border-primary/30 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="h-5 w-5" />
+                </div>
+                <p className="font-bold text-sm">Completed</p>
+                <p className="text-xs text-muted-foreground mt-1">bg-primary/20 + border</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <div className="w-12 h-12 rounded-full bg-background text-muted-foreground border-2 border-border flex items-center justify-center mx-auto mb-3">
+                  <Eye className="h-5 w-5" />
+                </div>
+                <p className="font-bold text-sm">Pending</p>
+                <p className="text-xs text-muted-foreground mt-1">bg-background + border</p>
+              </Card>
+            </div>
+          </div>
+
+          {/* Especificações */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Especificações</h3>
+            <Card className="p-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="font-bold mb-2">Dimensões</p>
+                  <ul className="space-y-1 text-muted-foreground">
+                    <li>Círculo: <code className="text-xs bg-muted px-1 rounded">w-12 h-12</code></li>
+                    <li>Ícone: <code className="text-xs bg-muted px-1 rounded">h-5 w-5</code></li>
+                    <li>Linha: <code className="text-xs bg-muted px-1 rounded">h-0.5 w-16</code></li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold mb-2">Tipografia</p>
+                  <ul className="space-y-1 text-muted-foreground">
+                    <li>Label: <code className="text-xs bg-muted px-1 rounded">text-sm font-bold</code></li>
+                    <li>Gap círculo-label: <code className="text-xs bg-muted px-1 rounded">gap-2</code></li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
 
