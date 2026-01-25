@@ -20,6 +20,8 @@ import {
   Eye,
   SquareDashedKanban,
   ImageIcon,
+  PenLine,
+  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Client, ClientPermissions, PermissionProfile } from '@/types/user';
@@ -355,23 +357,29 @@ export const ClientFormDialog = ({
               <Label>Perfil de acesso</Label>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { id: 'visualizacao' as const, label: 'Visualização', desc: 'Apenas ver KPIs' },
-                  { id: 'gestao-parcial' as const, label: 'Gestão parcial', desc: 'Ver + algumas ações' },
-                  { id: 'gestao-completa' as const, label: 'Gestão completa', desc: 'Acesso total' },
+                  { id: 'visualizacao' as const, label: 'Visualização', desc: 'Apenas ver KPIs', icon: Eye },
+                  { id: 'gestao-parcial' as const, label: 'Gestão parcial', desc: 'Ver + algumas ações', icon: PenLine },
+                  { id: 'gestao-completa' as const, label: 'Gestão completa', desc: 'Acesso total', icon: ShieldCheck },
                 ].map(profile => (
                   <button
                     key={profile.id}
                     type="button"
                     onClick={() => handleProfileChange(profile.id)}
                     className={cn(
-                      "p-3 rounded-lg border-2 text-left transition-all",
+                      "p-4 rounded-lg border-2 text-center transition-all flex flex-col items-center gap-2",
                       selectedProfile === profile.id
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
                     )}
                   >
-                    <p className="font-bold text-sm">{profile.label}</p>
-                    <p className="text-xs text-muted-foreground">{profile.desc}</p>
+                    <profile.icon className={cn(
+                      "h-6 w-6",
+                      selectedProfile === profile.id ? "text-primary" : "text-muted-foreground"
+                    )} />
+                    <div>
+                      <p className="font-bold text-sm">{profile.label}</p>
+                      <p className="text-xs text-muted-foreground">{profile.desc}</p>
+                    </div>
                   </button>
                 ))}
               </div>
