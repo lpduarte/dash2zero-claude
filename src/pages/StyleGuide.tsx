@@ -702,7 +702,10 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-xl font-bold mb-2">Âmbitos</h3>
             <p className="text-sm text-muted-foreground mb-4">Cores para gráficos de emissões por âmbito</p>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+
+            {/* Current colors */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Actuais (pastel)</p>
+            <div className="grid grid-cols-3 gap-2 mb-6">
               {allColors.scope.map((c) => (
                 <ColorSwatch
                   key={c.name}
@@ -715,6 +718,53 @@ const StyleGuide = () => {
               ))}
             </div>
 
+            {/* Option 1: Increased saturation */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Opção 1: Saturação aumentada (~65-70%)</p>
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              <ColorSwatch label="scope-1-alt" hsl="12 65% 58%" tailwind="—" note="Âmbito 1 - Coral vibrante" />
+              <ColorSwatch label="scope-2-alt" hsl="42 70% 55%" tailwind="—" note="Âmbito 2 - Âmbar vibrante" />
+              <ColorSwatch label="scope-3-alt" hsl="195 60% 45%" tailwind="—" note="Âmbito 3 - Petróleo vibrante" />
+            </div>
+
+            {/* Option 3: New dedicated palette */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Opção 3: Paleta nova dedicada</p>
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              <ColorSwatch label="scope-1-new" hsl="0 65% 55%" tailwind="—" note="Âmbito 1 - Vermelho terra" />
+              <ColorSwatch label="scope-2-new" hsl="35 75% 50%" tailwind="—" note="Âmbito 2 - Laranja dourado" />
+              <ColorSwatch label="scope-3-new" hsl="210 55% 50%" tailwind="—" note="Âmbito 3 - Azul oceano" />
+            </div>
+
+            {/* Visual comparison with mini charts */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Comparação visual</p>
+            <div className="grid grid-cols-3 gap-4">
+              {/* Current */}
+              <div className="border rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-2 text-center">Actuais</p>
+                <div className="flex gap-1 h-20">
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(12 50% 65%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(45 50% 65%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(195 45% 55%)' }} />
+                </div>
+              </div>
+              {/* Option 1 */}
+              <div className="border rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-2 text-center">Opção 1</p>
+                <div className="flex gap-1 h-20">
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(12 65% 58%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(42 70% 55%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(195 60% 45%)' }} />
+                </div>
+              </div>
+              {/* Option 3 */}
+              <div className="border rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-2 text-center">Opção 3</p>
+                <div className="flex gap-1 h-20">
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(0 65% 55%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(35 75% 50%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(210 55% 50%)' }} />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Cores de Onboarding Status */}
