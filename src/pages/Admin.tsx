@@ -584,7 +584,9 @@ const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProp
           </div>
         </div>
         <div className="min-w-0 flex-1 self-center">
-          <h3 className={cn("font-bold text-lg line-clamp-1", client.isArchived ? "text-muted-foreground" : "text-foreground")}>{client.name}</h3>
+          <h3 className={cn("font-bold text-lg line-clamp-1", client.isArchived ? "text-muted-foreground" : "text-foreground")}>
+            {client.type === 'municipio' ? `Município de ${client.name}` : client.name}
+          </h3>
         </div>
         {/* Ícones: arquivo (se arquivado) + tipo */}
         <div className="flex items-center gap-1.5 shrink-0">

@@ -62,7 +62,7 @@ export const MunicipioCombobox = ({
           disabled={disabled}
           className="w-full justify-between font-normal"
         >
-          {value || <span className="text-muted-foreground">{placeholder}</span>}
+          {value || <span className="text-muted-foreground/60">{placeholder}</span>}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -88,10 +88,10 @@ export const MunicipioCombobox = ({
               Nenhum município encontrado.
             </div>
           ) : (
-            <div className="p-1">
-              {filteredDistritos.map((distrito) => (
-                <div key={distrito.distrito}>
-                  <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground sticky top-0 bg-popover">
+            <div className="py-1">
+              {filteredDistritos.map((distrito, index) => (
+                <div key={distrito.distrito} className={index > 0 ? 'mt-2' : ''}>
+                  <div className="px-3 py-2 text-xs font-bold text-primary bg-primary/5 border-y">
                     {distrito.distrito}
                   </div>
                   {distrito.municipios.map((municipio) => {
