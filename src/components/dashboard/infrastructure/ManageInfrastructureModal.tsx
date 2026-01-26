@@ -202,8 +202,8 @@ export const ManageInfrastructureModal = ({
         checked={visibility[infraKey]}
         onCheckedChange={() => toggleVisibility(infraKey)}
       />
-      <span className="text-sm w-16">
-        {visibility[infraKey] ? 'Listar' : 'Remover'}
+      <span className="text-sm w-20">
+        {visibility[infraKey] ? 'Listado' : 'Removido'}
       </span>
     </div>
   );
@@ -273,66 +273,71 @@ export const ManageInfrastructureModal = ({
     const value = values[infraKey];
 
     return (
-      <div className={`border rounded-lg ${shadows.sm} transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
-        {/* Header with icon, title and toggle */}
-        <div className="p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
+      <div className={`border rounded-lg ${shadows.sm}`}>
+        {/* Header with toggle - always full opacity */}
+        <div className="p-4 pb-3">
+          <div className="flex items-start justify-between">
+            <div className={`flex items-center gap-3 transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
               <IconBox icon={icon} />
               <span className="font-bold">{title}</span>
             </div>
             <VisibilityToggle infraKey={infraKey} />
           </div>
-
-          {/* Description/disclaimer - below title */}
-          <p className="text-sm text-muted-foreground">
-            {description}
-          </p>
         </div>
 
-        {/* Separator */}
-        <div className="border-t border-border" />
-
-        {/* Source and value section */}
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            {isApiCapable ? (
-              <SourceSelector
-                infraKey={infraKey as keyof InfrastructureSources}
-                apiLabel={apiLabel!}
-              />
-            ) : (
-              <ManualSourceLabel />
-            )}
-
-            <div className="flex items-center gap-3">
-              <input
-                type={step ? 'number' : 'text'}
-                step={step}
-                value={value}
-                onChange={(e) => updateValue(infraKey, e.target.value)}
-                disabled={isApiSource}
-                className={`${elements.inputSmall} ${isApiSource ? 'bg-muted cursor-not-allowed' : ''}`}
-              />
-              {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
-              {isApiSource && (
-                <button
-                  onClick={() => handleRefreshData(title.toLowerCase())}
-                  className={elements.outlineButtonSm}
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Atualizar
-                </button>
-              )}
-            </div>
+        {/* Content area - affected by opacity */}
+        <div className={`transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
+          {/* Description/disclaimer - below title */}
+          <div className="px-4 pb-4">
+            <p className="text-sm text-muted-foreground">
+              {description}
+            </p>
           </div>
 
-          {/* API last update info */}
-          {isApiSource && apiLastUpdate && (
-            <p className="text-xs text-muted-foreground mt-3">
-              Última atualização: {apiLastUpdate} · Atualização automática semanal
-            </p>
-          )}
+          {/* Separator */}
+          <div className="border-t border-border" />
+
+          {/* Source and value section */}
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              {isApiCapable ? (
+                <SourceSelector
+                  infraKey={infraKey as keyof InfrastructureSources}
+                  apiLabel={apiLabel!}
+                />
+              ) : (
+                <ManualSourceLabel />
+              )}
+
+              <div className="flex items-center gap-3">
+                <input
+                  type={step ? 'number' : 'text'}
+                  step={step}
+                  value={value}
+                  onChange={(e) => updateValue(infraKey, e.target.value)}
+                  disabled={isApiSource}
+                  className={`${elements.inputSmall} ${isApiSource ? 'bg-muted cursor-not-allowed' : ''}`}
+                />
+                {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
+                {isApiSource && (
+                  <button
+                    onClick={() => handleRefreshData(title.toLowerCase())}
+                    className={elements.outlineButtonSm}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Atualizar
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* API last update info */}
+            {isApiSource && apiLastUpdate && (
+              <p className="text-xs text-muted-foreground mt-3">
+                Última atualização: {apiLastUpdate} · Atualização automática semanal
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );
