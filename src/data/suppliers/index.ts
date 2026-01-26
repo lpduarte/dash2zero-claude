@@ -100,7 +100,7 @@ export const addSupplierWithoutFootprint = (
   return newSupplier;
 };
 
-// Adicionar múltiplos suppliers (actualiza clusterIds se NIF já existe)
+// Adicionar múltiplos suppliers (atualiza clusterIds se NIF já existe)
 export const addSuppliersWithoutFootprint = (
   inputs: NewSupplierInput[],
   ownerType: OwnerType
@@ -133,7 +133,7 @@ export const addSuppliersWithoutFootprint = (
           );
         }
       }
-      // Retornar o supplier actualizado
+      // Retornar o supplier atualizado
       const updated = (ownerType === 'empresa'
         ? dynamicEmpresaSuppliersWithoutFootprint
         : dynamicMunicipioSuppliersWithoutFootprint
@@ -157,7 +157,7 @@ export const addSupplierToCluster = (
   ownerType: OwnerType
 ): boolean => {
   if (ownerType === 'empresa') {
-    // Tentar actualizar em suppliers dinâmicos (sem pegada)
+    // Tentar atualizar em suppliers dinâmicos (sem pegada)
     const index = dynamicEmpresaSuppliersWithoutFootprint.findIndex(s => s.id === supplierId);
     if (index !== -1) {
       dynamicEmpresaSuppliersWithoutFootprint = dynamicEmpresaSuppliersWithoutFootprint.map(s =>
@@ -175,7 +175,7 @@ export const addSupplierToCluster = (
       return true;
     }
   } else {
-    // Tentar actualizar em suppliers dinâmicos (sem pegada)
+    // Tentar atualizar em suppliers dinâmicos (sem pegada)
     const index = dynamicMunicipioSuppliersWithoutFootprint.findIndex(s => s.id === supplierId);
     if (index !== -1) {
       dynamicMunicipioSuppliersWithoutFootprint = dynamicMunicipioSuppliersWithoutFootprint.map(s =>
@@ -203,7 +203,7 @@ export const removeSupplierFromCluster = (
   ownerType: OwnerType
 ): boolean => {
   if (ownerType === 'empresa') {
-    // Tentar actualizar em suppliers dinâmicos (sem pegada)
+    // Tentar atualizar em suppliers dinâmicos (sem pegada)
     const index = dynamicEmpresaSuppliersWithoutFootprint.findIndex(s => s.id === supplierId);
     if (index !== -1) {
       dynamicEmpresaSuppliersWithoutFootprint = dynamicEmpresaSuppliersWithoutFootprint.map(s =>
@@ -222,7 +222,7 @@ export const removeSupplierFromCluster = (
       return true;
     }
   } else {
-    // Tentar actualizar em suppliers dinâmicos (sem pegada)
+    // Tentar atualizar em suppliers dinâmicos (sem pegada)
     const index = dynamicMunicipioSuppliersWithoutFootprint.findIndex(s => s.id === supplierId);
     if (index !== -1) {
       dynamicMunicipioSuppliersWithoutFootprint = dynamicMunicipioSuppliersWithoutFootprint.map(s =>

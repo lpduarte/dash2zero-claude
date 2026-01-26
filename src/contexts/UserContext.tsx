@@ -45,7 +45,7 @@ interface UserContextType {
   activeClient: Client | null;
   setActiveClient: (client: Client | null) => void;
 
-  // Permissões efectivas (do cliente ativo ou todas se Get2C sem cliente)
+  // Permissões efetivas (do cliente ativo ou todas se Get2C sem cliente)
   effectivePermissions: Client['permissions'] | null;
 }
 
@@ -109,7 +109,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Permissões efectivas
+  // Permissões efetivas
   const effectivePermissions = activeClient?.permissions ?? null;
 
   return (

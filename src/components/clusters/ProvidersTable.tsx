@@ -576,7 +576,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
         <div className="py-16 text-center">
           <CircleDot className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
           <p className="text-muted-foreground">
-            Seleccione um cluster para adicionar empresas
+            Selecione um cluster para adicionar empresas
           </p>
         </div>
       </Card>
@@ -667,7 +667,7 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
       {filteredAndSortedCompanies.length === 0 ? (
         <div className="text-center py-12 border rounded-lg">
           <p className="text-muted-foreground mb-3">
-            Nenhuma empresa encontrada com os filtros actuais.
+            Nenhuma empresa encontrada com os filtros atuais.
           </p>
           <Button variant="outline" size="sm" onClick={clearAllFilters}>
             Limpar filtros
@@ -856,9 +856,9 @@ export function ProvidersTable({ companies, onUpdateCompany, onDeleteCompanies, 
             <AlertDialogTitle>Confirmar eliminação</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteTarget === 'bulk'
-                ? `Tem a certeza que deseja eliminar ${selectedIds.size} empresas? Esta acção não pode ser revertida.`
+                ? `Tem a certeza que deseja eliminar ${selectedIds.size} empresas? Esta ação não pode ser revertida.`
                 : deleteTarget
-                  ? `Tem a certeza que deseja eliminar "${getCompanyNameForDelete(deleteTarget)}"? Esta acção não pode ser revertida.`
+                  ? `Tem a certeza que deseja eliminar "${getCompanyNameForDelete(deleteTarget)}"? Esta ação não pode ser revertida.`
                   : ''}
             </AlertDialogDescription>
           </AlertDialogHeader>

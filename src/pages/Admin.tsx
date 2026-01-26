@@ -213,7 +213,7 @@ const Admin = () => {
       <Header />
 
       <main className="relative z-10 max-w-[1400px] mx-auto px-8 py-8">
-        {/* Título da secção */}
+        {/* Título da seção */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">

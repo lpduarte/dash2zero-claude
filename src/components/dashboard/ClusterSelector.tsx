@@ -446,7 +446,7 @@ export function ClusterSelector({
                       {deleteAction === 'move' && otherClusters.length > 0 && (
                         <Select value={targetClusterId} onValueChange={setTargetClusterId}>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Seleccione o cluster de destino" />
+                            <SelectValue placeholder="Selecione o cluster de destino" />
                           </SelectTrigger>
                           <SelectContent>
                             {otherClusters.map(cluster => (

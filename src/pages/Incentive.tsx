@@ -1178,7 +1178,7 @@ const Incentive = () => {
                             </div>
                           </div>
 
-                          {/* Status + próxima acção + histórico */}
+                          {/* Status + próxima ação + histórico */}
                           <div className="flex items-center gap-2">
                             {/* Badge de status */}
                             <TooltipProvider delayDuration={100}>
@@ -1196,7 +1196,7 @@ const Incentive = () => {
                               </Tooltip>
                             </TooltipProvider>
 
-                            {/* Próxima acção sugerida */}
+                            {/* Próxima ação sugerida */}
                             <span className="text-xs text-muted-foreground hidden lg:inline">
                               → {getNextAction(company.onboardingStatus)}
                             </span>

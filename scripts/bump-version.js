@@ -12,7 +12,7 @@
  *
  * Exemplos:
  *   npm run version:patch -- "Correção de bug no header"
- *   npm run version:minor -- "Adicionada nova secção de ícones"
+ *   npm run version:minor -- "Adicionada nova seção de ícones"
  *   npm run version:major -- "Redesign completo do sistema"
  */
 

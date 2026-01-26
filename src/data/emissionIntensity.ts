@@ -95,7 +95,7 @@ export const bibliography = {
 export interface SectorEmissionFactor {
   /** Chave do setor (corresponde às chaves em sectors.ts) */
   sector: string;
-  /** Código CAE/NACE da Secção */
+  /** Código CAE/NACE da Seção */
   caeSection: string;
   /** Intensidade de carbono em kg CO₂eq por € de VAB */
   intensity: number;

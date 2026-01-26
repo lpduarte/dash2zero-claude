@@ -193,7 +193,7 @@
       "priority": 10,
       "briefing": "10-documentacao-metodologia.md",
       "criteria": [
-        { "text": "Secção sobre Incentivos adicionada", "done": true },
+        { "text": "Seção sobre Incentivos adicionada", "done": true },
         { "text": "KPIs documentados", "done": true },
         { "text": "Boas práticas de email incluídas", "done": true },
         { "text": "Processo de envio explicado", "done": true }

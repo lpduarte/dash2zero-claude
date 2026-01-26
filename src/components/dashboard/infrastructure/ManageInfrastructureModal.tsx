@@ -28,10 +28,12 @@ import {
   Link,
   PenLine,
   RefreshCw,
+  Loader2,
   LucideIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { shadows } from '@/lib/styles';
+import { fetchChargingStations, fetchTransportStops } from '@/services/infrastructureApis';
 
 // Keys for each infrastructure type
 export type InfrastructureKey =
@@ -48,6 +50,7 @@ export type InfrastructureVisibility = Record<InfrastructureKey, boolean>;
 const STORAGE_KEY = 'dash2zero-infrastructure-visibility';
 const VALUES_STORAGE_KEY = 'dash2zero-infrastructure-values';
 const SOURCES_STORAGE_KEY = 'dash2zero-infrastructure-sources';
+const LAST_SYNC_STORAGE_KEY = 'dash2zero-infrastructure-last-sync';
 
 // Default: all visible
 const defaultVisibility: InfrastructureVisibility = {
@@ -118,14 +121,39 @@ type SourceType = 'api' | 'manual';
 
 interface InfrastructureSources {
   chargingStations: SourceType;
-  bikeStations: SourceType;
+  publicTransport: SourceType;
   airQuality: SourceType;
 }
 
 const defaultSources: InfrastructureSources = {
   chargingStations: 'api',
-  bikeStations: 'api',
+  publicTransport: 'api',
   airQuality: 'api',
+};
+
+// Last sync timestamps per infrastructure type
+interface LastSyncTimestamps {
+  chargingStations?: string;
+  publicTransport?: string;
+}
+
+const getLastSyncTimestamps = (): LastSyncTimestamps => {
+  try {
+    const stored = localStorage.getItem(LAST_SYNC_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch {
+    // ignore
+  }
+  return {};
+};
+
+const saveLastSyncTimestamp = (key: keyof LastSyncTimestamps) => {
+  const timestamps = getLastSyncTimestamps();
+  timestamps[key] = new Date().toLocaleDateString('pt-PT');
+  localStorage.setItem(LAST_SYNC_STORAGE_KEY, JSON.stringify(timestamps));
+  return timestamps[key];
 };
 
 const getStoredSources = (): InfrastructureSources => {
@@ -180,7 +208,7 @@ const SourceSelector = ({
       value={source}
       onValueChange={(value: SourceType) => onSourceChange(value)}
     >
-      <SelectTrigger className="w-44 h-8">
+      <SelectTrigger className="w-56 h-8">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -222,6 +250,7 @@ const InfrastructureCard = ({
   apiLastUpdate,
   isVisible,
   isApiSource,
+  isLoading = false,
   value,
   source,
   onToggleVisibility,
@@ -240,6 +269,7 @@ const InfrastructureCard = ({
   apiLastUpdate?: string;
   isVisible: boolean;
   isApiSource: boolean;
+  isLoading?: boolean;
   value: string;
   source?: SourceType;
   onToggleVisibility: () => void;
@@ -303,9 +333,14 @@ const InfrastructureCard = ({
                   variant="outline"
                   size="sm"
                   onClick={onRefresh}
+                  disabled={isLoading}
                 >
-                  <RefreshCw className="h-4 w-4" />
-                  Atualizar
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                  {isLoading ? 'A atualizar...' : 'Atualizar'}
                 </Button>
               )}
             </div>
@@ -344,6 +379,12 @@ export const ManageInfrastructureModal = ({
 
   // Sources state (for API-capable infrastructures)
   const [sources, setSources] = useState<InfrastructureSources>(getStoredSources);
+
+  // Loading state for API calls
+  const [loadingApi, setLoadingApi] = useState<InfrastructureKey | null>(null);
+
+  // Last sync timestamps
+  const [lastSync, setLastSync] = useState<LastSyncTimestamps>(getLastSyncTimestamps);
 
   const toggleVisibility = (key: InfrastructureKey) => {
     const newVisibility = { ...visibility, [key]: !visibility[key] };
@@ -412,8 +453,52 @@ export const ManageInfrastructureModal = ({
     saveSources(newSources);
   };
 
-  const handleRefreshData = (type: string) => {
-    toast.success(`Dados de ${type} atualizados com sucesso`);
+  const handleRefreshApi = async (key: InfrastructureKey) => {
+    setLoadingApi(key);
+    const municipality = 'Cascais'; // TODO: get from context/props
+
+    try {
+      if (key === 'chargingStations') {
+        const result = await fetchChargingStations(municipality);
+        if (result.success) {
+          const newValue = result.total.toString();
+          const newValues = { ...values, chargingStations: newValue };
+          setValues(newValues);
+          saveValues(newValues);
+          onValuesChange?.(newValues);
+          const syncDate = saveLastSyncTimestamp('chargingStations');
+          setLastSync(prev => ({ ...prev, chargingStations: syncDate }));
+          toast.success(`Encontrados ${result.total} postos de carregamento em ${municipality}`);
+        } else {
+          toast.error(result.error || 'Erro ao obter dados da API');
+        }
+      }
+
+      if (key === 'publicTransport') {
+        const result = await fetchTransportStops(municipality);
+        if (result.success) {
+          const newValue = result.total.toString();
+          const newValues = { ...values, publicTransport: newValue };
+          setValues(newValues);
+          saveValues(newValues);
+          onValuesChange?.(newValues);
+          const syncDate = saveLastSyncTimestamp('publicTransport');
+          setLastSync(prev => ({ ...prev, publicTransport: syncDate }));
+          toast.success(`Encontradas ${result.total} paragens de transporte em ${municipality}`);
+        } else {
+          toast.error(result.error || 'Erro ao obter dados da API');
+        }
+      }
+
+      // Placeholder for other API-capable infrastructures
+      if (key === 'airQuality') {
+        toast.info('Integração com esta API ainda não está disponível');
+      }
+    } catch (error) {
+      toast.error('Erro ao contactar a API');
+    } finally {
+      setLoadingApi(null);
+    }
   };
 
   return (
@@ -445,17 +530,18 @@ export const ManageInfrastructureModal = ({
               title="Postos de Carregamento"
               description="A existência de postos de carregamento permite recomendar a transição para frotas elétricas com menor investimento em infraestrutura própria."
               isApiCapable
-              apiLabel="API MOBI.E"
-              apiLastUpdate="06/01/2026"
+              apiLabel="API Open Charge Map"
+              apiLastUpdate={lastSync.chargingStations}
               isVisible={visibility.chargingStations}
               isApiSource={sources.chargingStations === 'api'}
+              isLoading={loadingApi === 'chargingStations'}
               value={values.chargingStations}
               source={sources.chargingStations}
               onToggleVisibility={() => toggleVisibility('chargingStations')}
               onValueChange={(v) => updateValue('chargingStations', v)}
               onValueBlur={() => handleValueBlur('chargingStations')}
               onSourceChange={(s) => updateSource('chargingStations', s)}
-              onRefresh={() => handleRefreshData('postos de carregamento')}
+              onRefresh={() => handleRefreshApi('chargingStations')}
             />
 
             {/* ECOPONTOS - Manual */}
@@ -472,23 +558,18 @@ export const ManageInfrastructureModal = ({
               onRefresh={() => {}}
             />
 
-            {/* ESTAÇÕES DE BICICLETAS - API com escolha */}
+            {/* ESTAÇÕES DE BICICLETAS - Manual */}
             <InfrastructureCard
               icon={Bike}
               title="Estações de Bicicletas"
               description="Bicicletas partilhadas são alternativa para deslocações de curta distância, reduzindo emissões de mobilidade (Âmbito 1 e 3)."
-              isApiCapable
-              apiLabel="API GIRA (Lisboa)"
-              apiLastUpdate="06/01/2026"
               isVisible={visibility.bikeStations}
-              isApiSource={sources.bikeStations === 'api'}
+              isApiSource={false}
               value={values.bikeStations}
-              source={sources.bikeStations}
               onToggleVisibility={() => toggleVisibility('bikeStations')}
               onValueChange={(v) => updateValue('bikeStations', v)}
               onValueBlur={() => handleValueBlur('bikeStations')}
-              onSourceChange={(s) => updateSource('bikeStations', s)}
-              onRefresh={() => handleRefreshData('estações de bicicletas')}
+              onRefresh={() => {}}
             />
 
             {/* CONTENTORES ORGÂNICOS - Manual */}
@@ -521,18 +602,24 @@ export const ManageInfrastructureModal = ({
               onRefresh={() => {}}
             />
 
-            {/* TRANSPORTES PÚBLICOS - Manual */}
+            {/* TRANSPORTES PÚBLICOS - API */}
             <InfrastructureCard
               icon={Bus}
               title="Paragens Transportes Públicos"
               description="Boa cobertura de transportes públicos facilita programas de mobilidade sustentável e reduz necessidade de estacionamento nas empresas."
+              isApiCapable
+              apiLabel="API Carris Metropolitana"
+              apiLastUpdate={lastSync.publicTransport}
               isVisible={visibility.publicTransport}
-              isApiSource={false}
+              isApiSource={sources.publicTransport === 'api'}
+              isLoading={loadingApi === 'publicTransport'}
               value={values.publicTransport}
+              source={sources.publicTransport}
               onToggleVisibility={() => toggleVisibility('publicTransport')}
               onValueChange={(v) => updateValue('publicTransport', v)}
               onValueBlur={() => handleValueBlur('publicTransport')}
-              onRefresh={() => {}}
+              onSourceChange={(s) => updateSource('publicTransport', s)}
+              onRefresh={() => handleRefreshApi('publicTransport')}
             />
 
             {/* QUALIDADE DO AR - API */}
@@ -542,16 +629,16 @@ export const ManageInfrastructureModal = ({
               description="Dados de qualidade do ar permitem sensibilizar empresas para o impacto local das emissões e priorizar medidas em zonas mais afetadas."
               isApiCapable
               apiLabel="API QualAr (APA)"
-              apiLastUpdate="09/01/2026"
               isVisible={visibility.airQuality}
               isApiSource={sources.airQuality === 'api'}
+              isLoading={loadingApi === 'airQuality'}
               value={values.airQuality}
               source={sources.airQuality}
               onToggleVisibility={() => toggleVisibility('airQuality')}
               onValueChange={(v) => updateValue('airQuality', v)}
               onValueBlur={() => handleValueBlur('airQuality')}
               onSourceChange={(s) => updateSource('airQuality', s)}
-              onRefresh={() => handleRefreshData('qualidade do ar')}
+              onRefresh={() => handleRefreshApi('airQuality')}
             />
 
           </div>

@@ -57,7 +57,7 @@ export const ClientFormDialog = ({
   const isEditing = !!client;
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  // Permissões vazias (nenhum checkmark activo)
+  // Permissões vazias (nenhum checkmark ativo)
   const emptyPermissions: ClientPermissions = {
     dashboard: {
       viewKPIs: false,

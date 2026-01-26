@@ -48,7 +48,7 @@ export function AddCompaniesDialog({
             <span className="text-sm text-muted-foreground">Cluster:</span>
             <Select value={clusterId} onValueChange={onClusterChange}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Seleccione um cluster" />
+                <SelectValue placeholder="Selecione um cluster" />
               </SelectTrigger>
               <SelectContent>
                 {clusters.map(cluster => (
@@ -65,7 +65,7 @@ export function AddCompaniesDialog({
           <div className="py-8 text-center">
             <CircleDot className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground">
-              Seleccione um cluster para adicionar empresas.
+              Selecione um cluster para adicionar empresas.
             </p>
           </div>
         ) : (

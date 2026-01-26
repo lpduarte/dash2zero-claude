@@ -207,7 +207,7 @@ export default function ClusterManagement() {
 
   // Handler para mover empresas entre clusters
   const handleMoveCompanies = (companyIds: string[], targetClusterId: string, keepCopy: boolean) => {
-    // Remove do cluster actual (se não for "Todas" e se não for para manter cópia)
+    // Remove do cluster atual (se não for "Todas" e se não for para manter cópia)
     if (!keepCopy && selectedClusterId && selectedClusterId !== 'all') {
       companyIds.forEach(id => {
         removeSupplierFromCluster(id, selectedClusterId, ownerType);

@@ -61,7 +61,7 @@ export const sectorLabels: Record<string, string> = {
   services: "Outros Serviços",
 
   // -------------------------------------------------------------------------
-  // SUBSETORES DA INDÚSTRIA (Divisões CAE dentro da Secção C)
+  // SUBSETORES DA INDÚSTRIA (Divisões CAE dentro da Seção C)
   // Usados no campo 'subsector' para detalhe adicional
   // -------------------------------------------------------------------------
   alimentar: "Indústria Alimentar",           // CAE 10-12

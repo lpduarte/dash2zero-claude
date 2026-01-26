@@ -7,11 +7,11 @@ interface SectionHeaderProps {
   icon: LucideIcon;
   /** Classe adicional para o ícone */
   iconClassName?: string;
-  /** Título da secção */
+  /** Título da seção */
   title: string;
   /** Conteúdo adicional à direita (botões, badges, etc.) */
   actions?: React.ReactNode;
-  /** Se a secção é colapsável */
+  /** Se a seção é colapsável */
   collapsible?: boolean;
   /** Estado expandido (apenas se collapsible=true) */
   expanded?: boolean;

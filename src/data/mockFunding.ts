@@ -28,7 +28,7 @@ export const mockFunding: FundingSource[] = [
     maxAmount: 15000,
     percentage: 60,
     deadline: '2026-12-31',
-    requirements: ['Sede no concelho', 'Mínimo 2 anos actividade'],
+    requirements: ['Sede no concelho', 'Mínimo 2 anos atividade'],
     applicableTo: {
       measureCategories: ['energia', 'residuos', 'agua'],
       maxCompanySize: 'pequena',

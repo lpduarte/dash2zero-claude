@@ -1,5 +1,5 @@
 /**
- * Estilos centralizados para manter consistência no projecto
+ * Estilos centralizados para manter consistência no projeto
  * Dash2Zero Simple
  */
 
@@ -220,7 +220,7 @@ export const textStyles = {
   kpiValue: 'text-2xl font-bold',
   /** Unidade/subtítulo de KPI */
   kpiUnit: 'text-xs text-muted-foreground',
-  /** Título de secção */
+  /** Título de seção */
   sectionTitle: 'font-bold text-xl',
 } as const;
 
@@ -307,7 +307,7 @@ export const spacing = {
   /** Entre cards principais */
   spaceCards: 'space-y-6',
   
-  /** Após headers de secção */
+  /** Após headers de seção */
   sectionMargin: 'mb-4',
 } as const;
 
@@ -335,7 +335,7 @@ export const iconSizes = {
   sm: 'h-3.5 w-3.5',
   /** Padrão (botões, KPIs) */
   default: 'h-4 w-4',
-  /** Headers de secção */
+  /** Headers de seção */
   md: 'h-5 w-5',
   /** Destaques */
   lg: 'h-6 w-6',
@@ -347,7 +347,7 @@ export const iconSizes = {
 
 export const elements = {
   // Cards
-  /** Card principal de secção */
+  /** Card principal de seção */
   sectionCard: 'p-6 border rounded-lg shadow-md bg-card',
   /** Card de KPI */
   kpiCard: 'p-4 border rounded-md shadow-md bg-card hover:shadow-lg hover:border-primary/25 transition-all duration-200',

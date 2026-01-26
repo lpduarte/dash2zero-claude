@@ -78,7 +78,7 @@ export function MoveCompaniesDialog({
           <DialogDescription>
             {isSingleCompany
               ? `Escolha o cluster de destino para "${companyName}".`
-              : `Escolha o cluster de destino para as ${companies.length} empresas seleccionadas.`}
+              : `Escolha o cluster de destino para as ${companies.length} empresas selecionadas.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -88,7 +88,7 @@ export function MoveCompaniesDialog({
           </label>
           <Select value={targetClusterId} onValueChange={setTargetClusterId}>
             <SelectTrigger>
-              <SelectValue placeholder="Seleccione um cluster..." />
+              <SelectValue placeholder="Selecione um cluster..." />
             </SelectTrigger>
             <SelectContent>
               {availableClusters.map(cluster => {
@@ -120,7 +120,7 @@ export function MoveCompaniesDialog({
             />
             <div className="grid gap-1.5 leading-none">
               <label htmlFor="keepCopy" className="text-sm font-normal cursor-pointer">
-                Manter cópia no cluster actual
+                Manter cópia no cluster atual
               </label>
               <p className="text-xs text-muted-foreground">
                 A empresa continuará a contar como uma só para efeitos de envio de emails,

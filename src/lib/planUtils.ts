@@ -1,5 +1,5 @@
 /**
- * Utilitários para gestão de planos de acção
+ * Utilitários para gestão de planos de ação
  * Centraliza funções usadas em múltiplos componentes
  */
 
