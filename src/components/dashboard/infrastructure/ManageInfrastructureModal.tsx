@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Zap,
   Recycle,
@@ -29,7 +30,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { elements, shadows } from '@/lib/styles';
+import { shadows } from '@/lib/styles';
 
 // Keys for each infrastructure type
 export type InfrastructureKey =
@@ -321,13 +322,14 @@ export const ManageInfrastructureModal = ({
                 />
                 {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
                 {isApiSource && (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleRefreshData(title.toLowerCase())}
-                    className={elements.outlineButtonSm}
                   >
                     <RefreshCw className="h-4 w-4" />
                     Atualizar
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -438,12 +440,9 @@ export const ManageInfrastructureModal = ({
         </div>
 
         <DialogFooter>
-          <button
-            onClick={() => onOpenChange(false)}
-            className={elements.primaryButton}
-          >
+          <Button onClick={() => onOpenChange(false)}>
             Fechar
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
