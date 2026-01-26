@@ -198,13 +198,13 @@ export const ManageInfrastructureModal = ({
     infraKey: InfrastructureKey;
   }) => (
     <div className="flex items-center gap-2">
+      <span className="text-sm w-20 text-right">
+        {visibility[infraKey] ? 'Listado' : 'Removido'}
+      </span>
       <Switch
         checked={visibility[infraKey]}
         onCheckedChange={() => toggleVisibility(infraKey)}
       />
-      <span className="text-sm w-20">
-        {visibility[infraKey] ? 'Listado' : 'Removido'}
-      </span>
     </div>
   );
 
@@ -276,7 +276,7 @@ export const ManageInfrastructureModal = ({
       <div className={`border rounded-lg ${shadows.sm}`}>
         {/* Header with toggle - always full opacity */}
         <div className="p-4 pb-3">
-          <div className="flex items-start justify-between">
+          <div className="flex items-center justify-between">
             <div className={`flex items-center gap-3 transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
               <IconBox icon={icon} />
               <span className="font-bold">{title}</span>
