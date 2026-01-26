@@ -4,7 +4,7 @@ import { PERMISSION_PROFILES } from '@/types/permissions';
 export const mockClients: Client[] = [
   {
     id: 'cascais',
-    name: 'Câmara Municipal de Cascais',
+    name: 'Cascais',
     type: 'municipio',
     logo: '/img/cascais.svg',
     contactEmail: 'ambiente@cm-cascais.pt',
@@ -110,7 +110,7 @@ export const mockClients: Client[] = [
   },
   {
     id: 'lisboa-archived',
-    name: 'Câmara Municipal de Lisboa',
+    name: 'Lisboa',
     type: 'municipio',
     logo: '/img/lisboa.svg',
     contactEmail: 'ambiente@cm-lisboa.pt',

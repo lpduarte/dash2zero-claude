@@ -419,6 +419,10 @@ const Admin = () => {
           }}
           client={editingClient}
           onSave={handleSaveClient}
+          existingMunicipios={allClients
+            .filter(c => c.type === 'municipio' && !c.isArchived)
+            .map(c => c.name)
+          }
         />
       </main>
     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import { MunicipioCombobox } from '@/components/ui/municipio-combobox';
 import {
   Building2,
   MapPin,
@@ -41,6 +42,7 @@ interface ClientFormDialogProps {
   onOpenChange: (open: boolean) => void;
   client?: Client; // Se definido, modo edição
   onSave: (data: ClientFormData) => void;
+  existingMunicipios?: string[]; // Lista de municípios já existentes (para validação de unicidade)
 }
 
 export const ClientFormDialog = ({
@@ -48,8 +50,10 @@ export const ClientFormDialog = ({
   onOpenChange,
   client,
   onSave,
+  existingMunicipios = [],
 }: ClientFormDialogProps) => {
   const isEditing = !!client;
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   // Permissões vazias (nenhum checkmark activo)
   const emptyPermissions: ClientPermissions = {
@@ -195,7 +199,7 @@ export const ClientFormDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent ref={dialogRef} className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Editar cliente' : 'Novo cliente'}
@@ -267,7 +271,11 @@ export const ClientFormDialog = ({
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, type: 'municipio' }))}
+                  onClick={() => setFormData(prev => ({
+                    ...prev,
+                    type: 'municipio',
+                    name: prev.type !== 'municipio' ? '' : prev.name
+                  }))}
                   className={cn(
                     "flex items-center gap-3 p-4 rounded-lg border-2 transition-all",
                     formData.type === 'municipio'
@@ -291,7 +299,11 @@ export const ClientFormDialog = ({
 
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, type: 'empresa' }))}
+                  onClick={() => setFormData(prev => ({
+                    ...prev,
+                    type: 'empresa',
+                    name: prev.type !== 'empresa' ? '' : prev.name
+                  }))}
                   className={cn(
                     "flex items-center gap-3 p-4 rounded-lg border-2 transition-all",
                     formData.type === 'empresa'
@@ -315,26 +327,33 @@ export const ClientFormDialog = ({
               </div>
             </div>
 
-            {/* Nome */}
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome do cliente *</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="name"
-                  placeholder={
-                    formData.type === 'municipio'
-                      ? 'Ex: Câmara Municipal de Valdouros'
-                      : formData.type === 'empresa'
-                        ? 'Ex: Iberotejo'
-                        : ''
-                  }
-                  className="pl-10"
+            {/* Nome - diferente para município vs empresa */}
+            {formData.type === 'municipio' ? (
+              <div className="space-y-2">
+                <Label>Município *</Label>
+                <MunicipioCombobox
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
+                  placeholder="Selecionar município..."
+                  disabledMunicipios={existingMunicipios.filter(m => m !== client?.name)}
+                  portalContainer={dialogRef.current}
                 />
               </div>
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome do cliente *</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    placeholder="Ex: Iberotejo"
+                    className="pl-10"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Email de acesso */}
             <div className="space-y-2">
