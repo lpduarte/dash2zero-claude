@@ -28,6 +28,7 @@ import {
   Link,
   PenLine,
   RefreshCw,
+  LucideIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { shadows } from '@/lib/styles';
@@ -143,6 +144,185 @@ const saveSources = (sources: InfrastructureSources) => {
   localStorage.setItem(SOURCES_STORAGE_KEY, JSON.stringify(sources));
 };
 
+// Icon box component (like KPI cards)
+const IconBox = ({ icon: Icon }: { icon: LucideIcon }) => (
+  <div className="p-2 rounded-lg bg-primary/10">
+    <Icon className="h-5 w-5 text-primary" />
+  </div>
+);
+
+// Manual source label component
+const ManualSourceLabel = () => (
+  <div className="flex items-center gap-2">
+    <PenLine className="h-4 w-4 text-muted-foreground" />
+    <span className="text-sm text-muted-foreground">Fonte: Inserção manual</span>
+  </div>
+);
+
+// Source selector for API-capable infrastructures
+const SourceSelector = ({
+  source,
+  apiLabel,
+  onSourceChange,
+}: {
+  source: SourceType;
+  apiLabel: string;
+  onSourceChange: (source: SourceType) => void;
+}) => (
+  <div className="flex items-center gap-2">
+    {source === 'api' ? (
+      <Link className="h-4 w-4 text-muted-foreground" />
+    ) : (
+      <PenLine className="h-4 w-4 text-muted-foreground" />
+    )}
+    <span className="text-sm text-muted-foreground">Fonte:</span>
+    <Select
+      value={source}
+      onValueChange={(value: SourceType) => onSourceChange(value)}
+    >
+      <SelectTrigger className="w-44 h-8">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="api">{apiLabel}</SelectItem>
+        <SelectItem value="manual">Inserção manual</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+);
+
+// Visibility toggle component
+const VisibilityToggle = ({
+  isVisible,
+  onToggle,
+}: {
+  isVisible: boolean;
+  onToggle: () => void;
+}) => (
+  <div className="flex items-center gap-2">
+    <span className="text-sm w-20 text-right">
+      {isVisible ? 'Listado' : 'Removido'}
+    </span>
+    <Switch
+      checked={isVisible}
+      onCheckedChange={onToggle}
+    />
+  </div>
+);
+
+// Infrastructure card component
+const InfrastructureCard = ({
+  icon,
+  title,
+  description,
+  unit,
+  allowDecimal,
+  isApiCapable = false,
+  apiLabel,
+  apiLastUpdate,
+  isVisible,
+  isApiSource,
+  value,
+  source,
+  onToggleVisibility,
+  onValueChange,
+  onValueBlur,
+  onSourceChange,
+  onRefresh,
+}: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  unit?: string;
+  allowDecimal?: boolean;
+  isApiCapable?: boolean;
+  apiLabel?: string;
+  apiLastUpdate?: string;
+  isVisible: boolean;
+  isApiSource: boolean;
+  value: string;
+  source?: SourceType;
+  onToggleVisibility: () => void;
+  onValueChange: (value: string) => void;
+  onValueBlur: () => void;
+  onSourceChange?: (source: SourceType) => void;
+  onRefresh: () => void;
+}) => {
+  return (
+    <div className={`border rounded-lg ${isVisible ? shadows.sm : ''}`}>
+      {/* Header with toggle - always full opacity */}
+      <div className="p-4 pb-3">
+        <div className="flex items-center justify-between">
+          <div className={`flex items-center gap-3 transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
+            <IconBox icon={icon} />
+            <span className="font-bold">{title}</span>
+          </div>
+          <VisibilityToggle isVisible={isVisible} onToggle={onToggleVisibility} />
+        </div>
+      </div>
+
+      {/* Content area - affected by opacity */}
+      <div className={`transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
+        {/* Description/disclaimer - below title */}
+        <div className="px-4 pb-4">
+          <p className="text-sm text-muted-foreground">
+            {description}
+          </p>
+        </div>
+
+        {/* Separator */}
+        <div className="border-t border-border" />
+
+        {/* Source and value section */}
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            {isApiCapable && source && onSourceChange ? (
+              <SourceSelector
+                source={source}
+                apiLabel={apiLabel!}
+                onSourceChange={onSourceChange}
+              />
+            ) : (
+              <ManualSourceLabel />
+            )}
+
+            <div className="flex items-center gap-3">
+              <Input
+                type="text"
+                inputMode={allowDecimal ? 'decimal' : 'numeric'}
+                value={value}
+                placeholder="0"
+                onChange={(e) => onValueChange(e.target.value)}
+                onBlur={onValueBlur}
+                disabled={isApiSource || !isVisible}
+                className="w-24"
+              />
+              {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
+              {isApiSource && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onRefresh}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Atualizar
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* API last update info */}
+          {isApiSource && apiLastUpdate && (
+            <p className="text-xs text-muted-foreground mt-3">
+              Última atualização: {apiLastUpdate} · Atualização automática semanal
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 interface ManageInfrastructureModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -176,7 +356,7 @@ export const ManageInfrastructureModal = ({
     if (value !== '' && !regex.test(value)) {
       return; // Reject non-numeric input
     }
-    // Only update local state while typing - save on blur
+    // Only update local state while typing
     setValues(prev => ({ ...prev, [key]: value }));
   };
 
@@ -230,168 +410,6 @@ export const ManageInfrastructureModal = ({
     toast.success(`Dados de ${type} atualizados com sucesso`);
   };
 
-  // Icon box component (like KPI cards)
-  const IconBox = ({ icon: Icon }: { icon: typeof Zap }) => (
-    <div className="p-2 rounded-lg bg-primary/10">
-      <Icon className="h-5 w-5 text-primary" />
-    </div>
-  );
-
-  // Visibility toggle component
-  const VisibilityToggle = ({
-    infraKey,
-  }: {
-    infraKey: InfrastructureKey;
-  }) => (
-    <div className="flex items-center gap-2">
-      <span className="text-sm w-20 text-right">
-        {visibility[infraKey] ? 'Listado' : 'Removido'}
-      </span>
-      <Switch
-        checked={visibility[infraKey]}
-        onCheckedChange={() => toggleVisibility(infraKey)}
-      />
-    </div>
-  );
-
-  // Source selector for API-capable infrastructures
-  const SourceSelector = ({
-    infraKey,
-    apiLabel,
-  }: {
-    infraKey: keyof InfrastructureSources;
-    apiLabel: string;
-  }) => (
-    <div className="flex items-center gap-2">
-      {sources[infraKey] === 'api' ? (
-        <Link className="h-4 w-4 text-muted-foreground" />
-      ) : (
-        <PenLine className="h-4 w-4 text-muted-foreground" />
-      )}
-      <span className="text-sm text-muted-foreground">Fonte:</span>
-      <Select
-        value={sources[infraKey]}
-        onValueChange={(value: SourceType) => updateSource(infraKey, value)}
-      >
-        <SelectTrigger className="w-44 h-8">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="api">{apiLabel}</SelectItem>
-          <SelectItem value="manual">Inserção manual</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  );
-
-  // Manual source label component
-  const ManualSourceLabel = () => (
-    <div className="flex items-center gap-2">
-      <PenLine className="h-4 w-4 text-muted-foreground" />
-      <span className="text-sm text-muted-foreground">Fonte: Inserção manual</span>
-    </div>
-  );
-
-  // Infrastructure card component
-  const InfrastructureCard = ({
-    infraKey,
-    icon,
-    title,
-    description,
-    unit,
-    step,
-    isApiCapable = false,
-    apiLabel,
-    apiLastUpdate,
-  }: {
-    infraKey: InfrastructureKey;
-    icon: typeof Zap;
-    title: string;
-    description: string;
-    unit?: string;
-    step?: string;
-    isApiCapable?: boolean;
-    apiLabel?: string;
-    apiLastUpdate?: string;
-  }) => {
-    const isVisible = visibility[infraKey];
-    const isApiSource = isApiCapable && sources[infraKey as keyof InfrastructureSources] === 'api';
-    const value = values[infraKey];
-
-    return (
-      <div className={`border rounded-lg ${isVisible ? shadows.sm : ''}`}>
-        {/* Header with toggle - always full opacity */}
-        <div className="p-4 pb-3">
-          <div className="flex items-center justify-between">
-            <div className={`flex items-center gap-3 transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
-              <IconBox icon={icon} />
-              <span className="font-bold">{title}</span>
-            </div>
-            <VisibilityToggle infraKey={infraKey} />
-          </div>
-        </div>
-
-        {/* Content area - affected by opacity */}
-        <div className={`transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
-          {/* Description/disclaimer - below title */}
-          <div className="px-4 pb-4">
-            <p className="text-sm text-muted-foreground">
-              {description}
-            </p>
-          </div>
-
-          {/* Separator */}
-          <div className="border-t border-border" />
-
-          {/* Source and value section */}
-          <div className="p-4">
-            <div className="flex items-center justify-between">
-              {isApiCapable ? (
-                <SourceSelector
-                  infraKey={infraKey as keyof InfrastructureSources}
-                  apiLabel={apiLabel!}
-                />
-              ) : (
-                <ManualSourceLabel />
-              )}
-
-              <div className="flex items-center gap-3">
-                <Input
-                  type="text"
-                  inputMode={step ? 'decimal' : 'numeric'}
-                  value={value}
-                  placeholder="0"
-                  onChange={(e) => updateValue(infraKey, e.target.value, !!step)}
-                  onBlur={() => handleValueBlur(infraKey)}
-                  disabled={isApiSource || !isVisible}
-                  className="w-24"
-                />
-                {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
-                {isApiSource && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRefreshData(title.toLowerCase())}
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Atualizar
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* API last update info */}
-            {isApiSource && apiLastUpdate && (
-              <p className="text-xs text-muted-foreground mt-3">
-                Última atualização: {apiLastUpdate} · Atualização automática semanal
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={handleModalClose}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
@@ -417,69 +435,117 @@ export const ManageInfrastructureModal = ({
 
             {/* POSTOS DE CARREGAMENTO - API */}
             <InfrastructureCard
-              infraKey="chargingStations"
               icon={Zap}
               title="Postos de Carregamento"
               description="A existência de postos de carregamento permite recomendar a transição para frotas elétricas com menor investimento em infraestrutura própria."
               isApiCapable
               apiLabel="API MOBI.E"
               apiLastUpdate="06/01/2026"
+              isVisible={visibility.chargingStations}
+              isApiSource={sources.chargingStations === 'api'}
+              value={values.chargingStations}
+              source={sources.chargingStations}
+              onToggleVisibility={() => toggleVisibility('chargingStations')}
+              onValueChange={(v) => updateValue('chargingStations', v)}
+              onValueBlur={() => handleValueBlur('chargingStations')}
+              onSourceChange={(s) => updateSource('chargingStations', s)}
+              onRefresh={() => handleRefreshData('postos de carregamento')}
             />
 
             {/* ECOPONTOS - Manual */}
             <InfrastructureCard
-              infraKey="ecoPoints"
               icon={Recycle}
               title="Ecopontos"
               description="Ecopontos próximos facilitam a implementação de programas de separação de resíduos nas empresas, reduzindo emissões do Âmbito 3."
+              isVisible={visibility.ecoPoints}
+              isApiSource={false}
+              value={values.ecoPoints}
+              onToggleVisibility={() => toggleVisibility('ecoPoints')}
+              onValueChange={(v) => updateValue('ecoPoints', v)}
+              onValueBlur={() => handleValueBlur('ecoPoints')}
+              onRefresh={() => {}}
             />
 
             {/* ESTAÇÕES DE BICICLETAS - API com escolha */}
             <InfrastructureCard
-              infraKey="bikeStations"
               icon={Bike}
               title="Estações de Bicicletas"
               description="Bicicletas partilhadas são alternativa para deslocações de curta distância, reduzindo emissões de mobilidade (Âmbito 1 e 3)."
               isApiCapable
               apiLabel="API GIRA (Lisboa)"
               apiLastUpdate="06/01/2026"
+              isVisible={visibility.bikeStations}
+              isApiSource={sources.bikeStations === 'api'}
+              value={values.bikeStations}
+              source={sources.bikeStations}
+              onToggleVisibility={() => toggleVisibility('bikeStations')}
+              onValueChange={(v) => updateValue('bikeStations', v)}
+              onValueBlur={() => handleValueBlur('bikeStations')}
+              onSourceChange={(s) => updateSource('bikeStations', s)}
+              onRefresh={() => handleRefreshData('estações de bicicletas')}
             />
 
             {/* CONTENTORES ORGÂNICOS - Manual */}
             <InfrastructureCard
-              infraKey="organicBins"
               icon={Leaf}
               title="Contentores Orgânicos"
               description="Recolha seletiva de orgânicos permite compostagem e reduz emissões de metano em aterro. Essencial para empresas de restauração e retalho."
+              isVisible={visibility.organicBins}
+              isApiSource={false}
+              value={values.organicBins}
+              onToggleVisibility={() => toggleVisibility('organicBins')}
+              onValueChange={(v) => updateValue('organicBins', v)}
+              onValueBlur={() => handleValueBlur('organicBins')}
+              onRefresh={() => {}}
             />
 
             {/* CICLOVIAS - Manual */}
             <InfrastructureCard
-              infraKey="cycleways"
               icon={Route}
               title="Ciclovias"
               description="Rede ciclável extensa incentiva deslocações em bicicleta para colaboradores, reduzindo emissões de mobilidade casa-trabalho."
               unit="km"
-              step="0.1"
+              allowDecimal
+              isVisible={visibility.cycleways}
+              isApiSource={false}
+              value={values.cycleways}
+              onToggleVisibility={() => toggleVisibility('cycleways')}
+              onValueChange={(v) => updateValue('cycleways', v, true)}
+              onValueBlur={() => handleValueBlur('cycleways')}
+              onRefresh={() => {}}
             />
 
             {/* TRANSPORTES PÚBLICOS - Manual */}
             <InfrastructureCard
-              infraKey="publicTransport"
               icon={Bus}
               title="Paragens Transportes Públicos"
               description="Boa cobertura de transportes públicos facilita programas de mobilidade sustentável e reduz necessidade de estacionamento nas empresas."
+              isVisible={visibility.publicTransport}
+              isApiSource={false}
+              value={values.publicTransport}
+              onToggleVisibility={() => toggleVisibility('publicTransport')}
+              onValueChange={(v) => updateValue('publicTransport', v)}
+              onValueBlur={() => handleValueBlur('publicTransport')}
+              onRefresh={() => {}}
             />
 
             {/* QUALIDADE DO AR - API */}
             <InfrastructureCard
-              infraKey="airQuality"
               icon={Wind}
               title="Qualidade do Ar"
               description="Dados de qualidade do ar permitem sensibilizar empresas para o impacto local das emissões e priorizar medidas em zonas mais afetadas."
               isApiCapable
               apiLabel="API QualAr (APA)"
               apiLastUpdate="09/01/2026"
+              isVisible={visibility.airQuality}
+              isApiSource={sources.airQuality === 'api'}
+              value={values.airQuality}
+              source={sources.airQuality}
+              onToggleVisibility={() => toggleVisibility('airQuality')}
+              onValueChange={(v) => updateValue('airQuality', v)}
+              onValueBlur={() => handleValueBlur('airQuality')}
+              onSourceChange={(s) => updateSource('airQuality', s)}
+              onRefresh={() => handleRefreshData('qualidade do ar')}
             />
 
           </div>
