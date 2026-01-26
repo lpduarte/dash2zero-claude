@@ -170,10 +170,26 @@ export const ManageInfrastructureModal = ({
     onVisibilityChange?.(newVisibility);
   };
 
-  const updateValue = (key: keyof InfrastructureValues, value: string) => {
+  const updateValue = (key: keyof InfrastructureValues, value: string, allowDecimal: boolean = false) => {
+    // Only allow numbers (and decimal point if allowDecimal)
+    const regex = allowDecimal ? /^[0-9]*\.?[0-9]*$/ : /^[0-9]*$/;
+    if (value !== '' && !regex.test(value)) {
+      return; // Reject non-numeric input
+    }
     const newValues = { ...values, [key]: value };
     setValues(newValues);
     saveValues(newValues);
+  };
+
+  const handleValueBlur = (key: InfrastructureKey) => {
+    const value = values[key];
+    // If empty or zero, set to removed
+    if (value === '' || value === '0' || value === '0.0') {
+      const newVisibility = { ...visibility, [key]: false };
+      setVisibility(newVisibility);
+      saveVisibility(newVisibility);
+      onVisibilityChange?.(newVisibility);
+    }
   };
 
   const updateSource = (key: keyof InfrastructureSources, source: SourceType) => {
@@ -313,10 +329,11 @@ export const ManageInfrastructureModal = ({
 
               <div className="flex items-center gap-3">
                 <Input
-                  type={step ? 'number' : 'text'}
-                  step={step}
+                  type="text"
+                  inputMode={step ? 'decimal' : 'numeric'}
                   value={value}
-                  onChange={(e) => updateValue(infraKey, e.target.value)}
+                  onChange={(e) => updateValue(infraKey, e.target.value, !!step)}
+                  onBlur={() => handleValueBlur(infraKey)}
                   disabled={isApiSource}
                   className="w-24"
                 />
