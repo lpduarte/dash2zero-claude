@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -26,14 +26,9 @@ import {
   Link,
   PenLine,
   RefreshCw,
-  CheckCircle,
-  AlertCircle,
-  Info,
-  Eye,
-  EyeOff,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { elements } from '@/lib/styles';
+import { elements, shadows } from '@/lib/styles';
 
 // Keys for each infrastructure type
 export type InfrastructureKey =
@@ -48,6 +43,8 @@ export type InfrastructureKey =
 export type InfrastructureVisibility = Record<InfrastructureKey, boolean>;
 
 const STORAGE_KEY = 'dash2zero-infrastructure-visibility';
+const VALUES_STORAGE_KEY = 'dash2zero-infrastructure-values';
+const SOURCES_STORAGE_KEY = 'dash2zero-infrastructure-sources';
 
 // Default: all visible
 const defaultVisibility: InfrastructureVisibility = {
@@ -76,6 +73,74 @@ const saveVisibility = (visibility: InfrastructureVisibility) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(visibility));
 };
 
+// Default values for infrastructure
+interface InfrastructureValues {
+  chargingStations: string;
+  ecoPoints: string;
+  bikeStations: string;
+  organicBins: string;
+  cycleways: string;
+  publicTransport: string;
+  airQuality: string;
+}
+
+const defaultValues: InfrastructureValues = {
+  chargingStations: '89',
+  ecoPoints: '245',
+  bikeStations: '52',
+  organicBins: '178',
+  cycleways: '47.3',
+  publicTransport: '312',
+  airQuality: 'Bom',
+};
+
+const getStoredValues = (): InfrastructureValues => {
+  try {
+    const stored = localStorage.getItem(VALUES_STORAGE_KEY);
+    if (stored) {
+      return { ...defaultValues, ...JSON.parse(stored) };
+    }
+  } catch {
+    // ignore
+  }
+  return defaultValues;
+};
+
+const saveValues = (values: InfrastructureValues) => {
+  localStorage.setItem(VALUES_STORAGE_KEY, JSON.stringify(values));
+};
+
+// Source types for each infrastructure
+type SourceType = 'api' | 'manual';
+
+interface InfrastructureSources {
+  chargingStations: SourceType;
+  bikeStations: SourceType;
+  airQuality: SourceType;
+}
+
+const defaultSources: InfrastructureSources = {
+  chargingStations: 'api',
+  bikeStations: 'api',
+  airQuality: 'api',
+};
+
+const getStoredSources = (): InfrastructureSources => {
+  try {
+    const stored = localStorage.getItem(SOURCES_STORAGE_KEY);
+    if (stored) {
+      return { ...defaultSources, ...JSON.parse(stored) };
+    }
+  } catch {
+    // ignore
+  }
+  return defaultSources;
+};
+
+const saveSources = (sources: InfrastructureSources) => {
+  localStorage.setItem(SOURCES_STORAGE_KEY, JSON.stringify(sources));
+};
+
 interface ManageInfrastructureModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -90,15 +155,11 @@ export const ManageInfrastructureModal = ({
   // Visibility state
   const [visibility, setVisibility] = useState<InfrastructureVisibility>(getInfrastructureVisibility);
 
-  // Estados dos inputs manuais
-  const [ecopontosCount, setEcopontosCount] = useState('245');
-  const [organicosCount, setOrganicosCount] = useState('178');
-  const [cicloviasKm, setCicloviasKm] = useState('47.3');
-  const [transportesCount, setTransportesCount] = useState('312');
-  const [bicicletasCount, setBicicletasCount] = useState('52');
+  // Values state
+  const [values, setValues] = useState<InfrastructureValues>(getStoredValues);
 
-  // Fonte seleccionada para bicicletas
-  const [bicicletasSource, setBicicletasSource] = useState('gira');
+  // Sources state (for API-capable infrastructures)
+  const [sources, setSources] = useState<InfrastructureSources>(getStoredSources);
 
   const toggleVisibility = (key: InfrastructureKey) => {
     const newVisibility = { ...visibility, [key]: !visibility[key] };
@@ -107,32 +168,175 @@ export const ManageInfrastructureModal = ({
     onVisibilityChange?.(newVisibility);
   };
 
+  const updateValue = (key: keyof InfrastructureValues, value: string) => {
+    const newValues = { ...values, [key]: value };
+    setValues(newValues);
+    saveValues(newValues);
+  };
+
+  const updateSource = (key: keyof InfrastructureSources, source: SourceType) => {
+    const newSources = { ...sources, [key]: source };
+    setSources(newSources);
+    saveSources(newSources);
+  };
+
   const handleRefreshData = (type: string) => {
-    toast.success(`Dados de ${type} actualizados com sucesso`);
+    toast.success(`Dados de ${type} atualizados com sucesso`);
   };
 
-  const handleSaveData = (type: string) => {
-    toast.success(`${type} guardado com sucesso`);
-  };
+  // Icon box component (like KPI cards)
+  const IconBox = ({ icon: Icon }: { icon: typeof Zap }) => (
+    <div className="p-2 rounded-lg bg-primary/10">
+      <Icon className="h-5 w-5 text-primary" />
+    </div>
+  );
 
+  // Visibility toggle component
   const VisibilityToggle = ({
     infraKey,
-    label
   }: {
     infraKey: InfrastructureKey;
-    label: string;
   }) => (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/50">
+    <div className="flex items-center gap-2">
       <Switch
         checked={visibility[infraKey]}
         onCheckedChange={() => toggleVisibility(infraKey)}
-        className="scale-75"
       />
-      <span className="text-xs text-muted-foreground">
-        {visibility[infraKey] ? 'Visível' : 'Oculto'}
+      <span className="text-sm w-16">
+        {visibility[infraKey] ? 'Listar' : 'Remover'}
       </span>
     </div>
   );
+
+  // Source selector for API-capable infrastructures
+  const SourceSelector = ({
+    infraKey,
+    apiLabel,
+  }: {
+    infraKey: keyof InfrastructureSources;
+    apiLabel: string;
+  }) => (
+    <div className="flex items-center gap-2">
+      {sources[infraKey] === 'api' ? (
+        <Link className="h-4 w-4 text-muted-foreground" />
+      ) : (
+        <PenLine className="h-4 w-4 text-muted-foreground" />
+      )}
+      <span className="text-sm text-muted-foreground">Fonte:</span>
+      <Select
+        value={sources[infraKey]}
+        onValueChange={(value: SourceType) => updateSource(infraKey, value)}
+      >
+        <SelectTrigger className="w-44 h-8">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="api">{apiLabel}</SelectItem>
+          <SelectItem value="manual">Inserção manual</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  // Manual source label component
+  const ManualSourceLabel = () => (
+    <div className="flex items-center gap-2">
+      <PenLine className="h-4 w-4 text-muted-foreground" />
+      <span className="text-sm text-muted-foreground">Fonte: Inserção manual</span>
+    </div>
+  );
+
+  // Infrastructure card component
+  const InfrastructureCard = ({
+    infraKey,
+    icon,
+    title,
+    description,
+    unit,
+    step,
+    isApiCapable = false,
+    apiLabel,
+    apiLastUpdate,
+  }: {
+    infraKey: InfrastructureKey;
+    icon: typeof Zap;
+    title: string;
+    description: string;
+    unit?: string;
+    step?: string;
+    isApiCapable?: boolean;
+    apiLabel?: string;
+    apiLastUpdate?: string;
+  }) => {
+    const isVisible = visibility[infraKey];
+    const isApiSource = isApiCapable && sources[infraKey as keyof InfrastructureSources] === 'api';
+    const value = values[infraKey];
+
+    return (
+      <div className={`border rounded-lg ${shadows.sm} transition-opacity ${!isVisible ? 'opacity-40' : ''}`}>
+        {/* Header with icon, title and toggle */}
+        <div className="p-4">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <IconBox icon={icon} />
+              <span className="font-bold">{title}</span>
+            </div>
+            <VisibilityToggle infraKey={infraKey} />
+          </div>
+
+          {/* Description/disclaimer - below title */}
+          <p className="text-sm text-muted-foreground">
+            {description}
+          </p>
+        </div>
+
+        {/* Separator */}
+        <div className="border-t border-border" />
+
+        {/* Source and value section */}
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            {isApiCapable ? (
+              <SourceSelector
+                infraKey={infraKey as keyof InfrastructureSources}
+                apiLabel={apiLabel!}
+              />
+            ) : (
+              <ManualSourceLabel />
+            )}
+
+            <div className="flex items-center gap-3">
+              <input
+                type={step ? 'number' : 'text'}
+                step={step}
+                value={value}
+                onChange={(e) => updateValue(infraKey, e.target.value)}
+                disabled={isApiSource}
+                className={`${elements.inputSmall} ${isApiSource ? 'bg-muted cursor-not-allowed' : ''}`}
+              />
+              {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
+              {isApiSource && (
+                <button
+                  onClick={() => handleRefreshData(title.toLowerCase())}
+                  className={elements.outlineButtonSm}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Atualizar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* API last update info */}
+          {isApiSource && apiLastUpdate && (
+            <p className="text-xs text-muted-foreground mt-3">
+              Última atualização: {apiLastUpdate} · Atualização automática semanal
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -152,375 +356,77 @@ export const ManageInfrastructureModal = ({
               Estes dados influenciam as medidas de descarbonização disponíveis para as empresas do concelho.
               Infraestruturas existentes permitem recomendar medidas mais eficazes e de menor investimento.
             </p>
-            <p className="text-sm text-primary mt-2">
-              <Eye className="h-4 w-4 inline mr-1" />
-              Use o interruptor em cada secção para mostrar ou ocultar KPIs que não se aplicam ao seu município.
-            </p>
           </div>
 
           {/* Lista de infraestruturas */}
           <div className="space-y-4">
 
             {/* POSTOS DE CARREGAMENTO - API */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.chargingStations ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Zap className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Postos de Carregamento</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">89</span>
-                    <CheckCircle className="h-5 w-5 text-success" />
-                  </div>
-                  <VisibilityToggle infraKey="chargingStations" label="Postos" />
-                </div>
-              </div>
-              {visibility.chargingStations && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-primary" />
-                      <span className="text-sm">Fonte: API MOBI.E</span>
-                      <span className="text-xs px-2 py-0.5 bg-success/20 text-success rounded-full">Recomendada</span>
-                    </div>
-                    <button
-                      onClick={() => handleRefreshData('postos')}
-                      className={elements.outlineButtonSm}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                      Actualizar
-                    </button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Última actualização: 06/01/2026 · Actualização automática semanal
-                  </p>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      A existência de postos de carregamento permite recomendar a transição para frotas eléctricas
-                      com menor investimento em infraestrutura própria.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="chargingStations"
+              icon={Zap}
+              title="Postos de Carregamento"
+              description="A existência de postos de carregamento permite recomendar a transição para frotas elétricas com menor investimento em infraestrutura própria."
+              isApiCapable
+              apiLabel="API MOBI.E"
+              apiLastUpdate="06/01/2026"
+            />
 
             {/* ECOPONTOS - Manual */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.ecoPoints ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Recycle className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Ecopontos</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">245</span>
-                    <CheckCircle className="h-5 w-5 text-success" />
-                  </div>
-                  <VisibilityToggle infraKey="ecoPoints" label="Ecopontos" />
-                </div>
-              </div>
-              {visibility.ecoPoints && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <PenLine className="h-4 w-4 text-warning" />
-                      <span className="text-sm">Fonte: Inserção manual</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={ecopontosCount}
-                        onChange={(e) => setEcopontosCount(e.target.value)}
-                        className={elements.inputSmall}
-                      />
-                      <button
-                        onClick={() => handleSaveData('Ecopontos')}
-                        className={elements.primaryButtonSm}
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      Ecopontos próximos facilitam a implementação de programas de separação de resíduos
-                      nas empresas, reduzindo emissões do Âmbito 3.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="ecoPoints"
+              icon={Recycle}
+              title="Ecopontos"
+              description="Ecopontos próximos facilitam a implementação de programas de separação de resíduos nas empresas, reduzindo emissões do Âmbito 3."
+            />
 
             {/* ESTAÇÕES DE BICICLETAS - API com escolha */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.bikeStations ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Bike className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Estações de Bicicletas</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">52</span>
-                    <CheckCircle className="h-5 w-5 text-success" />
-                  </div>
-                  <VisibilityToggle infraKey="bikeStations" label="Bicicletas" />
-                </div>
-              </div>
-              {visibility.bikeStations && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-primary" />
-                      <span className="text-sm">Fonte:</span>
-                      <Select value={bicicletasSource} onValueChange={setBicicletasSource}>
-                        <SelectTrigger className="w-40 h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="gira">API GIRA (Lisboa)</SelectItem>
-                          <SelectItem value="manual">Inserção manual</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {bicicletasSource === 'gira' ? (
-                      <button
-                        onClick={() => handleRefreshData('bicicletas')}
-                        className={elements.outlineButtonSm}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                        Actualizar
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={bicicletasCount}
-                          onChange={(e) => setBicicletasCount(e.target.value)}
-                          className={elements.inputSmall}
-                        />
-                        <button
-                          onClick={() => handleSaveData('Estações de bicicletas')}
-                          className={elements.primaryButtonSm}
-                        >
-                          Guardar
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {bicicletasSource === 'gira' && (
-                    <p className="text-xs text-muted-foreground">
-                      Última actualização: 06/01/2026 · Actualização automática semanal
-                    </p>
-                  )}
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      Bicicletas partilhadas são alternativa para deslocações de curta distância,
-                      reduzindo emissões de mobilidade (Âmbito 1 e 3).
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="bikeStations"
+              icon={Bike}
+              title="Estações de Bicicletas"
+              description="Bicicletas partilhadas são alternativa para deslocações de curta distância, reduzindo emissões de mobilidade (Âmbito 1 e 3)."
+              isApiCapable
+              apiLabel="API GIRA (Lisboa)"
+              apiLastUpdate="06/01/2026"
+            />
 
             {/* CONTENTORES ORGÂNICOS - Manual */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.organicBins ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Leaf className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Contentores Orgânicos</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">178</span>
-                    {organicosCount ? (
-                      <CheckCircle className="h-5 w-5 text-success" />
-                    ) : (
-                      <AlertCircle className="h-5 w-5 text-warning" />
-                    )}
-                  </div>
-                  <VisibilityToggle infraKey="organicBins" label="Orgânicos" />
-                </div>
-              </div>
-              {visibility.organicBins && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <PenLine className="h-4 w-4 text-warning" />
-                      <span className="text-sm">Fonte: Inserção manual</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={organicosCount}
-                        onChange={(e) => setOrganicosCount(e.target.value)}
-                        className={elements.inputSmall}
-                      />
-                      <button
-                        onClick={() => handleSaveData('Contentores orgânicos')}
-                        className={elements.primaryButtonSm}
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      Recolha selectiva de orgânicos permite compostagem e reduz emissões de metano em aterro.
-                      Essencial para empresas de restauração e retalho.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="organicBins"
+              icon={Leaf}
+              title="Contentores Orgânicos"
+              description="Recolha seletiva de orgânicos permite compostagem e reduz emissões de metano em aterro. Essencial para empresas de restauração e retalho."
+            />
 
             {/* CICLOVIAS - Manual */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.cycleways ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Route className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Ciclovias</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">47.3</span>
-                    <span className="text-sm text-muted-foreground">km</span>
-                    <CheckCircle className="h-5 w-5 text-success" />
-                  </div>
-                  <VisibilityToggle infraKey="cycleways" label="Ciclovias" />
-                </div>
-              </div>
-              {visibility.cycleways && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <PenLine className="h-4 w-4 text-warning" />
-                      <span className="text-sm">Fonte: Inserção manual</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={cicloviasKm}
-                        onChange={(e) => setCicloviasKm(e.target.value)}
-                        className={elements.inputSmall}
-                      />
-                      <span className="text-sm text-muted-foreground">km</span>
-                      <button
-                        onClick={() => handleSaveData('Ciclovias')}
-                        className={elements.primaryButtonSm}
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      Rede ciclável extensa incentiva deslocações em bicicleta para colaboradores,
-                      reduzindo emissões de mobilidade casa-trabalho.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="cycleways"
+              icon={Route}
+              title="Ciclovias"
+              description="Rede ciclável extensa incentiva deslocações em bicicleta para colaboradores, reduzindo emissões de mobilidade casa-trabalho."
+              unit="km"
+              step="0.1"
+            />
 
             {/* TRANSPORTES PÚBLICOS - Manual */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.publicTransport ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Bus className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Paragens Transportes Públicos</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold">312</span>
-                    <CheckCircle className="h-5 w-5 text-success" />
-                  </div>
-                  <VisibilityToggle infraKey="publicTransport" label="Transportes" />
-                </div>
-              </div>
-              {visibility.publicTransport && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <PenLine className="h-4 w-4 text-warning" />
-                      <span className="text-sm">Fonte: Inserção manual</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={transportesCount}
-                        onChange={(e) => setTransportesCount(e.target.value)}
-                        className={elements.inputSmall}
-                      />
-                      <button
-                        onClick={() => handleSaveData('Paragens de transportes')}
-                        className={elements.primaryButtonSm}
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      Boa cobertura de transportes públicos facilita programas de mobilidade sustentável
-                      e reduz necessidade de estacionamento nas empresas.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="publicTransport"
+              icon={Bus}
+              title="Paragens Transportes Públicos"
+              description="Boa cobertura de transportes públicos facilita programas de mobilidade sustentável e reduz necessidade de estacionamento nas empresas."
+            />
 
             {/* QUALIDADE DO AR - API */}
-            <div className={`border rounded-lg overflow-hidden transition-opacity ${!visibility.airQuality ? 'opacity-50' : ''}`}>
-              <div className="flex items-center justify-between p-4 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <Wind className="h-5 w-5 text-primary" />
-                  <span className="font-normal">Qualidade do Ar</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-success">Bom</span>
-                    <CheckCircle className="h-5 w-5 text-success" />
-                  </div>
-                  <VisibilityToggle infraKey="airQuality" label="Qualidade do Ar" />
-                </div>
-              </div>
-              {visibility.airQuality && (
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-primary" />
-                      <span className="text-sm">Fonte: API QualAr (APA)</span>
-                      <span className="text-xs px-2 py-0.5 bg-success/20 text-success rounded-full">Recomendada</span>
-                    </div>
-                    <button
-                      onClick={() => handleRefreshData('qualidade do ar')}
-                      className={elements.outlineButtonSm}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                      Actualizar
-                    </button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Última actualização: 09/01/2026 · Actualização automática semanal · 3 estações de monitorização
-                  </p>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <Info className="h-4 w-4 inline mr-1" />
-                      Dados de qualidade do ar permitem sensibilizar empresas para o impacto local das emissões
-                      e priorizar medidas em zonas mais afetadas.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfrastructureCard
+              infraKey="airQuality"
+              icon={Wind}
+              title="Qualidade do Ar"
+              description="Dados de qualidade do ar permitem sensibilizar empresas para o impacto local das emissões e priorizar medidas em zonas mais afetadas."
+              isApiCapable
+              apiLabel="API QualAr (APA)"
+              apiLastUpdate="09/01/2026"
+            />
 
           </div>
         </div>
