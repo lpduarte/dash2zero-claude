@@ -82,7 +82,7 @@ export const MunicipioCombobox = ({
               placeholder="Pesquisar município..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
+              className="pl-8 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
         </div>
@@ -95,7 +95,7 @@ export const MunicipioCombobox = ({
             <div className="p-1">
               {filteredDistritos.map((distrito) => (
                 <div key={distrito.distrito}>
-                  <div className="sticky top-0 z-10 py-1.5 pl-8 pr-2 text-sm font-bold text-primary bg-primary/5">
+                  <div className="sticky top-0 z-10 py-1.5 pl-8 pr-2 text-sm font-bold text-primary bg-muted">
                     {distrito.distrito}
                   </div>
                   {distrito.municipios.map((municipio) => {
