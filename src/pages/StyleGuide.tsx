@@ -138,6 +138,7 @@ const allColors = {
   status: [
     { name: '--warning', tailwind: 'bg-warning', hsl: '42 90% 50%', hex: '#F2A91E', note: 'Atenção / Médio Risco (texto usa --foreground)' },
     { name: '--danger', tailwind: 'bg-danger', hsl: '0 70% 55%', hex: '#DF4545', note: 'Erro / Alto Risco (= destructive)' },
+    { name: '--autumn', tailwind: 'bg-autumn', hsl: '28 80% 50%', hex: '#E67A1A', note: 'Cor de outono para elementos decorativos' },
   ],
   // Scope/Âmbito colors for emissions charts (3 CSS variables)
   scope: [
@@ -765,47 +766,6 @@ const StyleGuide = () => {
             </p>
 
             <div className="space-y-4">
-              {/* NotFound.tsx */}
-              <Card className="p-4">
-                <h4 className="font-bold text-sm mb-3 flex items-center gap-2">
-                  <FileCode className="h-4 w-4" />
-                  NotFound.tsx
-                </h4>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                  <div className="flex items-center gap-2 p-2 rounded border bg-muted/30">
-                    <div
-                      className="w-6 h-6 rounded border"
-                      style={{ backgroundColor: "hsl(175 66% 38% / 0.18)" }}
-                    />
-                    <code className="text-xs">primary/18</code>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded border bg-muted/30">
-                    <div
-                      className="w-6 h-6 rounded border"
-                      style={{ backgroundColor: "hsl(175 66% 38% / 0.22)" }}
-                    />
-                    <code className="text-xs">primary/22</code>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded border bg-muted/30">
-                    <div
-                      className="w-6 h-6 rounded border"
-                      style={{ backgroundColor: "hsl(175 66% 38% / 0.25)" }}
-                    />
-                    <code className="text-xs">primary/25</code>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded border bg-muted/30">
-                    <div
-                      className="w-6 h-6 rounded border"
-                      style={{ backgroundColor: "hsl(28 80% 50% / 0.15)" }}
-                    />
-                    <code className="text-xs">orange/15</code>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Efeitos de glow animados na página 404 — variantes de opacidade da cor primary + overlay laranja
-                </p>
-              </Card>
-
               {/* Header.tsx */}
               <Card className="p-4">
                 <h4 className="font-bold text-sm mb-3 flex items-center gap-2">

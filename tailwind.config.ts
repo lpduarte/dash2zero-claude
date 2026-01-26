@@ -155,6 +155,8 @@ export default {
           silver: "hsl(var(--medal-silver))",
           bronze: "hsl(var(--medal-bronze))",
         },
+        // Decorative colors
+        autumn: "hsl(var(--autumn))",
         // Chart utility colors (alias to existing)
         chart: {
           grid: "hsl(var(--border))", // alias to border

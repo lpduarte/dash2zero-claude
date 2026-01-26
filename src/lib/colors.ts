@@ -1,6 +1,6 @@
 // GERADO AUTOMATICAMENTE - NAO EDITAR
 // Fonte: src/index.css
-// Gerado em: 2026-01-26T14:00:08.700Z
+// Gerado em: 2026-01-26T14:43:48.175Z
 // Script: scripts/extract-colors.js
 
 /**
@@ -23,6 +23,7 @@ export const colors = {
     'primaryDark': '#157971',
     'warning': '#F2AD0D',
     'danger': '#DD3C3C',
+    'autumn': '#E67919',
     'scope1': '#D28B79',
     'scope2': '#D2BC79',
     'scope3': '#59A6C0',
@@ -52,6 +53,7 @@ export const colors = {
     'primaryDark': '#1F938A',
     'warning': '#EEB32B',
     'danger': '#DA4E4E',
+    'autumn': '#E28736',
     'scope1': '#D69585',
     'scope2': '#D6C285',
     'scope3': '#6BB0C7',
@@ -81,6 +83,7 @@ export const colors = {
     'primaryDark': 'hsl(175, 70%, 28%)',
     'warning': 'hsl(42, 90%, 50%)',
     'danger': 'hsl(0, 70%, 55%)',
+    'autumn': 'hsl(28, 80%, 50%)',
     'scope1': 'hsl(12, 50%, 65%)',
     'scope2': 'hsl(45, 50%, 65%)',
     'scope3': 'hsl(195, 45%, 55%)',

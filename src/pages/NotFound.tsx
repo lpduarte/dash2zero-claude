@@ -27,72 +27,71 @@ const NotFound = () => {
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Main central cluster */}
         <div
-          className="absolute w-[700px] h-[700px] rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.18)", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+          className="absolute w-[700px] h-[700px] rounded-full blur-3xl animate-pulse-slow bg-primary/[0.18]"
+          style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
         />
         <div
-          className="absolute w-96 h-96 rounded-full blur-3xl animate-pulse-slower"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.22)", top: "40%", left: "45%", transform: "translate(-50%, -50%)" }}
+          className="absolute w-96 h-96 rounded-full blur-3xl animate-pulse-slower bg-primary/[0.22]"
+          style={{ top: "40%", left: "45%", transform: "translate(-50%, -50%)" }}
         />
         <div
-          className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.20)", top: "55%", left: "58%", transform: "translate(-50%, -50%)" }}
+          className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse-slow bg-primary/20"
+          style={{ top: "55%", left: "58%", transform: "translate(-50%, -50%)" }}
         />
 
         {/* Upper cluster */}
         <div
-          className="absolute w-80 h-80 rounded-full blur-3xl animate-pulse-slower"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.25)", top: "5%", left: "35%" }}
+          className="absolute w-80 h-80 rounded-full blur-3xl animate-pulse-slower bg-primary/25"
+          style={{ top: "5%", left: "35%" }}
         />
         <div
-          className="absolute w-64 h-64 rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.20)", top: "12%", left: "50%" }}
+          className="absolute w-64 h-64 rounded-full blur-3xl animate-pulse-slow bg-primary/20"
+          style={{ top: "12%", left: "50%" }}
         />
         <div
-          className="absolute w-48 h-48 rounded-full blur-3xl animate-pulse-slower"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.18)", top: "8%", left: "62%" }}
+          className="absolute w-48 h-48 rounded-full blur-3xl animate-pulse-slower bg-primary/[0.18]"
+          style={{ top: "8%", left: "62%" }}
         />
 
         {/* Right cluster */}
         <div
-          className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.22)", top: "35%", right: "5%" }}
+          className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse-slow bg-primary/[0.22]"
+          style={{ top: "35%", right: "5%" }}
         />
         <div
-          className="absolute w-56 h-56 rounded-full blur-3xl animate-pulse-slower"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.18)", top: "50%", right: "12%" }}
+          className="absolute w-56 h-56 rounded-full blur-3xl animate-pulse-slower bg-primary/[0.18]"
+          style={{ top: "50%", right: "12%" }}
         />
 
         {/* Left cluster */}
         <div
-          className="absolute w-80 h-80 rounded-full blur-3xl animate-pulse-slower"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.24)", top: "30%", left: "2%" }}
+          className="absolute w-80 h-80 rounded-full blur-3xl animate-pulse-slower bg-primary/[0.24]"
+          style={{ top: "30%", left: "2%" }}
         />
         <div
-          className="absolute w-52 h-52 rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.18)", top: "48%", left: "15%" }}
+          className="absolute w-52 h-52 rounded-full blur-3xl animate-pulse-slow bg-primary/[0.18]"
+          style={{ top: "48%", left: "15%" }}
         />
 
         {/* Lower cluster */}
         <div
-          className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.22)", bottom: "5%", left: "40%" }}
+          className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse-slow bg-primary/[0.22]"
+          style={{ bottom: "5%", left: "40%" }}
         />
         <div
-          className="absolute w-60 h-60 rounded-full blur-3xl animate-pulse-slower"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.20)", bottom: "10%", left: "55%" }}
+          className="absolute w-60 h-60 rounded-full blur-3xl animate-pulse-slower bg-primary/20"
+          style={{ bottom: "10%", left: "55%" }}
         />
         <div
-          className="absolute w-44 h-44 rounded-full blur-3xl animate-pulse-slow"
-          style={{ backgroundColor: "hsl(175 66% 38% / 0.16)", bottom: "15%", right: "20%" }}
+          className="absolute w-44 h-44 rounded-full blur-3xl animate-pulse-slow bg-primary/[0.16]"
+          style={{ bottom: "15%", right: "20%" }}
         />
       </div>
 
       {/* Orange overlay - fades in when leaf lands */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none bg-autumn/15"
         style={{
-          backgroundColor: "hsl(28 80% 50% / 0.15)",
           opacity: isOrange ? 1 : 0,
           transition: "opacity 8s ease-in-out",
         }}
@@ -101,7 +100,7 @@ const NotFound = () => {
       {/* Falling leaf */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="falling-leaf">
-          <Leaf className="w-14 h-14 text-orange-500" />
+          <Leaf className="w-14 h-14 text-autumn" />
         </div>
       </div>
 
