@@ -82,7 +82,7 @@ export const Step1Analysis = ({
           </span>
         </div>
 
-        {/* SECÇÃO 1: Intensidade de Carbono */}
+        {/* SEÇÃO 1: Intensidade de Carbono */}
         <div>
           <p className="text-xl font-normal text-foreground mb-4">
             Intensidade de Carbono
@@ -115,7 +115,7 @@ export const Step1Analysis = ({
 
         <Separator />
 
-        {/* SECÇÃO 2: Consequências (Vermelho) - VISÃO MUNICÍPIO */}
+        {/* SEÇÃO 2: Consequências (Vermelho) - VISÃO MUNICÍPIO */}
         <div className={`p-4 ${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border} rounded-lg`}>
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="h-4 w-4 text-danger" />
@@ -169,7 +169,7 @@ export const Step1Analysis = ({
 
         <Separator />
 
-        {/* SECÇÃO 3: Distribuição por Âmbito */}
+        {/* SEÇÃO 3: Distribuição por Âmbito */}
         <div>
           <p className="text-xl font-normal text-foreground mb-4">
             Distribuição por Âmbito
@@ -220,7 +220,7 @@ export const Step1Analysis = ({
           </div>
         </div>
 
-        {/* SECÇÃO 4: Análise por Âmbito (só >30%) */}
+        {/* SEÇÃO 4: Análise por Âmbito (só >30%) */}
         {scopesAbove30.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -256,7 +256,7 @@ export const Step1Analysis = ({
 
         <Separator />
 
-        {/* SECÇÃO 5: Para Atingir Zona Segura (Vermelho) */}
+        {/* SEÇÃO 5: Para Atingir Zona Segura (Vermelho) */}
         <div className={`p-4 ${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border} rounded-lg`}>
           <div className="flex items-center gap-2 mb-3">
             <Target className="h-4 w-4 text-danger" />

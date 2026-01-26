@@ -578,7 +578,7 @@ export default function Methodology() {
 
                 {/* Subsetores da Indústria */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Subsetores da Indústria (Divisões CAE - Secção C)</h3>
+                  <h3 className="font-semibold">Subsetores da Indústria (Divisões CAE - Seção C)</h3>
                   <p className="text-sm text-muted-foreground">
                     O setor industrial é subdividido em subsetores mais específicos para permitir
                     comparações mais precisas entre empresas com atividades semelhantes.
@@ -698,7 +698,7 @@ export default function Methodology() {
 
                 {/* Subsetores da Indústria */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Intensidade de Subsetores Industriais (Secção C)</h3>
+                  <h3 className="font-semibold">Intensidade de Subsetores Industriais (Seção C)</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {[
                       { name: "Cerâmica/Vidro", intensity: "3.70", highlight: true },
@@ -1153,7 +1153,7 @@ export default function Methodology() {
                 <Info className="h-4 w-4 text-success mt-0.5 shrink-0" />
                 <p className="text-sm text-muted-foreground">
                   <strong>Segurança:</strong> A importação nunca é destrutiva. Novos dados são
-                  adicionados ou actualizados, mas nunca eliminados automaticamente.
+                  adicionados ou atualizados, mas nunca eliminados automaticamente.
                 </p>
               </div>
             </div>
@@ -1190,7 +1190,7 @@ export default function Methodology() {
                     </tr>
                     <tr>
                       <td className="py-2 pr-4">NIF já existe no mesmo cluster</td>
-                      <td className="py-2 text-muted-foreground">Dados são actualizados (nome, email) se diferentes</td>
+                      <td className="py-2 text-muted-foreground">Dados são atualizados (nome, email) se diferentes</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1216,7 +1216,7 @@ export default function Methodology() {
                   <div>
                     <p className="text-sm font-bold">Criar Cluster</p>
                     <p className="text-xs text-muted-foreground">
-                      Definir um nome e seleccionar um ícone identificativo.
+                      Definir um nome e selecionar um ícone identificativo.
                       O cluster fica imediatamente disponível para receber empresas.
                     </p>
                   </div>
@@ -1247,11 +1247,11 @@ export default function Methodology() {
               </div>
             </div>
 
-            {/* Protecção de Dados */}
+            {/* Proteção de Dados */}
             <div className="border rounded-lg p-4 space-y-4 bg-warning/5 border-warning/20">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-warning" />
-                <h3 className="font-semibold">Protecção de Dados</h3>
+                <h3 className="font-semibold">Proteção de Dados</h3>
               </div>
 
               <div className="space-y-2 text-sm text-muted-foreground">
@@ -1266,7 +1266,7 @@ export default function Methodology() {
                 </p>
                 <p>
                   <strong>Apenas empresas "órfãs" são removidas:</strong> Empresas que só pertencem
-                  ao cluster a ser eliminado são efectivamente removidas do sistema.
+                  ao cluster a ser eliminado são efetivamente removidas do sistema.
                 </p>
               </div>
             </div>
@@ -1307,7 +1307,7 @@ export default function Methodology() {
                     </tr>
                     <tr>
                       <td className="py-2 pr-4 font-bold">Potencial de Melhoria</td>
-                      <td className="py-2 pr-4 text-muted-foreground">Redução possível com optimizações</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Redução possível com otimizações</td>
                       <td className="py-2 text-muted-foreground">Alto/Médio/Baixo</td>
                     </tr>
                     <tr>
@@ -1371,7 +1371,7 @@ export default function Methodology() {
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                   <Badge variant="secondary" className="shrink-0">4</Badge>
                   <div>
-                    <p className="font-bold">Análise por Actividade</p>
+                    <p className="font-bold">Análise por Atividade</p>
                     <p className="text-sm text-muted-foreground">
                       Heatmap região×sector para identificar concentrações de emissões,
                       benchmarking sectorial comparando com médias nacionais.
@@ -1430,7 +1430,7 @@ export default function Methodology() {
                   <li>Análise de fornecedores por emissões</li>
                   <li>Alternativas mais eficientes</li>
                   <li>Impacto de substituição</li>
-                  <li>Optimização de Scope 3</li>
+                  <li>Otimização de Scope 3</li>
                 </ul>
               </div>
 
@@ -1518,7 +1518,7 @@ export default function Methodology() {
                   <p className="text-xs text-muted-foreground">Alterar dados e permissões existentes</p>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30">
-                  <p className="font-bold text-sm">Arquivar/Reactivar</p>
+                  <p className="font-bold text-sm">Arquivar/Reativar</p>
                   <p className="text-xs text-muted-foreground">Ocultar clientes sem eliminar dados</p>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30">
@@ -1605,7 +1605,7 @@ export default function Methodology() {
             <div className="border rounded-lg p-4 space-y-4 bg-card">
               <h3 className="font-semibold">Métricas Globais</h3>
               <p className="text-sm text-muted-foreground">
-                O painel apresenta métricas agregadas de todos os clientes activos:
+                O painel apresenta métricas agregadas de todos os clientes ativos:
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="p-3 rounded-lg bg-muted/30 text-center">
@@ -1644,7 +1644,7 @@ export default function Methodology() {
                 <div className="flex items-start gap-3">
                   <Badge variant="secondary" className="shrink-0">2</Badge>
                   <div>
-                    <p className="font-bold text-sm">Gráfico de Actividade</p>
+                    <p className="font-bold text-sm">Gráfico de Atividade</p>
                     <p className="text-xs text-muted-foreground">
                       Pegadas concluídas por semana (últimas 12 semanas) em todos os clientes.
                     </p>
@@ -1670,8 +1670,8 @@ export default function Methodology() {
               </p>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                 <li>Logótipo, nome e tipo (Município/Empresa)</li>
-                <li>Mini-métricas: empresas, conversão, última actividade</li>
-                <li>Sparkline de actividade semanal</li>
+                <li>Mini-métricas: empresas, conversão, última atividade</li>
+                <li>Sparkline de atividade semanal</li>
                 <li>Mini-funil de onboarding</li>
                 <li>Alertas (bounces de email)</li>
                 <li>Acções: Editar, Arquivar, Dashboard</li>
@@ -1693,7 +1693,7 @@ export default function Methodology() {
                   <p className="font-bold text-sm mb-2">Filtros</p>
                   <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
                     <li>Por tipo: Todos, Municípios, Empresas</li>
-                    <li>Por estado: Activos, Arquivados, Todos</li>
+                    <li>Por estado: Ativos, Arquivados, Todos</li>
                   </ul>
                 </div>
               </div>
@@ -1910,7 +1910,7 @@ export default function Methodology() {
                     Disponível
                   </Badge>
                   <p className="text-sm text-muted-foreground">
-                    API funcional com cobertura nacional. Sincronização automática activa.
+                    API funcional com cobertura nacional. Sincronização automática ativa.
                   </p>
                 </div>
                 <div className="p-3 rounded-lg bg-warning/5 border border-warning/20">
@@ -1959,7 +1959,7 @@ export default function Methodology() {
           <div className="space-y-6">
             <p className="text-muted-foreground">
               O módulo de Incentivos permite criar campanhas de email, acompanhar o progresso
-              das empresas no funil de onboarding e optimizar as taxas de conversão.
+              das empresas no funil de onboarding e otimizar as taxas de conversão.
             </p>
 
             {/* Funil de Onboarding */}
@@ -2044,13 +2044,13 @@ export default function Methodology() {
               </div>
 
               <p className="text-sm text-muted-foreground">
-                O sistema de envio inteligente optimiza automaticamente as campanhas:
+                O sistema de envio inteligente otimiza automaticamente as campanhas:
               </p>
 
               <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
                 <li>Agrupa empresas por template recomendado</li>
                 <li>Associação automática baseada no estado de onboarding</li>
-                <li>Optimiza taxa de conversão com base em dados históricos</li>
+                <li>Otimiza taxa de conversão com base em dados históricos</li>
                 <li>Evita saturação de contactos</li>
               </ul>
             </div>
@@ -2061,7 +2061,7 @@ export default function Methodology() {
             id="email"
             title="Boas Práticas de Email"
             icon={Send}
-            description="Recomendações para campanhas de email efectivas"
+            description="Recomendações para campanhas de email efetivas"
           />
 
           <div className="space-y-6">
@@ -2103,7 +2103,7 @@ export default function Methodology() {
                     <tr className="border-b">
                       <th className="text-left py-2 pr-4 font-bold">Tipo</th>
                       <th className="text-left py-2 pr-4 font-bold">Causa</th>
-                      <th className="text-left py-2 font-bold">Acção</th>
+                      <th className="text-left py-2 font-bold">Ação</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -2194,7 +2194,7 @@ export default function Methodology() {
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
                   <p className="text-sm text-muted-foreground">
-                    <strong>Envio Inteligente:</strong> Utilizar para optimização automática baseada em dados
+                    <strong>Envio Inteligente:</strong> Utilizar para otimização automática baseada em dados
                   </p>
                 </div>
               </div>

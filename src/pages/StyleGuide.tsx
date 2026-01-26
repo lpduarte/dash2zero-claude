@@ -565,7 +565,7 @@ const StyleGuide = () => {
         {/* Conteúdo das secções */}
         <div className="p-8 max-w-5xl">
 
-        {/* === SECÇÃO: STACK TECNOLÓGICO === */}
+        {/* === SEÇÃO: STACK TECNOLÓGICO === */}
         <SectionHeader
           id="stack"
           title="Stack Tecnológico"
@@ -635,7 +635,7 @@ const StyleGuide = () => {
           </Card>
         </div>
 
-        {/* === SECÇÃO: CORES === */}
+        {/* === SEÇÃO: CORES === */}
         <SectionHeader
           id="cores"
           title="Cores"
@@ -755,7 +755,7 @@ const StyleGuide = () => {
 
         </div>
 
-        {/* === SECÇÃO: TIPOGRAFIA === */}
+        {/* === SEÇÃO: TIPOGRAFIA === */}
         <SectionHeader
           id="tipografia"
           title="Tipografia"
@@ -789,7 +789,7 @@ const StyleGuide = () => {
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
-                  <span><strong>Optimizada para ecrãs</strong> — excelente legibilidade</span>
+                  <span><strong>Otimizada para ecrãs</strong> — excelente legibilidade</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
@@ -855,7 +855,7 @@ const StyleGuide = () => {
 
         </div>
 
-        {/* === SECÇÃO: SOMBRAS === */}
+        {/* === SEÇÃO: SOMBRAS === */}
         <SectionHeader
           id="sombras"
           title="Sombras & Elevação"
@@ -899,7 +899,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: BOTÕES === */}
+        {/* === SEÇÃO: BOTÕES === */}
         <SectionHeader
           id="botoes"
           title="Botões"
@@ -967,7 +967,7 @@ const StyleGuide = () => {
 
         </div>
 
-        {/* === SECÇÃO: BADGES === */}
+        {/* === SEÇÃO: BADGES === */}
         <SectionHeader
           id="badges"
           title="Badges"
@@ -1034,7 +1034,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: INPUTS === */}
+        {/* === SEÇÃO: INPUTS === */}
         <SectionHeader
           id="inputs"
           title="Inputs"
@@ -1050,7 +1050,7 @@ const StyleGuide = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="input-disabled">Input Disabled</Label>
-              <Input id="input-disabled" placeholder="Desactivado" disabled />
+              <Input id="input-disabled" placeholder="Desativado" disabled />
             </div>
             <div className="space-y-2">
               <Label htmlFor="textarea-example">Textarea</Label>
@@ -1069,7 +1069,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: SELECT === */}
+        {/* === SEÇÃO: SELECT === */}
         <SectionHeader
           id="select"
           title="Select"
@@ -1080,7 +1080,7 @@ const StyleGuide = () => {
         <div className="space-y-4">
           <Select>
             <SelectTrigger className="w-64">
-              <SelectValue placeholder="Seleccione uma opção..." />
+              <SelectValue placeholder="Selecione uma opção..." />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="opt1">Opção 1</SelectItem>
@@ -1090,7 +1090,7 @@ const StyleGuide = () => {
           </Select>
         </div>
 
-        {/* === SECÇÃO: DIALOGS === */}
+        {/* === SEÇÃO: DIALOGS === */}
         <SectionHeader
           id="dialogs"
           title="Dialogs"
@@ -1110,9 +1110,9 @@ const StyleGuide = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Confirmar acção</AlertDialogTitle>
+                  <AlertDialogTitle>Confirmar ação</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta é uma mensagem de confirmação. Tem a certeza que deseja continuar com esta acção?
+                    Esta é uma mensagem de confirmação. Tem a certeza que deseja continuar com esta ação?
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -1126,7 +1126,7 @@ const StyleGuide = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">Alert Dialog Destructive</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Variante para acções destrutivas como eliminar.
+              Variante para ações destrutivas como eliminar.
             </p>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -1136,7 +1136,7 @@ const StyleGuide = () => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Confirmar eliminação</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Tem a certeza que deseja eliminar este item? Esta acção não pode ser revertida.
+                    Tem a certeza que deseja eliminar este item? Esta ação não pode ser revertida.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -1148,7 +1148,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: STEPS === */}
+        {/* === SEÇÃO: STEPS === */}
         <SectionHeader
           id="steps"
           title="Steps"
@@ -1157,7 +1157,7 @@ const StyleGuide = () => {
         />
 
         <div className="space-y-8">
-          {/* Exemplo interactivo */}
+          {/* Exemplo interativo */}
           <div>
             <h3 className="text-xl font-bold mb-4">Step Indicator</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -1235,7 +1235,7 @@ const StyleGuide = () => {
                   </div>
 
                   <p className="text-xs text-muted-foreground text-center mt-6">
-                    Clica nos steps para mudar o estado activo
+                    Clica nos steps para mudar o estado ativo
                   </p>
                 </Card>
               );
@@ -1295,7 +1295,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: KPI CARDS === */}
+        {/* === SEÇÃO: KPI CARDS === */}
         <SectionHeader
           id="kpi-cards"
           title="KPI Cards"
@@ -1436,7 +1436,7 @@ const StyleGuide = () => {
           </div>
         </div>
 
-        {/* === SECÇÃO: TABS === */}
+        {/* === SEÇÃO: TABS === */}
         <SectionHeader
           id="tabs"
           title="Tabs"
@@ -1489,7 +1489,7 @@ const StyleGuide = () => {
           </Tabs>
         </div>
 
-        {/* === SECÇÃO: TABELAS === */}
+        {/* === SEÇÃO: TABELAS === */}
         <SectionHeader
           id="tabelas"
           title="Tabelas"
@@ -1530,7 +1530,7 @@ const StyleGuide = () => {
           </Table>
         </div>
 
-        {/* === SECÇÃO: GRÁFICOS === */}
+        {/* === SEÇÃO: GRÁFICOS === */}
         <SectionHeader
           id="graficos"
           title="Gráficos"
@@ -1623,7 +1623,7 @@ const StyleGuide = () => {
           </Card>
         </div>
 
-        {/* === SECÇÃO: FUNIL ONBOARDING === */}
+        {/* === SEÇÃO: FUNIL ONBOARDING === */}
         <SectionHeader
           id="funil"
           title="Funil Onboarding"
@@ -1784,7 +1784,7 @@ const StyleGuide = () => {
           })()}
         </div>
 
-        {/* === SECÇÃO: ÍCONES === */}
+        {/* === SEÇÃO: ÍCONES === */}
         <SectionHeader
           id="icones"
           title="Ícones"

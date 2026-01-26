@@ -90,7 +90,7 @@ export const Step4Summary = ({
 
   const handleSendEmail = () => {
     onSendEmail();
-    // Actualizar localStorage
+    // Atualizar localStorage
     if (storageKey) {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
@@ -159,7 +159,7 @@ export const Step4Summary = ({
 
       {/* Conteúdo */}
       <div ref={scrollContainerRef} className="p-6 space-y-4">
-        {/* SECÇÃO: Próximos Passos */}
+        {/* SEÇÃO: Próximos Passos */}
         <CollapsibleSection
           id="proximosPassos"
           title="Próximos Passos"
@@ -214,7 +214,7 @@ export const Step4Summary = ({
           </div>
         </CollapsibleSection>
 
-        {/* SECÇÃO: Diagnóstico e Impacto */}
+        {/* SEÇÃO: Diagnóstico e Impacto */}
         <CollapsibleSection
           id="diagnosticoImpacto"
           title="Diagnóstico e Impacto"
@@ -294,7 +294,7 @@ export const Step4Summary = ({
               <h5 className="text-sm font-normal text-muted-foreground mb-3">Intensidade de Carbono</h5>
               <div className="grid grid-cols-3 gap-4">
                 <div className={`p-4 ${riskColors.alto.bg} ${riskColors.alto.bgDark} border ${riskColors.alto.border} rounded-lg text-center`}>
-                  <p className="text-xs text-danger mb-1">Intensidade Actual</p>
+                  <p className="text-xs text-danger mb-1">Intensidade Atual</p>
                   <p className="font-bold text-xl text-danger">{formatNumber(currentIntensity, 2)}</p>
                   <p className="text-xs text-danger">kg CO₂e/€</p>
                 </div>
@@ -363,7 +363,7 @@ export const Step4Summary = ({
           </div>
         </CollapsibleSection>
 
-        {/* SECÇÃO: Medidas Selecionadas */}
+        {/* SEÇÃO: Medidas Selecionadas */}
         <CollapsibleSection
           id="medidas"
           title="Medidas Selecionadas"
@@ -397,7 +397,7 @@ export const Step4Summary = ({
           )}
         </CollapsibleSection>
 
-        {/* SECÇÃO: Financiamento */}
+        {/* SEÇÃO: Financiamento */}
         <CollapsibleSection
           id="financiamento"
           title="Financiamento"
@@ -431,7 +431,7 @@ export const Step4Summary = ({
           )}
         </CollapsibleSection>
 
-        {/* SECÇÃO: Contexto do Município */}
+        {/* SEÇÃO: Contexto do Município */}
         <CollapsibleSection
           id="contexto"
           title="Infraestrutura Municipal de Suporte"
@@ -471,7 +471,7 @@ export const Step4Summary = ({
           </div>
         </CollapsibleSection>
 
-        {/* SECÇÃO: Notas do Município */}
+        {/* SEÇÃO: Notas do Município */}
         <CollapsibleSection
           id="notas"
           title="Notas do Município"

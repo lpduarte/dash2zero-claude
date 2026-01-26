@@ -96,7 +96,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
           
           {/* SECÇÕES EXPANDÍVEIS */}
           <div className="space-y-2">
-            {/* Secção: Origem dos dados */}
+            {/* Seção: Origem dos dados */}
             <Collapsible open={expandedSections.origem} onOpenChange={() => toggleSection('origem')}>
               <div className="border rounded-lg overflow-hidden">
                 <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
@@ -138,7 +138,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
               </div>
             </Collapsible>
             
-            {/* Secção: Âmbitos de emissões */}
+            {/* Seção: Âmbitos de emissões */}
             <Collapsible open={expandedSections.ambitos} onOpenChange={() => toggleSection('ambitos')}>
               <div className="border rounded-lg overflow-hidden">
                 <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
@@ -176,7 +176,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
                         <div>
                           <p className="font-normal text-sm">Âmbito 2 — Energia</p>
                           <p className="text-xs text-muted-foreground">
-                            Electricidade e calor adquiridos
+                            Eletricidade e calor adquiridos
                           </p>
                         </div>
                       </div>
@@ -197,7 +197,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
               </div>
             </Collapsible>
             
-            {/* Secção: Métricas */}
+            {/* Seção: Métricas */}
             <Collapsible open={expandedSections.metricas} onOpenChange={() => toggleSection('metricas')}>
               <div className="border rounded-lg overflow-hidden">
                 <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
@@ -262,7 +262,7 @@ export const MethodologyModal = ({ open, onOpenChange }: MethodologyModalProps) 
               </div>
             </Collapsible>
             
-            {/* Secção: Análise de risco */}
+            {/* Seção: Análise de risco */}
             <Collapsible open={expandedSections.risco} onOpenChange={() => toggleSection('risco')}>
               <div className="border rounded-lg overflow-hidden">
                 <CollapsibleTrigger className={collapsibleStyles.triggerCompact}>
