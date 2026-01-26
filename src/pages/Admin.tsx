@@ -1213,10 +1213,43 @@ interface ApiConfig {
   coverage: string;
   lastSync?: Date;
   autoSync: boolean;
+  testFn?: (municipality: string) => Promise<{ count: number; error?: string }>;
+}
+
+interface TestResult {
+  apiId: string;
+  count: number;
+  error?: string;
+  timestamp: Date;
 }
 
 const InfrastructureConfig = () => {
   const [syncing, setSyncing] = useState<string | null>(null);
+  const [testResults, setTestResults] = useState<Record<string, TestResult>>({});
+  const [testMunicipality, setTestMunicipality] = useState('Cascais');
+
+  // Test functions that call real APIs
+  const testTransportStops = async (municipality: string) => {
+    try {
+      const response = await fetch('https://api.carrismetropolitana.pt/stops');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const filtered = data.filter((stop: any) =>
+        stop.municipality_name?.toLowerCase().includes(municipality.toLowerCase())
+      );
+      return { count: filtered.length };
+    } catch (error) {
+      return { count: 0, error: error instanceof Error ? error.message : 'Erro desconhecido' };
+    }
+  };
+
+  const testChargingStations = async () => {
+    const apiKey = import.meta.env.VITE_OPEN_CHARGE_MAP_API_KEY;
+    if (!apiKey) {
+      return { count: 0, error: 'API key não configurada (VITE_OPEN_CHARGE_MAP_API_KEY)' };
+    }
+    return { count: 0, error: 'Teste disponível com API key configurada' };
+  };
 
   // Configuration for each infrastructure API
   const apiConfigs: ApiConfig[] = [
@@ -1226,10 +1259,11 @@ const InfrastructureConfig = () => {
       description: 'Open Charge Map - Base de dados global de postos de carregamento',
       icon: Zap,
       category: 'Mobilidade',
-      status: 'available',
-      endpoint: 'https://api.openchargemap.io/v3/poi/',
+      status: import.meta.env.VITE_OPEN_CHARGE_MAP_API_KEY ? 'available' : 'partial',
+      endpoint: 'https://openchargemap.org/site/develop/api',
       coverage: 'Nacional (Portugal)',
       autoSync: true,
+      testFn: testChargingStations,
     },
     {
       id: 'transport-stops',
@@ -1237,10 +1271,11 @@ const InfrastructureConfig = () => {
       description: 'Carris Metropolitana API - Paragens da área metropolitana de Lisboa',
       icon: Bus,
       category: 'Mobilidade',
-      status: 'partial',
-      endpoint: 'https://api.carrismetropolitana.pt/v2/',
+      status: 'available',
+      endpoint: 'https://api.carrismetropolitana.pt/',
       coverage: 'Área Metropolitana de Lisboa',
       autoSync: true,
+      testFn: testTransportStops,
     },
     {
       id: 'air-quality',
@@ -1268,10 +1303,10 @@ const InfrastructureConfig = () => {
       description: 'Ciclovias.pt - Mapeamento colaborativo de ciclovias',
       icon: Route,
       category: 'Mobilidade',
-      status: 'available',
+      status: 'partial',
       endpoint: 'https://ciclovias.pt/',
       coverage: 'Nacional (GeoJSON)',
-      autoSync: true,
+      autoSync: false,
     },
     {
       id: 'bike-sharing',
@@ -1285,10 +1320,44 @@ const InfrastructureConfig = () => {
     },
   ];
 
-  const handleSync = async (apiId: string) => {
+  const handleSync = async (apiId: string, testFn?: ApiConfig['testFn']) => {
     setSyncing(apiId);
-    // TODO: Implement actual sync
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      if (testFn) {
+        const result = await testFn(testMunicipality);
+        setTestResults(prev => ({
+          ...prev,
+          [apiId]: {
+            apiId,
+            count: result.count,
+            error: result.error,
+            timestamp: new Date(),
+          },
+        }));
+      } else {
+        // Simulate for APIs without test function
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setTestResults(prev => ({
+          ...prev,
+          [apiId]: {
+            apiId,
+            count: 0,
+            error: 'Teste não implementado',
+            timestamp: new Date(),
+          },
+        }));
+      }
+    } catch (error) {
+      setTestResults(prev => ({
+        ...prev,
+        [apiId]: {
+          apiId,
+          count: 0,
+          error: error instanceof Error ? error.message : 'Erro desconhecido',
+          timestamp: new Date(),
+        },
+      }));
+    }
     setSyncing(null);
   };
 
@@ -1348,104 +1417,126 @@ const InfrastructureConfig = () => {
         </div>
       </div>
 
+      {/* Test Municipality Selector */}
+      <div className={cn(elements.sectionCard, "p-4")}>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-bold">Testar para:</span>
+          </div>
+          <Input
+            value={testMunicipality}
+            onChange={(e) => setTestMunicipality(e.target.value)}
+            placeholder="Nome do município..."
+            className="max-w-[200px]"
+          />
+          <span className="text-xs text-muted-foreground">
+            Clique em "Testar" numa API para verificar os dados disponíveis
+          </span>
+        </div>
+      </div>
+
       {/* API Cards by Category */}
       {Object.entries(groupedApis).map(([category, apis]) => (
         <div key={category}>
           <h4 className="text-sm font-bold text-muted-foreground mb-3">{category}</h4>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {apis.map((api) => (
-              <div
-                key={api.id}
-                className={cn(
-                  elements.sectionCard,
-                  "p-4",
-                  api.status === 'unavailable' && "opacity-60"
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={cn(
-                    "p-2 rounded-lg shrink-0",
-                    api.status === 'available' ? "bg-status-complete/10" :
-                    api.status === 'partial' ? "bg-warning/10" : "bg-muted"
-                  )}>
-                    <api.icon className={cn(
-                      "h-5 w-5",
-                      api.status === 'available' ? "text-status-complete" :
-                      api.status === 'partial' ? "text-warning" : "text-muted-foreground"
-                    )} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h5 className="font-bold text-sm">{api.name}</h5>
-                      {getStatusBadge(api.status)}
+            {apis.map((api) => {
+              const result = testResults[api.id];
+              return (
+                <div
+                  key={api.id}
+                  className={cn(
+                    elements.sectionCard,
+                    "p-4",
+                    api.status === 'unavailable' && "opacity-60"
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={cn(
+                      "p-2 rounded-lg shrink-0",
+                      api.status === 'available' ? "bg-status-complete/10" :
+                      api.status === 'partial' ? "bg-warning/10" : "bg-muted"
+                    )}>
+                      <api.icon className={cn(
+                        "h-5 w-5",
+                        api.status === 'available' ? "text-status-complete" :
+                        api.status === 'partial' ? "text-warning" : "text-muted-foreground"
+                      )} />
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">{api.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {api.coverage}
-                      </span>
-                      {api.autoSync && (
-                        <span className="flex items-center gap-1 text-primary">
-                          <RefreshCw className="h-3 w-3" />
-                          Auto-sync
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h5 className="font-bold text-sm">{api.name}</h5>
+                        {getStatusBadge(api.status)}
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">{api.description}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {api.coverage}
                         </span>
+                        {api.autoSync && (
+                          <span className="flex items-center gap-1 text-primary">
+                            <RefreshCw className="h-3 w-3" />
+                            Auto-sync
+                          </span>
+                        )}
+                      </div>
+                      {/* Test Result */}
+                      {result && (
+                        <div className={cn(
+                          "mt-3 p-2 rounded-md text-xs",
+                          result.error ? "bg-warning/10 text-warning" : "bg-status-complete/10 text-status-complete"
+                        )}>
+                          {result.error ? (
+                            <span>{result.error}</span>
+                          ) : (
+                            <span className="font-bold">
+                              {result.count} registos encontrados para {testMunicipality}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {api.endpoint && (
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={() => window.open(api.endpoint, '_blank')}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Ver documentação da API</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                      {api.status !== 'unavailable' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={syncing === api.id}
+                          onClick={() => handleSync(api.id, api.testFn)}
+                          className="gap-1.5"
+                        >
+                          <RefreshCw className={cn("h-4 w-4", syncing === api.id && "animate-spin")} />
+                          {syncing === api.id ? 'A testar...' : 'Testar'}
+                        </Button>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {api.endpoint && (
-                      <TooltipProvider delayDuration={100}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={() => window.open(api.endpoint, '_blank')}
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Ver documentação da API</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                    {api.status !== 'unavailable' && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={syncing === api.id}
-                        onClick={() => handleSync(api.id)}
-                        className="gap-1.5"
-                      >
-                        <RefreshCw className={cn("h-4 w-4", syncing === api.id && "animate-spin")} />
-                        {syncing === api.id ? 'A sincronizar...' : 'Testar'}
-                      </Button>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}
 
-      {/* Info about methodology */}
-      <div className={cn(elements.sectionCard, "p-4 bg-muted/30 border-dashed")}>
-        <div className="flex items-center gap-3">
-          <Settings className="h-5 w-5 text-muted-foreground shrink-0" />
-          <div className="text-sm text-muted-foreground">
-            <p>
-              A sincronização automática ocorre quando um novo cliente do tipo município é criado.
-              Para detalhes sobre as fontes de dados e metodologia de integração, consulte a{' '}
-              <a href="/metodologia" className="text-primary hover:underline font-bold">
-                página de metodologia
-              </a>.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

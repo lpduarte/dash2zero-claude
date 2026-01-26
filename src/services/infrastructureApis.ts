@@ -55,14 +55,26 @@ export interface ApiResponse<T> {
 }
 
 // OpenChargeMap API - EV Charging Stations
+// Requires API key from https://openchargemap.org/site/develop/api (free registration)
 const OPEN_CHARGE_MAP_API = 'https://api.openchargemap.io/v3/poi/';
+const OPEN_CHARGE_MAP_KEY = import.meta.env.VITE_OPEN_CHARGE_MAP_API_KEY || '';
 
 export async function fetchChargingStations(municipality: string): Promise<ApiResponse<ChargingStation>> {
   try {
+    if (!OPEN_CHARGE_MAP_KEY) {
+      return {
+        success: false,
+        data: [],
+        total: 0,
+        source: 'Open Charge Map',
+        timestamp: new Date(),
+        error: 'API key não configurada. Registe-se em openchargemap.org para obter uma chave gratuita.',
+      };
+    }
+
     // OpenChargeMap uses country codes and bounding boxes
-    // For now, we'll search by municipality name in Portugal
     const response = await fetch(
-      `${OPEN_CHARGE_MAP_API}?countrycode=PT&maxresults=100&compact=true&verbose=false`,
+      `${OPEN_CHARGE_MAP_API}?countrycode=PT&maxresults=500&compact=true&verbose=false&key=${OPEN_CHARGE_MAP_KEY}`,
       {
         headers: {
           'Accept': 'application/json',
@@ -81,7 +93,10 @@ export async function fetchChargingStations(municipality: string): Promise<ApiRe
     const filtered = data.filter((station: any) => {
       const town = station.AddressInfo?.Town?.toLowerCase() || '';
       const state = station.AddressInfo?.StateOrProvince?.toLowerCase() || '';
-      return town.includes(municipalityLower) || state.includes(municipalityLower);
+      const address = station.AddressInfo?.AddressLine1?.toLowerCase() || '';
+      return town.includes(municipalityLower) ||
+             state.includes(municipalityLower) ||
+             address.includes(municipalityLower);
     });
 
     const stations: ChargingStation[] = filtered.map((station: any) => ({
@@ -117,7 +132,8 @@ export async function fetchChargingStations(municipality: string): Promise<ApiRe
 }
 
 // Carris Metropolitana API - Transport Stops (AML only)
-const CARRIS_API = 'https://api.carrismetropolitana.pt/v2/';
+// Public API, no key required
+const CARRIS_API = 'https://api.carrismetropolitana.pt/';
 
 export async function fetchTransportStops(municipality: string): Promise<ApiResponse<TransportStop>> {
   try {
@@ -125,11 +141,15 @@ export async function fetchTransportStops(municipality: string): Promise<ApiResp
     const amlMunicipalities = [
       'alcochete', 'almada', 'amadora', 'barreiro', 'cascais', 'lisboa',
       'loures', 'mafra', 'moita', 'montijo', 'odivelas', 'oeiras',
-      'palmela', 'seixal', 'sesimbra', 'setubal', 'sintra', 'vila franca de xira'
+      'palmela', 'seixal', 'sesimbra', 'setúbal', 'sintra', 'vila franca de xira'
     ];
 
     const municipalityLower = municipality.toLowerCase();
-    if (!amlMunicipalities.some(m => m.includes(municipalityLower) || municipalityLower.includes(m))) {
+    const isInAML = amlMunicipalities.some(m =>
+      m.includes(municipalityLower) || municipalityLower.includes(m)
+    );
+
+    if (!isInAML) {
       return {
         success: true,
         data: [],
@@ -152,19 +172,20 @@ export async function fetchTransportStops(municipality: string): Promise<ApiResp
 
     const data = await response.json();
 
-    // Filter by municipality
+    // Filter by municipality_name field
     const filtered = data.filter((stop: any) => {
-      const stopMunicipality = stop.municipality?.toLowerCase() || '';
-      return stopMunicipality.includes(municipalityLower);
+      const stopMunicipality = stop.municipality_name?.toLowerCase() || '';
+      return stopMunicipality.includes(municipalityLower) ||
+             municipalityLower.includes(stopMunicipality);
     });
 
     const stops: TransportStop[] = filtered.map((stop: any) => ({
-      id: stop.id || '',
-      name: stop.name || 'Paragem sem nome',
-      latitude: stop.lat || 0,
-      longitude: stop.lon || 0,
+      id: stop.id || stop.stop_id || '',
+      name: stop.name || stop.short_name || 'Paragem sem nome',
+      latitude: parseFloat(stop.lat) || 0,
+      longitude: parseFloat(stop.lon) || 0,
       routes: stop.routes || [],
-      municipality: stop.municipality || municipality,
+      municipality: stop.municipality_name || municipality,
     }));
 
     return {
