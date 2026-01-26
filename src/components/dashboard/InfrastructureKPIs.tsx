@@ -124,13 +124,8 @@ export const InfrastructureKPIs = () => {
     setVisibility(newVisibility);
   };
 
-  const handleModalClose = (open: boolean) => {
-    setShowInfrastructureModal(open);
-    if (!open) {
-      // Refresh values from localStorage when modal closes
-      setInfraValues(getInfrastructureValues());
-      setVisibility(getInfrastructureVisibility());
-    }
+  const handleValuesChange = (newValues: InfrastructureValues) => {
+    setInfraValues(newValues);
   };
 
   return (
@@ -219,8 +214,9 @@ export const InfrastructureKPIs = () => {
 
       <ManageInfrastructureModal
         open={showInfrastructureModal}
-        onOpenChange={handleModalClose}
+        onOpenChange={setShowInfrastructureModal}
         onVisibilityChange={handleVisibilityChange}
+        onValuesChange={handleValuesChange}
       />
     </>
   );

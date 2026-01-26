@@ -327,12 +327,14 @@ interface ManageInfrastructureModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onVisibilityChange?: (visibility: InfrastructureVisibility) => void;
+  onValuesChange?: (values: InfrastructureValues) => void;
 }
 
 export const ManageInfrastructureModal = ({
   open,
   onOpenChange,
   onVisibilityChange,
+  onValuesChange,
 }: ManageInfrastructureModalProps) => {
   // Visibility state
   const [visibility, setVisibility] = useState<InfrastructureVisibility>(getInfrastructureVisibility);
@@ -362,6 +364,9 @@ export const ManageInfrastructureModal = ({
 
   const handleValueBlur = (key: InfrastructureKey) => {
     const value = values[key];
+    // Save values and notify parent
+    saveValues(values);
+    onValuesChange?.(values);
     // If empty or zero, set to removed
     if (value === '' || value === '0' || value === '0.0') {
       const newVisibility = { ...visibility, [key]: false };
@@ -396,6 +401,7 @@ export const ManageInfrastructureModal = ({
 
       // Save all values
       saveValues(values);
+      onValuesChange?.(values);
     }
     onOpenChange(open);
   };
