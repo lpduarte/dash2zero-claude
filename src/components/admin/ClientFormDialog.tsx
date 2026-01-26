@@ -35,6 +35,8 @@ export interface ClientFormData {
   contactName: string;
   permissions: ClientPermissions;
   icon?: string;
+  /** Signals that infrastructure sync should be triggered (for municipalities) */
+  shouldSyncInfrastructure?: boolean;
 }
 
 interface ClientFormDialogProps {
@@ -193,7 +195,12 @@ export const ClientFormDialog = ({
   // Submeter
   const handleSubmit = () => {
     if (!isValid) return;
-    onSave(formData);
+    // If creating a municipality, signal that infrastructure should be synced
+    const dataToSave: ClientFormData = {
+      ...formData,
+      shouldSyncInfrastructure: !isEditing && formData.type === 'municipio',
+    };
+    onSave(dataToSave);
     onOpenChange(false);
   };
 
