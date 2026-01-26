@@ -718,25 +718,33 @@ const StyleGuide = () => {
               ))}
             </div>
 
-            {/* Option 1: Increased saturation */}
-            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Opção 1: Saturação aumentada (~65-70%)</p>
+            {/* Proposta A: Rosa + Dourado + Azul (vibrante e moderna) */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Proposta A: Rosa + Dourado + Azul</p>
             <div className="grid grid-cols-3 gap-2 mb-6">
-              <ColorSwatch label="scope-1-alt" hsl="12 65% 58%" tailwind="—" note="Âmbito 1 - Coral vibrante" />
-              <ColorSwatch label="scope-2-alt" hsl="42 70% 55%" tailwind="—" note="Âmbito 2 - Âmbar vibrante" />
-              <ColorSwatch label="scope-3-alt" hsl="195 60% 45%" tailwind="—" note="Âmbito 3 - Petróleo vibrante" />
+              <ColorSwatch label="scope-1-a" hsl="330 55% 55%" tailwind="—" note="Âmbito 1 - Rosa/Magenta" />
+              <ColorSwatch label="scope-2-a" hsl="48 65% 48%" tailwind="—" note="Âmbito 2 - Dourado/Mostarda" />
+              <ColorSwatch label="scope-3-a" hsl="195 60% 45%" tailwind="—" note="Âmbito 3 - Azul Petróleo" />
             </div>
 
-            {/* Option 3: New dedicated palette */}
-            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Opção 3: Paleta nova dedicada</p>
+            {/* Proposta B: Roxo + Verde Lima + Azul (paleta fria/natural) */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Proposta B: Roxo + Verde + Azul</p>
             <div className="grid grid-cols-3 gap-2 mb-6">
-              <ColorSwatch label="scope-1-new" hsl="0 65% 55%" tailwind="—" note="Âmbito 1 - Vermelho terra" />
-              <ColorSwatch label="scope-2-new" hsl="35 75% 50%" tailwind="—" note="Âmbito 2 - Laranja dourado" />
-              <ColorSwatch label="scope-3-new" hsl="210 55% 50%" tailwind="—" note="Âmbito 3 - Azul oceano" />
+              <ColorSwatch label="scope-1-b" hsl="280 50% 55%" tailwind="—" note="Âmbito 1 - Roxo" />
+              <ColorSwatch label="scope-2-b" hsl="85 45% 45%" tailwind="—" note="Âmbito 2 - Verde Lima" />
+              <ColorSwatch label="scope-3-b" hsl="195 60% 45%" tailwind="—" note="Âmbito 3 - Azul Petróleo" />
+            </div>
+
+            {/* Proposta C: Terracota + Castanho + Azul (tons terra) */}
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Proposta C: Terracota + Castanho + Azul</p>
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              <ColorSwatch label="scope-1-c" hsl="18 45% 48%" tailwind="—" note="Âmbito 1 - Terracota" />
+              <ColorSwatch label="scope-2-c" hsl="32 50% 45%" tailwind="—" note="Âmbito 2 - Castanho Dourado" />
+              <ColorSwatch label="scope-3-c" hsl="195 60% 45%" tailwind="—" note="Âmbito 3 - Azul Petróleo" />
             </div>
 
             {/* Visual comparison with mini charts */}
             <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Comparação visual</p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Current */}
               <div className="border rounded-lg p-3">
                 <p className="text-xs text-muted-foreground mb-2 text-center">Actuais</p>
@@ -746,22 +754,31 @@ const StyleGuide = () => {
                   <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(195 45% 55%)' }} />
                 </div>
               </div>
-              {/* Option 1 */}
+              {/* Proposta A */}
               <div className="border rounded-lg p-3">
-                <p className="text-xs text-muted-foreground mb-2 text-center">Opção 1</p>
+                <p className="text-xs text-muted-foreground mb-2 text-center">Proposta A</p>
                 <div className="flex gap-1 h-20">
-                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(12 65% 58%)' }} />
-                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(42 70% 55%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(330 55% 55%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(48 65% 48%)' }} />
                   <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(195 60% 45%)' }} />
                 </div>
               </div>
-              {/* Option 3 */}
+              {/* Proposta B */}
               <div className="border rounded-lg p-3">
-                <p className="text-xs text-muted-foreground mb-2 text-center">Opção 3</p>
+                <p className="text-xs text-muted-foreground mb-2 text-center">Proposta B</p>
                 <div className="flex gap-1 h-20">
-                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(0 65% 55%)' }} />
-                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(35 75% 50%)' }} />
-                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(210 55% 50%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(280 50% 55%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(85 45% 45%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(195 60% 45%)' }} />
+                </div>
+              </div>
+              {/* Proposta C */}
+              <div className="border rounded-lg p-3">
+                <p className="text-xs text-muted-foreground mb-2 text-center">Proposta C</p>
+                <div className="flex gap-1 h-20">
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(18 45% 48%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(32 50% 45%)' }} />
+                  <div className="flex-1 rounded" style={{ backgroundColor: 'hsl(195 60% 45%)' }} />
                 </div>
               </div>
             </div>
