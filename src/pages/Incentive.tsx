@@ -7,18 +7,14 @@ import { KPICard } from "@/components/ui/kpi-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import {
   Search,
   Send,
@@ -29,22 +25,21 @@ import {
   TrendingUp,
   Info,
   BookOpen,
-  ChevronDown,
-  ChevronUp,
   ChevronRight,
   Archive,
-  CheckCircle2,
   Clock,
   Star,
-  Lightbulb,
   Zap,
-  Settings2,
-  MailOpen,
-  MousePointerClick,
-  Circle,
   MailX,
+  MailOpen,
+  MailWarning,
+  MousePointerClick,
   ShieldAlert,
+  Rocket,
+  FileText
 } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { pt } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { getClustersByOwnerType } from "@/data/clusters";
@@ -53,12 +48,10 @@ import {
 } from "@/data/suppliers";
 import { ClusterSelector } from "@/components/dashboard/ClusterSelector";
 import { UniversalFilterState, Supplier } from "@/types/supplier";
-import { emailTemplates as defaultEmailTemplates, getCompanyEmailTracking, getDeliveryMetrics, EmailRecord, EmailTemplate } from "@/data/emailTracking";
+import { emailTemplates as defaultEmailTemplates, getCompanyEmailTracking, getDeliveryMetrics, EmailRecord } from "@/data/emailTracking";
 import { SupplierWithoutFootprint } from "@/types/supplierNew";
-import { format, formatDistanceToNow } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
-import { pt } from "date-fns/locale";
-import { IncentiveFiltersDialog, IncentiveFilters } from "@/components/dashboard/IncentiveFiltersDialog";
+import { IncentiveTable } from "@/components/incentive/IncentiveTable";
 
 interface CompanyWithTracking extends SupplierWithoutFootprint {
   emailsSent: number;
@@ -72,6 +65,8 @@ interface CompanyWithTracking extends SupplierWithoutFootprint {
     reason?: string;
     date: string;
   };
+  // Archive reason
+  archiveReason?: 'spam' | 'optout' | 'completed';
 }
 
 // Import centralized status config
@@ -86,20 +81,6 @@ const templateSuggestions: Record<string, string> = {
   em_progresso_simple: 't2',     // Lembrete (suporte)
   em_progresso_formulario: 't2',
   completo: 't1',                // Ignorado mas mapeado
-};
-
-// Next action helper based on onboarding status
-const getNextAction = (status: string): string => {
-  const actions: Record<string, string> = {
-    por_contactar: 'Enviar convite',
-    sem_interacao: 'Enviar lembrete',
-    interessada: 'Oferecer ajuda',
-    registada_simple: 'Incentivar início',
-    em_progresso_simple: 'Dar suporte',
-    em_progresso_formulario: 'Dar suporte',
-    completo: 'Concluído',
-  };
-  return actions[status] || '';
 };
 
 const Incentive = () => {
@@ -122,35 +103,19 @@ const Incentive = () => {
     parish: [],
     sector: [],
   });
-  const [advancedFilters, setAdvancedFilters] = useState<IncentiveFilters>({
-    onboardingStatus: [],
-    emailCount: "all",
-    deliveryIssues: [],
-  });
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   
-  // Templates state
-  const [templates, setTemplates] = useState<EmailTemplate[]>(defaultEmailTemplates);
-  const [selectedTemplate, setSelectedTemplate] = useState(defaultEmailTemplates[0].id);
-  const [subject, setSubject] = useState(defaultEmailTemplates[0].subject);
-  const [message, setMessage] = useState(defaultEmailTemplates[0].body);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
-  const [sortBy, setSortBy] = useState<'status' | 'status-desc' | 'emails' | 'emails-desc'>('status');
   const [showSmartSendDialog, setShowSmartSendDialog] = useState(false);
   const [showKPIsModal, setShowKPIsModal] = useState(false);
-  
-  // Status order for sorting (most advanced first)
-  const statusOrder: Record<string, number> = {
-    completo: 0,
-    em_progresso_formulario: 1,
-    em_progresso_simple: 2,
-    registada_simple: 3,
-    interessada: 4,
-    sem_interacao: 5,
-    por_contactar: 6,
-  };
+
+  // Modal de envio de email individual
+  const [sendEmailDialog, setSendEmailDialog] = useState<{
+    company: CompanyWithTracking;
+    template: string;
+  } | null>(null);
+  const [selectedTemplateInModal, setSelectedTemplateInModal] = useState<string>("");
 
   // Handle URL params from Clusters page
   useEffect(() => {
@@ -244,62 +209,13 @@ const Incentive = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(c =>
-        c.name.toLowerCase().includes(query)
+        c.name.toLowerCase().includes(query) ||
+        c.contact.email.toLowerCase().includes(query)
       );
     }
 
-    // Advanced filters - email count
-    if (advancedFilters.emailCount !== "all") {
-      if (advancedFilters.emailCount === "0") {
-        filtered = filtered.filter(c => c.emailsSent === 0);
-      } else if (advancedFilters.emailCount === "1") {
-        filtered = filtered.filter(c => c.emailsSent === 1);
-      } else if (advancedFilters.emailCount === "2") {
-        filtered = filtered.filter(c => c.emailsSent === 2);
-      } else if (advancedFilters.emailCount === "3+") {
-        filtered = filtered.filter(c => c.emailsSent >= 3);
-      }
-    }
-
-    // Advanced filters - onboarding status
-    if (advancedFilters.onboardingStatus.length > 0) {
-      filtered = filtered.filter(c => advancedFilters.onboardingStatus.includes(c.onboardingStatus));
-    }
-
-    // Advanced filters - delivery issues
-    if (advancedFilters.deliveryIssues.length > 0) {
-      filtered = filtered.filter(c => {
-        if (advancedFilters.deliveryIssues.includes('bounced') && c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'bounced') {
-          return true;
-        }
-        if (advancedFilters.deliveryIssues.includes('spam') && c.hasDeliveryIssues && c.lastDeliveryIssue?.type === 'spam') {
-          return true;
-        }
-        if (advancedFilters.deliveryIssues.includes('none') && !c.hasDeliveryIssues) {
-          return true;
-        }
-        return false;
-      });
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'status':
-        filtered.sort((a, b) => (statusOrder[a.onboardingStatus] || 99) - (statusOrder[b.onboardingStatus] || 99));
-        break;
-      case 'status-desc':
-        filtered.sort((a, b) => (statusOrder[b.onboardingStatus] || 99) - (statusOrder[a.onboardingStatus] || 99));
-        break;
-      case 'emails':
-        filtered.sort((a, b) => b.emailsSent - a.emailsSent);
-        break;
-      case 'emails-desc':
-        filtered.sort((a, b) => a.emailsSent - b.emailsSent);
-        break;
-    }
-
     return filtered;
-  }, [companiesPending, searchQuery, advancedFilters, sortBy, statusOrder]);
+  }, [companiesPending, searchQuery]);
 
   // Filtered archive (já tem cluster e universal filters aplicados via companiesCompleted)
   const filteredArchive = useMemo(() => {
@@ -308,11 +224,12 @@ const Incentive = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(c =>
-        c.name.toLowerCase().includes(query)
+        c.name.toLowerCase().includes(query) ||
+        c.contact.email.toLowerCase().includes(query)
       );
     }
 
-    return filtered.sort((a, b) => a.name.localeCompare(b.name));
+    return filtered;
   }, [companiesCompleted, searchQuery]);
   
   // Funnel metrics based on onboardingStatus (filtrados por cluster e filtros universais)
@@ -478,66 +395,32 @@ const Incentive = () => {
     const currentList = activeTab === "pending" ? filteredCompanies : filteredArchive;
     const currentIds = currentList.map(c => c.id);
     const allSelected = currentIds.every(id => selectedCompanies.includes(id));
-    
+
     if (allSelected) {
       setSelectedCompanies(prev => prev.filter(id => !currentIds.includes(id)));
     } else {
       setSelectedCompanies(prev => [...new Set([...prev, ...currentIds])]);
     }
   };
-  
-  const handleTemplateChange = (templateId: string) => {
-    const template = templates.find(t => t.id === templateId);
-    if (template) {
-      setSelectedTemplate(templateId);
-      setSubject(template.subject);
-      setMessage(template.body);
+
+  const handleSelectRange = (startIndex: number, endIndex: number) => {
+    const currentList = activeTab === "pending" ? filteredCompanies : filteredArchive;
+    const newSelectedIds = new Set(selectedCompanies);
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      if (currentList[i]) {
+        newSelectedIds.add(currentList[i].id);
+      }
     }
+
+    setSelectedCompanies(Array.from(newSelectedIds));
   };
 
-  const handleSend = async () => {
-    if (selectedCompanies.length === 0) return;
+  const handleUpdateEmail = (companyId: string, email: string) => {
+    // In a real app, this would update the backend
+    console.log(`Update email for ${companyId} to ${email}`);
+  };
 
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    setSelectedCompanies([]);
-    setIsLoading(false);
-  };
-  
-    const formatEmailDate = (dateString: string) => {
-    return format(new Date(dateString), "d MMM yyyy, HH:mm", { locale: pt });
-  };
-  
-  const getEmailCountColor = (count: number) => {
-    if (count === 0) return "bg-muted text-muted-foreground border border-muted-foreground/30";
-    if (count === 1) return "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-colors";
-    if (count === 2) return "bg-warning/20 text-warning border border-warning/30 hover:bg-warning/30 transition-colors";
-    return "bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30 transition-colors";
-  };
-  
-  // Preview
-  const firstSelectedCompany = useMemo(() => {
-    if (selectedCompanies.length === 0) return null;
-    // Procurar em ambas as listas
-    return companiesWithoutFootprint.find(c => c.id === selectedCompanies[0]) ||
-           companiesCompleted.find(c => c.id === selectedCompanies[0]) as any;
-  }, [selectedCompanies, companiesWithoutFootprint, companiesCompleted]);
-  
-  // Suggested template based on first selected company's status
-  const suggestedTemplate = useMemo(() => {
-    if (!firstSelectedCompany) return null;
-    const status = firstSelectedCompany.onboardingStatus;
-    if (!status) return null;
-    return templateSuggestions[status] || null;
-  }, [firstSelectedCompany]);
-  
-  const suggestedTemplateName = useMemo(() => {
-    if (!suggestedTemplate) return null;
-    const template = templates.find(t => t.id === suggestedTemplate);
-    return template?.name || null;
-  }, [suggestedTemplate]);
-  
   // Smart send summary - group companies by suggested template
   const getSmartSendSummary = useMemo(() => {
     if (selectedCompanies.length === 0) return [];
@@ -549,7 +432,7 @@ const Incentive = () => {
       if (!company) return;
       
       const suggestedId = templateSuggestions[company.onboardingStatus] || 't1';
-      const template = templates.find(t => t.id === suggestedId);
+      const template = defaultEmailTemplates.find(t => t.id === suggestedId);
       
       if (!groups[suggestedId]) {
         groups[suggestedId] = {
@@ -577,10 +460,35 @@ const Incentive = () => {
     setSelectedCompanies([]);
     setIsLoading(false);
   };
-  
-  
-  const currentList = activeTab === "pending" ? filteredCompanies : filteredArchive;
-  const allSelected = currentList.length > 0 && currentList.every(c => selectedCompanies.includes(c.id));
+
+  // Sync selectedTemplateInModal when dialog opens
+  useEffect(() => {
+    if (sendEmailDialog) {
+      // Map template name to template id
+      const templateNameToId: Record<string, string> = {
+        'Convite Inicial': 't1',
+        'Lembrete': 't2',
+        'Benefícios': 't3',
+        'Urgente': 't4',
+      };
+      const templateId = templateNameToId[sendEmailDialog.template] || 't1';
+      setSelectedTemplateInModal(templateId);
+    }
+  }, [sendEmailDialog]);
+
+  // Handler for sending a single email
+  const handleSendSingleEmail = async () => {
+    if (!sendEmailDialog) return;
+
+    // In a real app, this would send the email via API
+    console.log(`Sending email to ${sendEmailDialog.company.id} with template: ${selectedTemplateInModal}`);
+
+    // Close the dialog
+    setSendEmailDialog(null);
+
+    // Could show a toast notification here in the future
+  };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -983,10 +891,10 @@ const Incentive = () => {
           </Card>
         </Collapsible>
         
-        {/* Main Grid: List + Compose */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,480px] gap-6">
-          {/* Left Column: Company List */}
-          <div className="flex flex-col border rounded-lg overflow-hidden bg-card shadow-md h-[700px]">
+        {/* Main Grid: Company List */}
+        <div className="grid grid-cols-1 gap-6">
+          {/* Company List */}
+          <div className="flex flex-col border rounded-lg overflow-hidden bg-card shadow-md h-[800px]">
             {/* Tabs: Por Contactar / Arquivo */}
             <div className="border-b p-3">
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "pending" | "archive")}>
@@ -1009,420 +917,55 @@ const Incentive = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Pesquisar empresa..."
+                    placeholder="Pesquisar por nome ou email..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
                   />
                 </div>
-                <IncentiveFiltersDialog
-                  filters={advancedFilters}
-                  onFiltersChange={setAdvancedFilters}
-                  companies={activeTab === "pending" ? companiesPending : companiesCompleted as any}
-                />
-                <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-                  <SelectTrigger className="w-[220px]">
-                    <SelectValue placeholder="Ordenar por" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="status">Status (mais avançado)</SelectItem>
-                    <SelectItem value="status-desc">Status (menos avançado)</SelectItem>
-                    <SelectItem value="emails">Nº emails (mais)</SelectItem>
-                    <SelectItem value="emails-desc">Nº emails (menos)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button variant="outline" onClick={handleSelectAll} size="sm" className="shrink-0 border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted">
-                  {allSelected ? "Desmarcar todas" : "Selecionar todas"}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  asChild
+                >
+                  <a href="/email-template" target="_blank" rel="noopener noreferrer">
+                    <FileText className="h-4 w-4 mr-1.5" />
+                    Gerir templates
+                  </a>
+                </Button>
+                <Button
+                  onClick={handleSmartSendPreview}
+                  size="sm"
+                  disabled={selectedCompanies.length === 0}
+                  className="shrink-0"
+                >
+                  <Rocket className="h-4 w-4 mr-1.5" />
+                  Envio emails em massa
                 </Button>
               </div>
             </div>
-            
-            {/* Company List */}
-            <ScrollArea className="flex-1 h-[500px]">
-              <div className="p-2 space-y-1">
-                {activeTab === "pending" ? (
-                  // Lista de empresas sem pegada
-                  filteredCompanies.length > 0 ? (
-                    filteredCompanies.map(company => (
-                      <div
-                        key={company.id}
-                        className={cn(
-                          "rounded-lg border transition-colors",
-                          company.hasDeliveryIssues && "border-danger/30",
-                          company.emailsSent >= 3 && !company.hasDeliveryIssues && "border-danger/30",
-                          selectedCompanies.includes(company.id) && "bg-primary/5 border-primary/30"
-                        )}
-                        style={
-                          company.hasDeliveryIssues || company.emailsSent >= 3
-                            ? { boxShadow: 'inset 0 0 12px hsl(var(--danger) / 0.15)' }
-                            : undefined
-                        }
-                      >
-                        <div className="flex items-center gap-3 p-3">
-                          <Checkbox
-                            checked={selectedCompanies.includes(company.id)}
-                            onCheckedChange={() => handleSelectCompany(company.id)}
-                          />
 
-                          <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleSelectCompany(company.id)}>
-                            <div className="flex items-center gap-2">
-                              <p className="font-normal truncate">{company.name}</p>
-                              {/* Alerta de deliverability */}
-                              {company.hasDeliveryIssues && company.lastDeliveryIssue && (
-                                <TooltipProvider delayDuration={100}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span className="cursor-help shrink-0">
-                                        {company.lastDeliveryIssue.type === 'bounced' ? (
-                                          <MailX className="h-4 w-4 text-danger" />
-                                        ) : (
-                                          <ShieldAlert className="h-4 w-4 text-danger" />
-                                        )}
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="border border-danger max-w-[250px]">
-                                      <p className="font-medium">
-                                        {company.lastDeliveryIssue.type === 'bounced' ? 'Email não entregue' : 'Marcado como spam'}
-                                      </p>
-                                      {company.lastDeliveryIssue.reason && (
-                                        <p className="text-xs text-muted-foreground mt-1">{company.lastDeliveryIssue.reason}</p>
-                                      )}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Status + próxima ação + histórico */}
-                          <div className="flex items-center gap-2">
-                            {/* Badge de status */}
-                            <TooltipProvider delayDuration={100}>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="cursor-help">
-                                    <Badge className={`text-xs py-0 shrink-0 ${onboardingStatusConfig[company.onboardingStatus]?.color || 'bg-muted text-muted-foreground'}`}>
-                                      {onboardingStatusConfig[company.onboardingStatus]?.label || company.onboardingStatus}
-                                    </Badge>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent className={cn("border", onboardingStatusConfig[company.onboardingStatus]?.borderColor)}>
-                                  {onboardingStatusConfig[company.onboardingStatus]?.tooltip || ''}
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-
-                            {/* Próxima ação sugerida */}
-                            <span className="text-xs text-muted-foreground hidden lg:inline">
-                              → {getNextAction(company.onboardingStatus)}
-                            </span>
-
-                            {/* Contador de emails com Popover */}
-                            {company.emailHistory.length > 0 ? (
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button
-                                    className={cn(
-                                      "inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal rounded-md",
-                                      company.hasDeliveryIssues
-                                        ? "bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30 transition-colors"
-                                        : getEmailCountColor(company.emailsSent)
-                                    )}
-                                  >
-                                    {company.hasDeliveryIssues ? (
-                                      company.lastDeliveryIssue?.type === 'bounced' ? (
-                                        <MailX className="h-3.5 w-3.5" />
-                                      ) : (
-                                        <ShieldAlert className="h-3.5 w-3.5" />
-                                      )
-                                    ) : (
-                                      <Mail className="h-3.5 w-3.5" />
-                                    )}
-                                    {company.emailsSent}
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent align="end" className="w-80 p-0">
-                                  <div className="p-3 border-b bg-muted/30">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <p className="font-medium text-sm">Histórico de Emails</p>
-                                      <div className="flex items-center gap-1">
-                                        {company.hasDeliveryIssues && company.lastDeliveryIssue && (
-                                          <Badge variant="outline" className="text-xs border-danger/50 text-danger bg-danger/10">
-                                            {company.lastDeliveryIssue.type === 'bounced' ? (
-                                              <>
-                                                <MailX className="h-3 w-3 mr-1" />
-                                                Bounce
-                                              </>
-                                            ) : (
-                                              <>
-                                                <ShieldAlert className="h-3 w-3 mr-1" />
-                                                Spam
-                                              </>
-                                            )}
-                                          </Badge>
-                                        )}
-                                        {company.emailsSent >= 3 && !company.hasDeliveryIssues && (
-                                          <Badge variant="outline" className="text-xs border-danger/50 text-danger bg-danger/10">
-                                            <AlertTriangle className="h-3 w-3 mr-1" />
-                                            Saturação
-                                          </Badge>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {company.emailsSent} email{company.emailsSent !== 1 ? 's' : ''} enviado{company.emailsSent !== 1 ? 's' : ''}
-                                    </p>
-                                  </div>
-                                  <div className="p-3 space-y-3 max-h-[250px] overflow-y-auto">
-                                    {company.emailHistory.map((email, index) => {
-                                      // Determinar ícone e cor baseado no status de entrega
-                                      const getEmailIcon = () => {
-                                        if (email.deliveryStatus === 'bounced') return { icon: MailX, color: 'bg-danger/20 text-danger' };
-                                        if (email.deliveryStatus === 'spam') return { icon: ShieldAlert, color: 'bg-warning/20 text-warning' };
-                                        if (email.deliveryStatus === 'clicked') return { icon: MousePointerClick, color: 'bg-success/20 text-success' };
-                                        if (email.deliveryStatus === 'opened') return { icon: MailOpen, color: 'bg-primary/20 text-primary' };
-                                        return { icon: Mail, color: 'bg-muted text-muted-foreground' };
-                                      };
-                                      const { icon: EmailIcon, color: iconColor } = getEmailIcon();
-
-                                      return (
-                                        <div key={email.id} className="flex gap-3">
-                                          <div className="flex flex-col items-center">
-                                            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", iconColor)}>
-                                              <EmailIcon className="h-4 w-4" />
-                                            </div>
-                                            {index < company.emailHistory.length - 1 && (
-                                              <div className="w-px h-full bg-border mt-1" />
-                                            )}
-                                          </div>
-                                          <div className="flex-1 pb-3">
-                                            <div className="flex items-center gap-2">
-                                              <p className="font-medium text-sm">{email.templateUsed}</p>
-                                              {email.deliveryStatus === 'bounced' && (
-                                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-danger/50 text-danger">
-                                                  {email.bounceType === 'hard' ? 'Hard bounce' : 'Soft bounce'}
-                                                </Badge>
-                                              )}
-                                              {email.deliveryStatus === 'spam' && (
-                                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-warning/50 text-warning">
-                                                  Spam
-                                                </Badge>
-                                              )}
-                                            </div>
-                                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                                              {email.subject}
-                                            </p>
-                                            {email.bounceReason && (
-                                              <p className="text-xs text-danger mt-0.5">{email.bounceReason}</p>
-                                            )}
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                              {formatDistanceToNow(new Date(email.sentAt), { addSuffix: true, locale: pt })}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            ) : (
-                              <div className="inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-normal bg-muted text-muted-foreground border border-muted-foreground/30 rounded-md">
-                                <Mail className="h-3.5 w-3.5" />
-                                0
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-8 text-center text-muted-foreground">
-                      Nenhuma empresa encontrada.
-                    </div>
-                  )
-                ) : (
-                  // Lista de empresas no arquivo (com pegada)
-                  filteredArchive.length > 0 ? (
-                    filteredArchive.map(company => (
-                      <div
-                        key={company.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/5 cursor-pointer transition-colors ${
-                          selectedCompanies.includes(company.id) ? 'bg-primary/5 border-primary/30' : ''
-                        }`}
-                        onClick={() => handleSelectCompany(company.id)}
-                      >
-                        <Checkbox
-                          checked={selectedCompanies.includes(company.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          onCheckedChange={() => handleSelectCompany(company.id)}
-                        />
-                        
-                        <div className="flex-1 min-w-0">
-                          <p className="font-normal truncate">{company.name}</p>
-                          {company.lastContactDate && (
-                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                              <CheckCircle2 className="h-3 w-3 text-success" />
-                              Concluído em {format(new Date(company.lastContactDate), "d MMM yyyy", { locale: pt })}
-                            </p>
-                          )}
-                        </div>
-                        
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="cursor-help">
-                                <Badge className={`text-xs py-0 shrink-0 ${onboardingStatusConfig['completo']?.color}`}>
-                                  Completo / {company.completedVia === 'simple' ? 'Simple' : 'Formulário'}
-                                </Badge>
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent className={cn("border", onboardingStatusConfig['completo']?.borderColor)}>
-                              {onboardingStatusConfig['completo']?.tooltip}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-8 text-center text-muted-foreground">
-                      Nenhuma empresa no arquivo.
-                    </div>
-                  )
-                )}
-              </div>
-            </ScrollArea>
+            {/* Company Table */}
+            <div className="flex-1 overflow-auto">
+              <IncentiveTable
+                companies={activeTab === "pending" ? filteredCompanies : filteredArchive}
+                onUpdateEmail={handleUpdateEmail}
+                onSendEmail={(companyId, template) => {
+                  const company = companiesWithoutFootprint.find(c => c.id === companyId);
+                  if (company) {
+                    setSendEmailDialog({ company, template });
+                  }
+                }}
+                isArchiveTab={activeTab === "archive"}
+              />
+            </div>
             
             {/* Footer */}
             <div className="p-3 border-t bg-muted/30">
               <p className="text-sm text-center text-muted-foreground">
                 {selectedCompanies.length} selecionada{selectedCompanies.length !== 1 ? "s" : ""}
               </p>
-            </div>
-          </div>
-          
-          {/* Right Column: Envio Inteligente + Email Compose */}
-          <div className="flex flex-col gap-4 h-[700px]">
-            {/* Super Wizard - Envio Inteligente */}
-            <div className="relative z-10 p-4 border rounded-lg shadow-md bg-card bg-gradient-to-r from-primary/5 to-primary/10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Zap className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm">Envio Inteligente</p>
-                    <p className="text-xs text-muted-foreground">
-                      {selectedCompanies.length > 0
-                        ? `${selectedCompanies.length} empresa${selectedCompanies.length !== 1 ? 's' : ''} selecionada${selectedCompanies.length !== 1 ? 's' : ''}`
-                        : 'Selecione uma ou mais empresas'
-                      }
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  onClick={handleSmartSendPreview}
-                  size="sm"
-                  disabled={selectedCompanies.length === 0}
-                >
-                  Preparar Envio
-                </Button>
-              </div>
-            </div>
-
-            {/* Email Composer */}
-            <div className="flex flex-col flex-1 border rounded-lg shadow-md overflow-hidden bg-card">
-              <div className="p-4 flex-1 flex flex-col">
-                <div className="space-y-4 flex-1 flex flex-col">
-                  <div className="space-y-2">
-                    <Label>Template</Label>
-                    <div className="flex gap-2">
-                      <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-                        <SelectTrigger className="flex-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {templates.map(template => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="shrink-0 border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted"
-                              onClick={() => window.open('/email-template', '_blank')}
-                            >
-                              <Settings2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Gerir templates</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    {suggestedTemplate && selectedTemplate !== suggestedTemplate && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2 p-2 bg-warning/10 rounded-md border border-warning/20">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Lightbulb className="h-4 w-4 text-warning shrink-0" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              Baseado no status de onboarding desta empresa, recomendamos este template para maior eficácia
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <span className="flex-1">Sugestão: usar template "<strong>{suggestedTemplateName}</strong>"</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="h-7 text-xs"
-                          onClick={() => handleTemplateChange(suggestedTemplate)}
-                        >
-                          Aplicar
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Assunto</Label>
-                    <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
-                  </div>
-                  
-                  <div className="flex-1 flex flex-col space-y-2">
-                    <Label>Mensagem</Label>
-                    <Textarea
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      className="flex-1 min-h-[200px] resize-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Send button - sempre visível no fundo */}
-              <div className="p-4 border-t shrink-0">
-                <Button
-                  className="w-full"
-                  disabled={selectedCompanies.length === 0 || isLoading}
-                  onClick={handleSend}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> A enviar...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" /> Enviar ({selectedCompanies.length})
-                    </>
-                  )}
-                </Button>
-              </div>
             </div>
           </div>
         </div>
@@ -1622,6 +1165,170 @@ const Incentive = () => {
             <DialogFooter>
               <Button onClick={() => setShowKPIsModal(false)}>
                 Entendido
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de envio de email individual */}
+        <Dialog open={sendEmailDialog !== null} onOpenChange={(open) => !open && setSendEmailDialog(null)}>
+          <DialogContent className="sm:max-w-[450px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                Enviar email
+              </DialogTitle>
+            </DialogHeader>
+
+            {sendEmailDialog && (
+              <div className="space-y-4 py-4">
+                {/* Empresa */}
+                <div>
+                  <p className="text-sm font-bold">{sendEmailDialog.company.name}</p>
+                  <p className="text-sm text-muted-foreground">{sendEmailDialog.company.contact.email}</p>
+                </div>
+
+                {/* Template selector */}
+                <div className="space-y-2">
+                  <Label>Template</Label>
+                  <Select value={selectedTemplateInModal} onValueChange={setSelectedTemplateInModal}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {defaultEmailTemplates.filter(t => t.id !== 't5').map((template) => {
+                        const isRecommended = template.name === sendEmailDialog.template;
+                        return (
+                          <SelectItem key={template.id} value={template.id}>
+                            <span className="flex items-center gap-2">
+                              {template.name}
+                              {isRecommended && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                                  Recomendado
+                                </Badge>
+                              )}
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Subject (read-only) */}
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Assunto</p>
+                  <p className="text-sm">
+                    {defaultEmailTemplates.find(t => t.id === selectedTemplateInModal)?.subject || '—'}
+                  </p>
+                </div>
+
+                {/* Context: emails sent + warnings */}
+                <div className="flex items-center gap-2 text-sm flex-wrap">
+                  <Badge variant="outline">
+                    {sendEmailDialog.company.emailsSent} email{sendEmailDialog.company.emailsSent !== 1 ? 's' : ''} enviado{sendEmailDialog.company.emailsSent !== 1 ? 's' : ''}
+                  </Badge>
+                  {sendEmailDialog.company.hasDeliveryIssues && sendEmailDialog.company.lastDeliveryIssue && (
+                    <Badge variant="destructive" className="gap-1">
+                      {sendEmailDialog.company.lastDeliveryIssue.type === 'bounced' ? (
+                        <>
+                          <MailX className="h-3 w-3" />
+                          Bounce
+                        </>
+                      ) : (
+                        <>
+                          <ShieldAlert className="h-3 w-3" />
+                          Spam
+                        </>
+                      )}
+                    </Badge>
+                  )}
+                  {sendEmailDialog.company.emailsSent >= 3 && !sendEmailDialog.company.hasDeliveryIssues && (
+                    <Badge variant="outline" className="gap-1 border-warning text-warning">
+                      <AlertTriangle className="h-3 w-3" />
+                      Saturação
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Warning message for delivery issues */}
+                {sendEmailDialog.company.hasDeliveryIssues && sendEmailDialog.company.lastDeliveryIssue && (
+                  <div className="p-3 bg-danger/10 border border-danger/30 rounded-lg">
+                    <p className="text-xs text-danger font-bold flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      {sendEmailDialog.company.lastDeliveryIssue.type === 'bounced'
+                        ? 'O último email não foi entregue'
+                        : 'O destinatário marcou como spam'}
+                    </p>
+                    {sendEmailDialog.company.lastDeliveryIssue.reason && (
+                      <p className="text-xs text-danger/80 mt-1">
+                        {sendEmailDialog.company.lastDeliveryIssue.reason}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Histórico de emails */}
+                {sendEmailDialog.company.emailHistory.length > 0 && (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="p-3 bg-muted/30 border-b">
+                      <p className="font-bold text-sm">Histórico de emails</p>
+                    </div>
+                    <div className="p-3 space-y-3 max-h-[200px] overflow-y-auto">
+                      {sendEmailDialog.company.emailHistory.map((email, index) => {
+                        const getEmailIcon = (email: EmailRecord) => {
+                          if (email.deliveryStatus === 'bounced') return { icon: MailX, color: 'bg-danger/20 text-danger' };
+                          if (email.deliveryStatus === 'spam') return { icon: MailWarning, color: 'bg-danger/20 text-danger' };
+                          if (email.deliveryStatus === 'clicked') return { icon: MousePointerClick, color: 'bg-success/20 text-success' };
+                          if (email.deliveryStatus === 'opened') return { icon: MailOpen, color: 'bg-primary/20 text-primary' };
+                          return { icon: Mail, color: 'bg-muted text-muted-foreground' };
+                        };
+                        const { icon: EmailIcon, color: iconColor } = getEmailIcon(email);
+                        return (
+                          <div key={email.id} className="flex gap-3">
+                            <div className="flex flex-col items-center">
+                              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", iconColor)}>
+                                <EmailIcon className="h-4 w-4" />
+                              </div>
+                              {index < sendEmailDialog.company.emailHistory.length - 1 && (
+                                <div className="w-px h-full bg-border mt-1" />
+                              )}
+                            </div>
+                            <div className="flex-1 pb-3">
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-sm">{email.templateUsed}</p>
+                                {email.deliveryStatus === 'bounced' && (
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 border-danger/50 text-danger">
+                                    {email.bounceType === 'hard' ? 'Hard bounce' : 'Soft bounce'}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                {email.subject}
+                              </p>
+                              {email.bounceReason && (
+                                <p className="text-xs text-danger mt-0.5">{email.bounceReason}</p>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {formatDistanceToNow(new Date(email.sentAt), { addSuffix: true, locale: pt })}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setSendEmailDialog(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSendSingleEmail}>
+                <Send className="h-4 w-4 mr-2" />
+                Enviar
               </Button>
             </DialogFooter>
           </DialogContent>
