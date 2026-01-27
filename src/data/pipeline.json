@@ -95,11 +95,11 @@
       "criteria": [
         { "text": "Modal usa variáveis do tema (sem hardcoded colors)", "done": false },
         { "text": "Toggle redesenhado", "done": false },
-        { "text": "Município identificado automaticamente", "done": false },
+        { "text": "Município identificado automaticamente", "done": true },
         { "text": "Empty state com ícones e CTA adequado", "done": false }
       ],
       "dependencies": ["02"],
-      "notes": "Depende do setup de utilizadores para contexto do município"
+      "notes": "Depende do setup de utilizadores para contexto do município. Município via activeClient corrigido."
     },
     {
       "id": "05",

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUser } from '@/contexts/UserContext';
 import {
   Dialog,
   DialogContent,
@@ -371,6 +372,10 @@ export const ManageInfrastructureModal = ({
   onVisibilityChange,
   onValuesChange,
 }: ManageInfrastructureModalProps) => {
+  // Get active client for municipality name
+  const { activeClient } = useUser();
+  const municipality = activeClient?.name || 'Cascais';
+
   // Visibility state
   const [visibility, setVisibility] = useState<InfrastructureVisibility>(getInfrastructureVisibility);
 
@@ -455,7 +460,6 @@ export const ManageInfrastructureModal = ({
 
   const handleRefreshApi = async (key: InfrastructureKey) => {
     setLoadingApi(key);
-    const municipality = 'Cascais'; // TODO: get from context/props
 
     try {
       if (key === 'chargingStations') {
