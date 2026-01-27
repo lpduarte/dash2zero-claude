@@ -43,10 +43,10 @@ interface EmailTemplateData {
 }
 
 const templates: EmailTemplateData[] = [
-  { id: "t1", name: "Convite Inicial", subject: "Convite: Calcule a pegada de carbono da sua empresa (gratuito)", description: "Primeiro contacto" },
-  { id: "t2", name: "Lembrete", subject: "Ainda a tempo: ferramenta gratuita de poupança energética", description: "Follow-up amigável" },
-  { id: "t3", name: "Benefícios", subject: "Empresas em Cascais já pouparam milhares de euros com esta ferramenta", description: "Foco em poupança" },
-  { id: "t4", name: "Urgente", subject: "Ação necessária: Novos requisitos de reporte de emissões", description: "Prazos e regulamentação" },
+  { id: "t1", name: "Convite Inicial", subject: "Convite: Calcule a pegada de carbono da sua empresa", description: "Primeiro contacto" },
+  { id: "t2", name: "Lembrete", subject: "Ainda a tempo: ferramenta municipal de poupança energética", description: "Follow-up amigável" },
+  { id: "t3", name: "Benefícios", subject: "Como empresas em Cascais estão a otimizar os seus custos energéticos", description: "Foco em poupança" },
+  { id: "t4", name: "Urgente", subject: "Informação: Novos requisitos europeus de cálculo de emissões", description: "Prazos e regulamentação" },
 ];
 
 const EmailTemplate = () => {
@@ -286,7 +286,7 @@ const EmailTemplate = () => {
                 <p style={{ fontSize: "14px", color: emailColors.textLight, textAlign: "center" as const, marginBottom: "32px" }}>
                   {selectedTemplate === "t1" && "O processo demora menos de 30 minutos. Se precisar de ajuda, estamos disponíveis."}
                   {selectedTemplate === "t2" && "Responda a este email se precisar de ajuda. Temos uma equipa pronta para apoiar."}
-                  {selectedTemplate === "t3" && "Sem custos, sem compromissos. A ferramenta é 100% gratuita."}
+                  {selectedTemplate === "t3" && "Sem custos, sem compromissos."}
                   {selectedTemplate === "t4" && "A nossa equipa está disponível para apoio. Responda para agendar."}
                 </p>
 
@@ -342,9 +342,9 @@ const EmailTemplate = () => {
                 >
                   Está a receber este email porque a sua empresa está registada no Município de Cascais.
                   <br />
-                  Se não deseja receber mais comunicações,{" "}
+                  Aqui pode gerir as suas {" "}
                   <a href="#" style={{ color: emailColors.textLighter, textDecoration: "underline" }}>
-                    clique aqui para deixar de receber
+                    preferências de comunicação
                   </a>.
                 </p>
               </div>
@@ -367,9 +367,7 @@ const ConviteInicialBody = () => (
     </p>
 
     <p style={{ fontSize: "14px", color: emailColors.textSecondary, lineHeight: 1.6, marginBottom: "16px" }}>
-      O Município de Cascais está a disponibilizar <strong style={{ color: emailColors.text }}>acesso gratuito</strong> a
-      uma ferramenta que ajuda empresas a reduzir custos energéticos e a prepararem-se para os novos
-      requisitos de sustentabilidade.
+      O Município de Cascais está a disponibilizar <strong style={{ color: emailColors.text }}>sem custos para a sua empresa</strong> uma ferramenta que ajuda a reduzir custos energéticos e a preparar-se para os novos requisitos de sustentabilidade.
     </p>
 
     <p style={{ fontSize: "14px", color: emailColors.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>
@@ -450,7 +448,7 @@ const LembreteBody = () => (
     <div style={{ marginBottom: "24px" }}>
       {[
         { icon: <Clock className="h-5 w-5" style={{ color: emailColors.primary }} />, title: "Menos de 30 minutos", text: "para completar o cálculo da pegada" },
-        { icon: <Euro className="h-5 w-5" style={{ color: emailColors.primary }} />, title: "100% gratuito", text: "sem custos nem compromissos" },
+        { icon: <Euro className="h-5 w-5" style={{ color: emailColors.primary }} />, title: "Sem custos", text: "nem compromissos para a sua empresa" },
         { icon: <TrendingDown className="h-5 w-5" style={{ color: emailColors.primary }} />, title: "Resultados imediatos", text: "com indicações de poupança personalizadas" },
       ].map((item, i) => (
         <div
@@ -506,13 +504,12 @@ const BeneficiosBody = () => (
     </p>
 
     <p style={{ fontSize: "14px", color: emailColors.textSecondary, lineHeight: 1.6, marginBottom: "16px" }}>
-      Sabia que empresas que analisam o seu consumo energético conseguem <strong style={{ color: emailColors.text }}>poupar
-      entre 10% a 25%</strong> nos custos de energia?
+      Sabia que empresas que analisam o seu consumo energético conseguem <strong style={{ color: emailColors.text }}>identificar oportunidades de otimização</strong> nos custos de energia?
     </p>
 
     <p style={{ fontSize: "14px", color: emailColors.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>
       A plataforma <strong style={{ color: emailColors.text }}>Get2Zero Simple</strong>, disponibilizada gratuitamente pelo Município,
-      já ajudou dezenas de empresas anualmente a:
+      já ajudou dezenas de empresas anualmente:
     </p>
 
     {/* Benefits with numbers */}
@@ -526,13 +523,13 @@ const BeneficiosBody = () => (
       >
         <div style={{ flex: 1, backgroundColor: withOpacity("primaryDark", 0.08), padding: "16px", borderRadius: "8px", textAlign: "center" as const }}>
           <PiggyBank className="h-6 w-6" style={{ color: emailColors.primary, margin: "0 auto 8px" }} />
-          <p style={{ fontSize: "20px", fontWeight: 700, color: emailColors.text, marginBottom: "4px" }}>€2.400</p>
-          <p style={{ fontSize: "12px", color: emailColors.textLight, margin: 0 }}>poupar na média de custos energéticos</p>
+          <p style={{ fontSize: "20px", fontWeight: 700, color: emailColors.text, marginBottom: "4px" }}>até 2.400€</p>
+          <p style={{ fontSize: "12px", color: emailColors.textLight, margin: 0 }}>em reduções de custos energéticos</p>
         </div>
         <div style={{ flex: 1, backgroundColor: withOpacity("primaryDark", 0.08), padding: "16px", borderRadius: "8px", textAlign: "center" as const }}>
           <TrendingDown className="h-6 w-6" style={{ color: emailColors.primary, margin: "0 auto 8px" }} />
-          <p style={{ fontSize: "20px", fontWeight: 700, color: emailColors.text, marginBottom: "4px" }}>18%</p>
-          <p style={{ fontSize: "12px", color: emailColors.textLight, margin: 0 }}>reduzir a média de emissões</p>
+          <p style={{ fontSize: "20px", fontWeight: 700, color: emailColors.text, marginBottom: "4px" }}>-18%</p>
+          <p style={{ fontSize: "12px", color: emailColors.textLight, margin: 0 }}>na média de emissões</p>
         </div>
       </div>
     </div>
@@ -580,7 +577,7 @@ const BeneficiosBody = () => (
     >
       <p style={{ fontSize: "14px", color: emailColors.textSecondary, fontStyle: "italic", marginBottom: "8px", lineHeight: 1.5 }}>
         Descobrimos que estávamos a gastar 30% mais em climatização do que o necessário.
-        Com pequenos ajustes, poupámos mais de €3.000 no primeiro ano.
+        Com pequenos ajustes, reduzimos significativamente os custos no primeiro ano.
       </p>
       <p style={{ fontSize: "12px", color: emailColors.textLight, margin: 0 }}>
         — Marco Gonçalves, Iberdomus
@@ -631,7 +628,7 @@ const UrgenteBody = () => (
     {/* Benefits of acting now */}
     <div style={{ marginBottom: "24px" }}>
       {[
-        { icon: <Shield className="h-5 w-5" style={{ color: emailColors.primary }} />, text: "Evitam multas e penalizações futuras" },
+        { icon: <Shield className="h-5 w-5" style={{ color: emailColors.primary }} />, text: "Cumprem os requisitos atempadamente, evitando multas e penalizações" },
         { icon: <Building2 className="h-5 w-5" style={{ color: emailColors.primary }} />, text: "Mantêm contratos com grandes clientes que exigem dados ESG" },
         { icon: <Euro className="h-5 w-5" style={{ color: emailColors.primary }} />, text: "Acedem a taxas de juro mais baixas em financiamento verde" },
         { icon: <FileCheck className="h-5 w-5" style={{ color: emailColors.primary }} />, text: "Qualificam-se para concursos públicos como sustentáveis" },
@@ -703,7 +700,7 @@ const UrgenteBody = () => (
 
     <p style={{ fontSize: "14px", color: emailColors.textSecondary, lineHeight: 1.6, marginBottom: "32px" }}>
       O Município de Cascais oferece esta plataforma gratuitamente.
-      <strong style={{ color: emailColors.text }}> Não deixe para a última hora.</strong>
+      <strong style={{ color: emailColors.text }}> Estamos disponíveis para apoiar.</strong>
     </p>
   </>
 );
