@@ -5,7 +5,7 @@ import { ClusterSelector, ImprovementPotential } from "@/components/dashboard/Cl
 import { MetricsOverview } from "@/components/dashboard/MetricsOverview";
 import { InfrastructureKPIs } from "@/components/dashboard/InfrastructureKPIs";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Landmark } from "lucide-react";
+import { LayoutDashboard, Building2, BarChart3, Activity } from "lucide-react";
 import { TopSuppliersHighlight } from "@/components/dashboard/TopSuppliersHighlight";
 import { CriticalSuppliersHighlight } from "@/components/dashboard/CriticalSuppliersHighlight";
 import { CompaniesTab } from "@/components/dashboard/CompaniesTab";
@@ -14,8 +14,6 @@ import { EmissionsBreakdown } from "@/components/dashboard/EmissionsBreakdown";
 import { PerformanceHeatmap } from "@/components/dashboard/PerformanceHeatmap";
 import { SupplierEmissionsChart } from "@/components/dashboard/SupplierEmissionsChart";
 import { SectorBenchmarking } from "@/components/dashboard/SectorBenchmarking";
-import { FinancialAnalysis } from "@/components/dashboard/FinancialAnalysis";
-import { EmissionsParetoChart } from "@/components/dashboard/EmissionsParetoChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { 
@@ -195,12 +193,23 @@ const Overview = () => {
 
         
         <Tabs defaultValue="home" className="space-y-6 mt-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="home">Visão geral</TabsTrigger>
-            <TabsTrigger value="companies">Empresas</TabsTrigger>
-            <TabsTrigger value="overview">Detalhes das emissões</TabsTrigger>
-            <TabsTrigger value="environmental">Análise por atividade</TabsTrigger>
-            <TabsTrigger value="financial">Análise por faturação</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="home" className="gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              Visão geral
+            </TabsTrigger>
+            <TabsTrigger value="companies" className="gap-2">
+              <Building2 className="h-4 w-4" />
+              Empresas
+            </TabsTrigger>
+            <TabsTrigger value="overview" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Detalhes das emissões
+            </TabsTrigger>
+            <TabsTrigger value="environmental" className="gap-2">
+              <Activity className="h-4 w-4" />
+              Análise por atividade
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="home" className="space-y-6" forceMount={false}>
@@ -239,11 +248,6 @@ const Overview = () => {
           <TabsContent value="environmental" className="space-y-6" forceMount={false}>
             <PerformanceHeatmap suppliers={filteredSuppliers} />
             <SectorBenchmarking suppliers={filteredSuppliers} />
-          </TabsContent>
-
-          <TabsContent value="financial" className="space-y-6" forceMount={false}>
-            <FinancialAnalysis suppliers={filteredSuppliers} />
-            <EmissionsParetoChart suppliers={filteredSuppliers} />
           </TabsContent>
 
         </Tabs>

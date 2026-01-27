@@ -226,14 +226,14 @@ const Admin = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="clientes" className="w-full">
-          <TabsList className="mb-6">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="clientes" className="gap-2">
               <Users className="h-4 w-4" />
               Clientes
             </TabsTrigger>
             <TabsTrigger value="infraestruturas" className="gap-2">
-              <Database className="h-4 w-4" />
-              Infraestruturas
+              <Landmark className="h-4 w-4" />
+              Infraestruturas municipais
             </TabsTrigger>
           </TabsList>
 
