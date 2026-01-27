@@ -1,6 +1,6 @@
 // GERADO AUTOMATICAMENTE - NAO EDITAR
 // Fonte: src/index.css
-// Gerado em: 2026-01-27T00:39:10.674Z
+// Gerado em: 2026-01-27T11:05:20.485Z
 // Script: scripts/extract-colors.js
 
 /**
@@ -105,10 +105,10 @@ export const colors = {
  */
 export const emailColors = {
   'text': '#172625',
-  'textSecondary': '#4a4a4a',
+  'textSecondary': '#577573',  // = mutedForeground (tom esverdeado)
   'textMuted': '#577573',
-  'textLight': '#6a6a6a',
-  'textLighter': '#8a8a8a',
+  'textLight': '#5E7E7C',      // Tom esverdeado mais claro
+  'textLighter': '#708E8B',    // Tom esverdeado para footer
   'background': '#FFFFFF',
   'backgroundMuted': '#EDF2F1',
   'backgroundSubtle': '#f5f5f5',

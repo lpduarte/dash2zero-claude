@@ -451,6 +451,10 @@ export const header = {
   navButtonActive: 'flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200 bg-primary text-primary-foreground shadow-md',
   /** Botão quadrado (ícone só) inativo */
   navButtonInactive: 'flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200 text-foreground/70 hover:text-foreground hover:bg-primary/10',
+  /** Link/botão ativo (small) */
+  navItemSmallActive: 'flex items-center justify-center gap-1.5 h-8 px-2.5 text-sm rounded-md transition-all duration-200 bg-primary text-primary-foreground shadow-md',
+  /** Link/botão inativo (small) */
+  navItemSmallInactive: 'flex items-center justify-center gap-1.5 h-8 px-2.5 text-sm rounded-md transition-all duration-200 text-foreground/70 hover:text-foreground hover:bg-primary/10',
 
   /** Container dos elementos pulsantes */
   pulseContainer: 'absolute inset-0 pointer-events-none',

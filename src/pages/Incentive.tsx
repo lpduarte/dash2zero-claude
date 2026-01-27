@@ -39,9 +39,6 @@ import {
   Lightbulb,
   Zap,
   Settings2,
-  Plus,
-  Pencil,
-  Trash2,
   MailOpen,
   MousePointerClick,
   Circle,
@@ -138,17 +135,11 @@ const Incentive = () => {
   const [subject, setSubject] = useState(defaultEmailTemplates[0].subject);
   const [message, setMessage] = useState(defaultEmailTemplates[0].body);
 
-  // Template editing state
-  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
-  const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
-  const [templateForm, setTemplateForm] = useState({ name: '', description: '', subject: '', body: '' });
-
   const [isLoading, setIsLoading] = useState(false);
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
   const [sortBy, setSortBy] = useState<'status' | 'status-desc' | 'emails' | 'emails-desc'>('status');
   const [showSmartSendDialog, setShowSmartSendDialog] = useState(false);
   const [showKPIsModal, setShowKPIsModal] = useState(false);
-  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   
   // Status order for sorting (most advanced first)
   const statusOrder: Record<string, number> = {
@@ -502,81 +493,6 @@ const Incentive = () => {
       setSubject(template.subject);
       setMessage(template.body);
     }
-  };
-
-  // Template management handlers
-  const handleEditTemplate = (template: EmailTemplate) => {
-    setEditingTemplate(template);
-    setTemplateForm({
-      name: template.name,
-      description: template.description,
-      subject: template.subject,
-      body: template.body,
-    });
-    setIsCreatingTemplate(false);
-  };
-
-  const handleCreateTemplate = () => {
-    setEditingTemplate(null);
-    setTemplateForm({ name: '', description: '', subject: '', body: '' });
-    setIsCreatingTemplate(true);
-  };
-
-  const handleSaveTemplate = () => {
-    if (!templateForm.name || !templateForm.subject || !templateForm.body) {
-      return;
-    }
-
-    if (isCreatingTemplate) {
-      // Create new template
-      const newTemplate: EmailTemplate = {
-        id: `t${Date.now()}`,
-        name: templateForm.name,
-        description: templateForm.description,
-        subject: templateForm.subject,
-        body: templateForm.body,
-      };
-      setTemplates(prev => [...prev, newTemplate]);
-    } else if (editingTemplate) {
-      // Update existing template
-      setTemplates(prev => prev.map(t =>
-        t.id === editingTemplate.id
-          ? { ...t, ...templateForm }
-          : t
-      ));
-      // Update composer if this template is selected
-      if (selectedTemplate === editingTemplate.id) {
-        setSubject(templateForm.subject);
-        setMessage(templateForm.body);
-      }
-    }
-
-    // Reset form state
-    setEditingTemplate(null);
-    setIsCreatingTemplate(false);
-    setTemplateForm({ name: '', description: '', subject: '', body: '' });
-  };
-
-  const handleDeleteTemplate = (template: EmailTemplate) => {
-    if (templates.length <= 1) {
-      return;
-    }
-
-    setTemplates(prev => prev.filter(t => t.id !== template.id));
-
-    // If deleted template was selected, select another one
-    if (selectedTemplate === template.id) {
-      const remaining = templates.filter(t => t.id !== template.id);
-      if (remaining.length > 0) {
-        handleTemplateChange(remaining[0].id);
-      }
-    }
-  };
-
-  const handleCancelTemplateEdit = () => {
-    setEditingTemplate(null);
-    setIsCreatingTemplate(false);
-    setTemplateForm({ name: '', description: '', subject: '', body: '' });
   };
 
   const handleSend = async () => {
@@ -1439,7 +1355,7 @@ const Incentive = () => {
                               variant="outline"
                               size="icon"
                               className="shrink-0 border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted"
-                              onClick={() => setShowTemplatesModal(true)}
+                              onClick={() => window.open('/email-template', '_blank')}
                             >
                               <Settings2 className="h-4 w-4" />
                             </Button>
@@ -1711,131 +1627,6 @@ const Incentive = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Templates Management Modal */}
-        <Dialog open={showTemplatesModal} onOpenChange={(open) => {
-          setShowTemplatesModal(open);
-          if (!open) handleCancelTemplateEdit();
-        }}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader className="pr-12">
-              <DialogTitle className="flex items-center gap-2">
-                <Settings2 className="h-5 w-5 text-primary" />
-                {isCreatingTemplate ? 'Novo Template' : editingTemplate ? 'Editar Template' : 'Gestão de Templates'}
-              </DialogTitle>
-              <DialogDescription>
-                {isCreatingTemplate || editingTemplate
-                  ? 'Preencha os campos abaixo para configurar o template de email.'
-                  : 'Crie, edite ou remova templates de email para comunicação com empresas.'}
-              </DialogDescription>
-            </DialogHeader>
-
-            {isCreatingTemplate || editingTemplate ? (
-              // Edit/Create Form
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Nome do template *</Label>
-                  <Input
-                    placeholder="Ex: Convite Inicial"
-                    value={templateForm.name}
-                    onChange={(e) => setTemplateForm(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Descrição</Label>
-                  <Input
-                    placeholder="Ex: Primeiro contacto para convidar ao cálculo"
-                    value={templateForm.description}
-                    onChange={(e) => setTemplateForm(prev => ({ ...prev, description: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Assunto do email *</Label>
-                  <Input
-                    placeholder="Ex: Convite para calcular a sua pegada de carbono"
-                    value={templateForm.subject}
-                    onChange={(e) => setTemplateForm(prev => ({ ...prev, subject: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Corpo do email *</Label>
-                  <Textarea
-                    placeholder="Escreva o conteúdo do email..."
-                    value={templateForm.body}
-                    onChange={(e) => setTemplateForm(prev => ({ ...prev, body: e.target.value }))}
-                    className="min-h-[200px]"
-                  />
-                </div>
-              </div>
-            ) : (
-              // Templates List
-              <div className="space-y-3 py-4 max-h-[400px] overflow-y-auto">
-                {templates.map(template => (
-                  <div key={template.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{template.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{template.description}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleEditTemplate(template)}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Editar template</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-danger hover:text-danger"
-                              onClick={() => handleDeleteTemplate(template)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Remover template</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <DialogFooter className="flex-row gap-2 sm:gap-0">
-              {isCreatingTemplate || editingTemplate ? (
-                <>
-                  <Button variant="outline" onClick={handleCancelTemplateEdit}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSaveTemplate}>
-                    {isCreatingTemplate ? 'Criar Template' : 'Guardar Alterações'}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="outline" className="flex-1 sm:flex-none gap-2" onClick={handleCreateTemplate}>
-                    <Plus className="h-4 w-4" />
-                    Novo Template
-                  </Button>
-                  <Button onClick={() => setShowTemplatesModal(false)}>
-                    Fechar
-                  </Button>
-                </>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </main>
     </div>
   );
