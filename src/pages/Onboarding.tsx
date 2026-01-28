@@ -5,6 +5,66 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
+// Logo paths for the ticker
+const logos = [
+  { src: "/img/cascais.svg", alt: "Câmara de Cascais" },
+  { src: "/img/lisboa.svg", alt: "Câmara de Lisboa" },
+  { src: "/img/montepio.svg", alt: "Montepio" },
+  { src: "/img/sabseg.svg", alt: "Sabseg" },
+  { src: "/img/sovena.svg", alt: "Sovena" },
+];
+
+// Logo Ticker Component
+const LogoTicker = () => (
+  <div className="w-full py-8 overflow-hidden relative">
+    <p className="text-center text-sm text-muted-foreground mb-6">
+      Empresas e municípios que confiam em nós
+    </p>
+
+    <div className="relative">
+      {/* Gradient edges */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to right, hsl(var(--background)) 0%, transparent 15%, transparent 85%, hsl(var(--background)) 100%)'
+        }}
+      />
+
+      {/* Ticker */}
+      <div className="ticker-wrap overflow-hidden">
+        <div className="ticker-track">
+          {/* First set of logos */}
+          {logos.map((logo, index) => (
+            <div
+              key={`logo-1-${index}`}
+              className="flex items-center justify-center shrink-0 px-8 h-10 opacity-60 hover:opacity-100 transition-opacity"
+            >
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                className="h-full w-auto object-contain"
+              />
+            </div>
+          ))}
+          {/* Duplicate set for seamless loop */}
+          {logos.map((logo, index) => (
+            <div
+              key={`logo-2-${index}`}
+              className="flex items-center justify-center shrink-0 px-8 h-10 opacity-60 hover:opacity-100 transition-opacity"
+            >
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                className="h-full w-auto object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 // Abstract Analytics Illustration Component
 const AbstractIllustration = () => (
   <div className="relative w-full max-w-md aspect-[4/3] bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-8 flex items-end justify-center gap-4">
@@ -193,9 +253,12 @@ const Onboarding = () => {
             </Card>
           </div>
 
+          {/* Logo Ticker */}
+          <LogoTicker />
+
           {/* Scroll indicator */}
           <div className="text-center">
-            <button 
+            <button
               onClick={scrollToVantagens}
               className="inline-flex flex-col items-center gap-1 text-muted-foreground hover:text-primary transition-colors animate-bounce"
             >

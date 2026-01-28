@@ -497,3 +497,23 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     transform: translateX(-4px);
   }
 }
+
+/* Logo ticker animation */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-wrap:hover .ticker-track {
+  animation-play-state: paused;
+}
