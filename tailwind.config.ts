@@ -149,12 +149,6 @@ export default {
           progress: "hsl(var(--status-progress))",
           complete: "hsl(var(--status-complete))",
         },
-        // Medal/Ranking colors
-        medal: {
-          gold: "hsl(var(--medal-gold))",
-          silver: "hsl(var(--medal-silver))",
-          bronze: "hsl(var(--medal-bronze))",
-        },
         // Decorative colors
         autumn: "hsl(var(--autumn))",
         // Chart utility colors (alias to existing)

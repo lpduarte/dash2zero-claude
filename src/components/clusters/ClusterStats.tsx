@@ -8,9 +8,10 @@ import { SupplierAny, hasFootprint } from "@/types/supplierNew";
 interface ClusterStatsProps {
   selectedCluster?: string;
   companies?: SupplierAny[];
+  incontactaveis?: number;  // Empresas com problemas de entrega (bounce/spam/opt-out)
 }
 
-export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) {
+export function ClusterStats({ selectedCluster, companies, incontactaveis = 0 }: ClusterStatsProps) {
 
   // Normalizar empresas para formato comum (com onboardingStatus e completedVia)
   const normalizedCompanies = useMemo(() => {
@@ -59,6 +60,7 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
 
     return {
       total,
+      incontactaveis,
       porContactar,
       semInteracao,
       interessada,
@@ -72,7 +74,7 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
         complete: completoFormulario,
       },
     };
-  }, [normalizedCompanies]);
+  }, [normalizedCompanies, incontactaveis]);
 
   const showOnboardingSection = normalizedCompanies.length > 0 && selectedCluster;
 
@@ -85,7 +87,7 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
     <div className="space-y-4">
       {/* Onboarding Funnel */}
       {showOnboardingSection && (() => {
-        const preTotal = funnelMetrics.porContactar + funnelMetrics.semInteracao + funnelMetrics.interessada;
+        const preTotal = funnelMetrics.incontactaveis + funnelMetrics.porContactar + funnelMetrics.semInteracao + funnelMetrics.interessada;
         const simpleTotal = funnelMetrics.simple.registered + funnelMetrics.simple.progress + funnelMetrics.simple.complete;
         const formularioTotal = funnelMetrics.formulario.progress + funnelMetrics.formulario.complete;
         const postTotal = simpleTotal + formularioTotal;
@@ -95,6 +97,7 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
         const rightPercent = preTotal === 0 ? 100 : postTotal === 0 ? 0 : (postTotal / grandTotal) * 100;
 
         const legendItems = [
+          { label: 'Incontactáveis', value: funnelMetrics.incontactaveis, color: 'bg-foreground', borderColor: 'border-foreground', tooltip: 'Email com problemas de entrega (bounce/spam/opt-out)' },
           { label: 'Por contactar', value: funnelMetrics.porContactar, color: 'bg-status-pending', borderColor: 'border-status-pending', tooltip: 'Ainda não recebeu nenhum email' },
           { label: 'Sem interação', value: funnelMetrics.semInteracao, color: 'bg-status-contacted', borderColor: 'border-status-contacted', tooltip: 'Recebeu email mas não clicou no link' },
           { label: 'Interessada', value: funnelMetrics.interessada, color: 'bg-status-interested', borderColor: 'border-status-interested', tooltip: 'Clicou no link do email' },
@@ -110,6 +113,7 @@ export function ClusterStats({ selectedCluster, companies }: ClusterStatsProps) 
               {/* Fase pré-decisão */}
               {preTotal > 0 && (() => {
                 const preSegments = [
+                  { key: 'incontactaveis', value: funnelMetrics.incontactaveis, color: 'bg-foreground', label: 'Incontactáveis' },
                   { key: 'pending', value: funnelMetrics.porContactar, color: 'bg-status-pending', label: 'Por contactar' },
                   { key: 'contacted', value: funnelMetrics.semInteracao, color: 'bg-status-contacted', label: 'Sem interação' },
                   { key: 'interested', value: funnelMetrics.interessada, color: 'bg-status-interested', label: 'Interessada' },

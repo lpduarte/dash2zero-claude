@@ -6,7 +6,6 @@ import { MetricsOverview } from "@/components/dashboard/MetricsOverview";
 import { InfrastructureKPIs } from "@/components/dashboard/InfrastructureKPIs";
 import { Card } from "@/components/ui/card";
 import { LayoutDashboard, Building2, BarChart3, Activity } from "lucide-react";
-import { TopSuppliersHighlight } from "@/components/dashboard/TopSuppliersHighlight";
 import { CriticalSuppliersHighlight } from "@/components/dashboard/CriticalSuppliersHighlight";
 import { CompaniesTab } from "@/components/dashboard/CompaniesTab";
 import { ComparisonChart } from "@/components/dashboard/ComparisonChart";
@@ -219,10 +218,7 @@ const Overview = () => {
             {/* GRUPO 2: KPIs de Infraestruturas (APENAS municípios) */}
             {isMunicipio && <InfrastructureKPIs />}
 
-            <div className="space-y-6">
-              <CriticalSuppliersHighlight suppliers={filteredSuppliers} allSuppliers={baseSuppliers} />
-              <TopSuppliersHighlight suppliers={filteredSuppliers} />
-            </div>
+            <CriticalSuppliersHighlight suppliers={filteredSuppliers} allSuppliers={baseSuppliers} />
           </TabsContent>
 
           <TabsContent value="companies" className="space-y-6" forceMount={false}>

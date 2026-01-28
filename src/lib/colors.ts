@@ -1,6 +1,6 @@
 // GERADO AUTOMATICAMENTE - NAO EDITAR
 // Fonte: src/index.css
-// Gerado em: 2026-01-27T11:05:20.485Z
+// Gerado em: 2026-01-28T01:14:45.391Z
 // Script: scripts/extract-colors.js
 
 /**
@@ -24,18 +24,15 @@ export const colors = {
     'warning': '#F2AD0D',
     'danger': '#DD3C3C',
     'autumn': '#E67919',
-    'scope1': '#CB4D8C',
-    'scope2': '#CAAA2B',
-    'scope3': '#2E95B8',
+    'scope1': '#373948',
+    'scope2': '#EFAE3E',
+    'scope3': '#B55740',
     'statusPending': '#97A3B4',
     'statusContacted': '#E9590C',
     'statusInterested': '#F59F0A',
     'statusRegistered': '#93B83D',
     'statusProgress': '#37BEB2',
-    'statusComplete': '#21A196',
-    'medalGold': '#FFD900',
-    'medalSilver': '#BFBFBF',
-    'medalBronze': '#CB8034'
+    'statusComplete': '#21A196'
 },
 
   /**
@@ -54,18 +51,15 @@ export const colors = {
     'warning': '#EEB32B',
     'danger': '#DA4E4E',
     'autumn': '#E28736',
-    'scope1': '#D16199',
-    'scope2': '#D7B942',
-    'scope3': '#33A6CC',
+    'scope1': '#757BA3',
+    'scope2': '#EDB95E',
+    'scope3': '#CB664D',
     'statusPending': '#7588A3',
     'statusContacted': '#EE6F2B',
     'statusInterested': '#EEA62B',
     'statusRegistered': '#A1C059',
     'statusProgress': '#4DCBC1',
-    'statusComplete': '#2EB8AC',
-    'medalGold': '#FFD900',
-    'medalSilver': '#BFBFBF',
-    'medalBronze': '#CB8034'
+    'statusComplete': '#2EB8AC'
 },
 
   /**
@@ -84,18 +78,15 @@ export const colors = {
     'warning': 'hsl(42, 90%, 50%)',
     'danger': 'hsl(0, 70%, 55%)',
     'autumn': 'hsl(28, 80%, 50%)',
-    'scope1': 'hsl(330, 55%, 55%)',
-    'scope2': 'hsl(48, 65%, 48%)',
-    'scope3': 'hsl(195, 60%, 45%)',
+    'scope1': 'hsl(233, 13%, 25%)',
+    'scope2': 'hsl(38, 85%, 59%)',
+    'scope3': 'hsl(12, 48%, 48%)',
     'statusPending': 'hsl(215, 16%, 65%)',
     'statusContacted': 'hsl(21, 90%, 48%)',
     'statusInterested': 'hsl(38, 92%, 50%)',
     'statusRegistered': 'hsl(78, 50%, 48%)',
     'statusProgress': 'hsl(175, 55%, 48%)',
-    'statusComplete': 'hsl(175, 66%, 38%)',
-    'medalGold': 'hsl(51, 100%, 50%)',
-    'medalSilver': 'hsl(0, 0%, 75%)',
-    'medalBronze': 'hsl(30, 59%, 50%)'
+    'statusComplete': 'hsl(175, 66%, 38%)'
 }
 } as const;
 
@@ -105,10 +96,10 @@ export const colors = {
  */
 export const emailColors = {
   'text': '#172625',
-  'textSecondary': '#577573',  // = mutedForeground (tom esverdeado)
+  'textSecondary': '#4a4a4a',
   'textMuted': '#577573',
-  'textLight': '#5E7E7C',      // Tom esverdeado mais claro
-  'textLighter': '#708E8B',    // Tom esverdeado para footer
+  'textLight': '#6a6a6a',
+  'textLighter': '#8a8a8a',
   'background': '#FFFFFF',
   'backgroundMuted': '#EDF2F1',
   'backgroundSubtle': '#f5f5f5',

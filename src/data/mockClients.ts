@@ -18,6 +18,7 @@ export const mockClients: Client[] = [
       totalClusters: 8,
       funnelStats: {
         // Cascais: maioria no início do funil, pouco em pós-decisão
+        incontactaveis: 8,
         porContactar: 65,
         semInteracao: 40,
         interessada: 15,
@@ -52,6 +53,7 @@ export const mockClients: Client[] = [
       totalClusters: 5,
       funnelStats: {
         // Sintra: equilibrado, mais formulário que simple
+        incontactaveis: 3,
         porContactar: 20,
         semInteracao: 15,
         interessada: 25,
@@ -86,6 +88,7 @@ export const mockClients: Client[] = [
       totalClusters: 3,
       funnelStats: {
         // Montepio: muito simple, sem formulário
+        incontactaveis: 2,
         porContactar: 5,
         semInteracao: 8,
         interessada: 12,
@@ -122,6 +125,7 @@ export const mockClients: Client[] = [
       totalCompanies: 0,
       totalClusters: 0,
       funnelStats: {
+        incontactaveis: 0,
         porContactar: 0,
         semInteracao: 0,
         interessada: 0,

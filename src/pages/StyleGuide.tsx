@@ -145,9 +145,9 @@ const getColors = (isDark: boolean) => {
     ],
     // Scope/Âmbito colors for emissions charts (3 CSS variables)
     scope: [
-      { name: '--scope-1', tailwind: 'bg-scope-1', hsl: '330 55% 55%', hex: c.scope1, note: 'Âmbito 1 - Emissões Diretas (Rosa/Magenta)' },
-      { name: '--scope-2', tailwind: 'bg-scope-2', hsl: '48 65% 48%', hex: c.scope2, note: 'Âmbito 2 - Energia (Dourado/Mostarda)' },
-      { name: '--scope-3', tailwind: 'bg-scope-3', hsl: '195 60% 45%', hex: c.scope3, note: 'Âmbito 3 - Cadeia de Valor (Azul Petróleo)' },
+      { name: '--scope-1', tailwind: 'bg-scope-1', hsl: '233 13% 25%', hex: c.scope1, note: 'Âmbito 1 - Emissões Diretas (Azul-ardósia)' },
+      { name: '--scope-2', tailwind: 'bg-scope-2', hsl: '38 85% 59%', hex: c.scope2, note: 'Âmbito 2 - Energia (Âmbar dourado)' },
+      { name: '--scope-3', tailwind: 'bg-scope-3', hsl: '12 48% 48%', hex: c.scope3, note: 'Âmbito 3 - Cadeia de Valor (Terracota)' },
     ],
     // Onboarding status colors (6 CSS variables)
     onboarding: [
@@ -157,12 +157,6 @@ const getColors = (isDark: boolean) => {
       { name: '--status-registered', tailwind: 'bg-status-registered', hsl: '78 50% 48%', hex: c.statusRegistered, note: 'Registada' },
       { name: '--status-progress', tailwind: 'bg-status-progress', hsl: '175 55% 48%', hex: c.statusProgress, note: 'Em progresso' },
       { name: '--status-complete', tailwind: 'bg-status-complete', hsl: '175 66% 38%', hex: c.statusComplete, note: 'Completo' },
-    ],
-    // Medal/Ranking colors (3 CSS variables)
-    medals: [
-      { name: '--medal-gold', tailwind: 'bg-medal-gold', hsl: '51 100% 50%', hex: c.medalGold, note: 'Ouro - 1º lugar' },
-      { name: '--medal-silver', tailwind: 'bg-medal-silver', hsl: '0 0% 75%', hex: c.medalSilver, note: 'Prata - 2º lugar' },
-      { name: '--medal-bronze', tailwind: 'bg-medal-bronze', hsl: '30 59% 50%', hex: c.medalBronze, note: 'Bronze - 3º lugar' },
     ],
   };
 };
@@ -733,24 +727,6 @@ const StyleGuide = () => {
               ))}
             </div>
 
-          </div>
-
-          {/* Cores de Medalhas */}
-          <div>
-            <h3 className="text-xl font-bold mb-2">Rankings</h3>
-            <p className="text-sm text-muted-foreground mb-4">Cores para destaques de ranking</p>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-              {allColors.medals.map((c) => (
-                <ColorSwatch
-                  key={c.name}
-                  label={c.name}
-                  hsl={c.hsl}
-                  tailwind={c.tailwind}
-                  hex={c.hex}
-                  note={c.note}
-                />
-              ))}
-            </div>
           </div>
 
         </div>

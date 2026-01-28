@@ -12,7 +12,8 @@ import {
   BookOpen,
   Leaf,
   ArrowRight,
-  ListTodo
+  ListTodo,
+  TowerControl
 } from 'lucide-react';
 
 interface PageLink {
@@ -22,7 +23,7 @@ interface PageLink {
   icon: typeof BarChart3;
 }
 
-const dashboardPages: PageLink[] = [
+const appPages: PageLink[] = [
   {
     path: '/',
     title: 'Dashboard',
@@ -35,9 +36,12 @@ const dashboardPages: PageLink[] = [
     description: 'Configuração e gestão de grupos de empresas',
     icon: CircleDot,
   },
-];
-
-const featurePages: PageLink[] = [
+  {
+    path: '/admin',
+    title: 'Painel de Controlo',
+    description: 'Gestão de clientes, utilizadores e configurações',
+    icon: TowerControl,
+  },
   {
     path: '/incentivo',
     title: 'Incentivo',
@@ -67,7 +71,7 @@ const featurePages: PageLink[] = [
 const documentationPages: PageLink[] = [
   {
     path: '/style-guide',
-    title: 'Product Design System',
+    title: 'Design System',
     description: 'Guia visual de componentes, cores e tipografia',
     icon: Eye,
   },
@@ -197,21 +201,11 @@ const Index = () => {
           </p>
         </header>
 
-        {/* Dashboard Section */}
+        {/* App Section */}
         <section className="mb-12">
-          <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">Dashboard</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {dashboardPages.map(page => (
-              <PageCard key={page.path} page={page} />
-            ))}
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="mb-12">
-          <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">Funcionalidades</h2>
+          <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">Aplicação</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {featurePages.map(page => (
+            {appPages.map(page => (
               <PageCard key={page.path} page={page} />
             ))}
           </div>
@@ -220,7 +214,7 @@ const Index = () => {
         {/* Documentation Section */}
         <section className="mb-12">
           <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">Documentação</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {documentationPages.map(page => (
               <PageCard key={page.path} page={page} />
             ))}

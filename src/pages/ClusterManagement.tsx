@@ -17,6 +17,7 @@ import {
   deleteSuppliers,
   moveSuppliersToCluster,
 } from "@/data/suppliers";
+import { getCompanyEmailTracking } from "@/data/emailTracking";
 import {
   getClustersByOwnerType,
   createCluster,
@@ -170,6 +171,14 @@ export default function ClusterManagement() {
     }
     return allCompanies.filter(c => c.clusterIds.includes(selectedClusterType));
   }, [allCompanies, selectedClusterType]);
+
+  // Calculate incontactaveis count from email tracking data
+  const incontactaveis = useMemo(() => {
+    return filteredAllCompanies.filter(c => {
+      const tracking = getCompanyEmailTracking(c.id);
+      return tracking?.hasDeliveryIssues;
+    }).length;
+  }, [filteredAllCompanies]);
 
   const handleAddCompanies = (companies: NewCompanyData[]) => {
     // Get the target cluster (use selected cluster if not 'all', otherwise empty string)
@@ -335,6 +344,7 @@ export default function ClusterManagement() {
             <ClusterStats
               selectedCluster={selectedClusterType}
               companies={filteredAllCompanies}
+              incontactaveis={incontactaveis}
             />
             <Card className="p-6 shadow-md">
               <ProvidersTable

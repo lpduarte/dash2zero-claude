@@ -119,6 +119,7 @@ const Admin = () => {
       totalCompanies: activeClients.reduce((sum, c) => sum + c.metrics.totalCompanies, 0),
       totalClusters: activeClients.reduce((sum, c) => sum + c.metrics.totalClusters, 0),
       funnelTotals: {
+        incontactaveis: activeClients.reduce((sum, c) => sum + (c.metrics.funnelStats.incontactaveis || 0), 0),
         porContactar: activeClients.reduce((sum, c) => sum + c.metrics.funnelStats.porContactar, 0),
         semInteracao: activeClients.reduce((sum, c) => sum + c.metrics.funnelStats.semInteracao, 0),
         interessada: activeClients.reduce((sum, c) => sum + c.metrics.funnelStats.interessada, 0),
@@ -146,7 +147,8 @@ const Admin = () => {
   const globalConversionRate = useMemo(() => {
     const { funnelTotals } = aggregatedMetrics;
     const totalCompleto = funnelTotals.simple.completo + funnelTotals.formulario.completo;
-    const total = funnelTotals.porContactar +
+    const total = funnelTotals.incontactaveis +
+                  funnelTotals.porContactar +
                   funnelTotals.semInteracao +
                   funnelTotals.interessada +
                   funnelTotals.simple.registada +
@@ -583,7 +585,8 @@ interface ClientCardProps {
 const ClientCard = ({ client, onEnter, onEdit, onToggleArchive }: ClientCardProps) => {
   const { funnelStats } = client.metrics;
   const completo = funnelStats.simple.completo + funnelStats.formulario.completo;
-  const totalFunnel = funnelStats.porContactar +
+  const totalFunnel = (funnelStats.incontactaveis || 0) +
+                      funnelStats.porContactar +
                       funnelStats.semInteracao +
                       funnelStats.interessada +
                       funnelStats.simple.registada +
@@ -820,7 +823,8 @@ interface MiniFunnelBarProps {
 }
 
 const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: MiniFunnelBarProps) => {
-  const preTotal = stats.porContactar + stats.semInteracao + stats.interessada;
+  const incontactaveis = stats.incontactaveis || 0;
+  const preTotal = incontactaveis + stats.porContactar + stats.semInteracao + stats.interessada;
   const simpleTotal = stats.simple.registada + stats.simple.emProgresso + stats.simple.completo;
   const formularioTotal = stats.formulario.emProgresso + stats.formulario.completo;
   const postTotal = simpleTotal + formularioTotal;
@@ -859,6 +863,7 @@ const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: Mini
   // Se não mostrar branches, usar barra simples agregada
   if (!showBranches) {
     const segments = [
+      { key: 'incontactaveis', value: incontactaveis, color: 'bg-foreground' },
       { key: 'porContactar', value: stats.porContactar, color: 'bg-status-pending' },
       { key: 'semInteracao', value: stats.semInteracao, color: 'bg-status-contacted' },
       { key: 'interessada', value: stats.interessada, color: 'bg-status-interested' },
@@ -895,6 +900,7 @@ const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: Mini
       {/* Fase pré-decisão */}
       {preTotal > 0 && (() => {
         const preSegments = [
+          { key: 'incontactaveis', value: incontactaveis, color: 'bg-foreground' },
           { key: 'pending', value: stats.porContactar, color: 'bg-status-pending' },
           { key: 'contacted', value: stats.semInteracao, color: 'bg-status-contacted' },
           { key: 'interested', value: stats.interessada, color: 'bg-status-interested' },
@@ -1016,6 +1022,7 @@ const MiniFunnelBar = ({ stats, showBranches = false, isArchived = false }: Mini
 // Componente: Funil Global (topo da página) com ramificação Simple/Formulário
 interface GlobalFunnelBarProps {
   metrics: {
+    incontactaveis: number;
     porContactar: number;
     semInteracao: number;
     interessada: number;
@@ -1032,7 +1039,7 @@ interface GlobalFunnelBarProps {
 }
 
 const GlobalFunnelBar = ({ metrics }: GlobalFunnelBarProps) => {
-  const preTotal = metrics.porContactar + metrics.semInteracao + metrics.interessada;
+  const preTotal = metrics.incontactaveis + metrics.porContactar + metrics.semInteracao + metrics.interessada;
   const simpleTotal = metrics.simple.registada + metrics.simple.emProgresso + metrics.simple.completo;
   const formularioTotal = metrics.formulario.emProgresso + metrics.formulario.completo;
   const postTotal = simpleTotal + formularioTotal;
@@ -1042,6 +1049,7 @@ const GlobalFunnelBar = ({ metrics }: GlobalFunnelBarProps) => {
   const rightPercent = preTotal === 0 ? 100 : postTotal === 0 ? 0 : (postTotal / grandTotal) * 100;
 
   const legendItems = [
+    { label: 'Incontactáveis', value: metrics.incontactaveis, color: 'bg-foreground', tooltip: 'Email com problemas de entrega (bounce/spam/opt-out)' },
     { label: 'Por contactar', value: metrics.porContactar, color: 'bg-status-pending', tooltip: 'Ainda não recebeu nenhum email' },
     { label: 'Sem interação', value: metrics.semInteracao, color: 'bg-status-contacted', tooltip: 'Recebeu email mas não clicou no link' },
     { label: 'Interessada', value: metrics.interessada, color: 'bg-status-interested', tooltip: 'Clicou no link do email' },
@@ -1065,6 +1073,7 @@ const GlobalFunnelBar = ({ metrics }: GlobalFunnelBarProps) => {
         {/* Fase pré-decisão */}
         {preTotal > 0 && (() => {
           const preSegments = [
+            { key: 'incontactaveis', value: metrics.incontactaveis, color: 'bg-foreground', label: 'Incontactáveis' },
             { key: 'pending', value: metrics.porContactar, color: 'bg-status-pending', label: 'Por contactar' },
             { key: 'contacted', value: metrics.semInteracao, color: 'bg-status-contacted', label: 'Sem interação' },
             { key: 'interested', value: metrics.interessada, color: 'bg-status-interested', label: 'Interessada' },

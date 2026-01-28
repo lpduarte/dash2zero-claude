@@ -35,9 +35,9 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     --radius: 0.75rem;
 
     /* Scope/Âmbito colors for emissions charts */
-    --scope-1: 330 55% 55%;  /* Rosa/Magenta - Emissões Diretas */
-    --scope-2: 48 65% 48%;   /* Dourado/Mostarda - Energia */
-    --scope-3: 195 60% 45%;  /* Azul Petróleo - Cadeia de Valor */
+    --scope-1: 233 13% 25%;  /* Azul-ardósia - Emissões Diretas */
+    --scope-2: 38 85% 59%;   /* Âmbar dourado - Energia */
+    --scope-3: 12 48% 48%;   /* Terracota - Cadeia de Valor */
 
     /* Onboarding status colors */
     --status-pending: 215 16% 65%;      /* Por contactar - Slate */
@@ -46,11 +46,6 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     --status-registered: 78 50% 48%;    /* Registada - Lime */
     --status-progress: 175 55% 48%;     /* Em progresso - Primary Light */
     --status-complete: 175 66% 38%;     /* Completo - Primary (marca) */
-
-    /* Medal/Ranking colors */
-    --medal-gold: 51 100% 50%;
-    --medal-silver: 0 0% 75%;
-    --medal-bronze: 30 59% 50%;
 
     /* Shadows with brand tint */
     --shadow-md: 0 1px 2px 0 hsla(175, 30%, 20%, 0.05);
@@ -80,9 +75,9 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     --autumn: 28 75% 55%;  /* Cor de outono para elementos decorativos */
 
     /* Scope/Âmbito colors for emissions charts (dark mode) */
-    --scope-1: 330 55% 60%;  /* Rosa/Magenta - Emissões Diretas */
-    --scope-2: 48 65% 55%;   /* Dourado/Mostarda - Energia */
-    --scope-3: 195 60% 50%;  /* Azul Petróleo - Cadeia de Valor */
+    --scope-1: 233 20% 55%;  /* Azul-ardósia claro - Emissões Diretas */
+    --scope-2: 38 80% 65%;   /* Âmbar dourado claro - Energia */
+    --scope-3: 12 55% 55%;   /* Terracota claro - Cadeia de Valor */
 
     /* Onboarding status colors (dark mode) */
     --status-pending: 215 20% 55%;      /* Por contactar - Slate */
@@ -91,11 +86,6 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
     --status-registered: 78 45% 55%;    /* Registada - Lime */
     --status-progress: 175 55% 55%;     /* Em progresso - Primary Light */
     --status-complete: 175 60% 45%;     /* Completo - Primary (marca) */
-
-    /* Medal/Ranking colors (same in dark mode) */
-    --medal-gold: 51 100% 50%;
-    --medal-silver: 0 0% 75%;
-    --medal-bronze: 30 59% 50%;
 
     /* Shadows */
     --shadow-md: 0 1px 2px 0 rgba(0, 0, 0, 0.3);

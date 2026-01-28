@@ -2,14 +2,14 @@
   "metadata": {
     "project": "Dash2Zero",
     "client": "Get2C",
-    "lastUpdated": "2026-01-25",
+    "lastUpdated": "2026-01-28",
     "updatedBy": "LP"
   },
   "summary": {
     "total": 14,
-    "completed": 8,
+    "completed": 9,
     "inProgress": 0,
-    "pending": 6
+    "pending": 5
   },
   "categories": [
     {
@@ -106,17 +106,17 @@
       "title": "Email Marketing: Templates e Remetente",
       "description": "Editor modular de templates e escolha de remetente (Dash2Zero vs co-branded)",
       "category": "important",
-      "status": "pending",
+      "status": "completed",
       "priority": 5,
       "briefing": "05-email-templates-remetente.md",
       "criteria": [
-        { "text": "Editor de blocos funcional", "done": false },
-        { "text": "Opção de remetente Dash2Zero ou co-branded", "done": false },
-        { "text": "Preview em tempo real", "done": false },
-        { "text": "Gestão de emails com bounce acessível via KPI", "done": false }
+        { "text": "Editor de blocos funcional", "done": true },
+        { "text": "Opção de remetente Dash2Zero ou co-branded", "done": true },
+        { "text": "Preview em tempo real", "done": true },
+        { "text": "Gestão de emails com bounce acessível via KPI", "done": true }
       ],
       "dependencies": [],
-      "notes": ""
+      "notes": "Concluído - templates, envio em massa, KPIs de deliverability com rejeições (spam + opt-out)"
     },
     {
       "id": "06",

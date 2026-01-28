@@ -57,6 +57,7 @@ export interface Client {
     totalCompanies: number;
     totalClusters: number;
     funnelStats: {
+      incontactaveis?: number;  // Empresas com problemas de entrega (bounce/spam/opt-out)
       porContactar: number;
       semInteracao: number;
       interessada: number;
