@@ -8,43 +8,80 @@ import {
   Briefcase, FileSpreadsheet, CheckCircle2,
   Leaf, Scale, Library, Layers, LayoutDashboard,
   Mail, Send, Upload, Users, AlertTriangle, Clock,
-  TowerControl, Database, Zap, Bus, Wind, Recycle, Route, Bike
+  TowerControl, Database, Zap, Bus, Wind, Recycle, Route, Bike,
+  PieChart, Target, Euro, Shield, FileText,
+  ChevronDown, ChevronRight,
+  Car, Droplets, Gift, Receipt,
+  Archive, Eye, Settings, ShieldCheck, Pencil, Download,
+  MousePointer, MousePointerClick, CircleDot, Hexagon,
+  Grid3X3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  METHODOLOGY_VERSION,
+  methodologySections,
+  getVersionString,
+  getVersionDate,
+  userTypes,
+  glossary,
+} from "@/config/methodology";
+import { sectorLabels } from "@/data/sectors";
+import {
+  sectorEmissionFactors,
+  industrySubsectorFactors,
+  emissionIntensityMetadata,
+  bibliography,
+} from "@/data/emissionIntensity";
 
-// ============================================
-// VERSIONING
-// ============================================
-const METHODOLOGY_VERSION = {
-  major: 1,
-  minor: 7,
-  patch: 0,
-  date: "2026-01-26",
+// Icon string-to-component mapping
+const iconMap: Record<string, React.ElementType> = {
+  BookOpen, Users, FileText, Factory, BarChart3, TrendingDown,
+  Briefcase, Scale, FileSpreadsheet, CheckCircle2, Layers,
+  LayoutDashboard, PieChart, Target, Leaf, Euro, Mail, Send,
+  TowerControl, Shield, Database, Library,
 };
 
-const getVersionString = () => `v${METHODOLOGY_VERSION.major}.${METHODOLOGY_VERSION.minor}.${METHODOLOGY_VERSION.patch}`;
-const getVersionDate = () => {
-  const date = new Date(METHODOLOGY_VERSION.date);
-  return date.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
+// Flat list of all section IDs for scroll tracking
+const allSections = methodologySections.flatMap(g => g.sections);
+
+// Mapeamento de setor para código CAE
+const sectorCAEMapping: Record<string, { code: string; description: string }> = {
+  agricultura: { code: 'A', description: 'Agricultura, produção animal, caça, floresta e pesca' },
+  extracao: { code: 'B', description: 'Indústrias extrativas' },
+  industria: { code: 'C', description: 'Indústrias transformadoras' },
+  energia: { code: 'D', description: 'Eletricidade, gás, vapor, água quente e fria' },
+  agua: { code: 'E', description: 'Captação, tratamento e distribuição de água' },
+  construcao: { code: 'F', description: 'Construção' },
+  comercio: { code: 'G', description: 'Comércio por grosso e a retalho' },
+  logistica: { code: 'H', description: 'Transporte e armazenagem' },
+  hotelaria: { code: 'I', description: 'Alojamento, restauração e similares' },
+  tecnologia: { code: 'J', description: 'Informação e comunicação' },
+  financas: { code: 'K', description: 'Atividades financeiras e de seguros' },
+  imobiliario: { code: 'L', description: 'Atividades imobiliárias' },
+  consultoria: { code: 'M', description: 'Atividades de consultoria, científicas e técnicas' },
+  administrativo: { code: 'N', description: 'Atividades administrativas' },
+  educacao: { code: 'P', description: 'Educação' },
+  saude: { code: 'Q', description: 'Atividades de saúde humana e apoio social' },
+  cultura: { code: 'R', description: 'Atividades artísticas e recreativas' },
+  servicos: { code: 'S', description: 'Outras atividades de serviços' },
 };
 
-// Sections for navigation
-const sections = [
-  { id: 'potencial', label: 'Potencial de Melhoria', icon: TrendingDown },
-  { id: 'emissoes', label: 'Cálculo de Emissões', icon: Factory },
-  { id: 'indicadores', label: 'Indicadores', icon: BarChart3 },
-  { id: 'setores', label: 'Setores de Atividade', icon: Briefcase },
-  { id: 'intensidades', label: 'Fatores de Intensidade', icon: Scale },
-  { id: 'dados', label: 'Dados a Recolher', icon: FileSpreadsheet },
-  { id: 'onboarding', label: 'Fluxo de Onboarding', icon: CheckCircle2 },
-  { id: 'clusters', label: 'Gestão de Clusters', icon: Layers },
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'admin', label: 'Painel de Controlo', icon: TowerControl },
-  { id: 'infraestruturas', label: 'Infraestruturas Municipais', icon: Database },
-  { id: 'incentivos', label: 'Incentivos', icon: Mail },
-  { id: 'email', label: 'Boas Práticas de Email', icon: Send },
-  { id: 'bibliografia', label: 'Bibliografia', icon: Library },
-];
+// Subsetores da indústria
+const industrySubsectors: Record<string, { code: string; name: string }> = {
+  alimentar: { code: '10-12', name: 'Indústria Alimentar' },
+  textil: { code: '13-14', name: 'Têxtil e Vestuário' },
+  madeira: { code: '16', name: 'Madeira e Cortiça' },
+  papel: { code: '17', name: 'Papel e Cartão' },
+  quimica: { code: '20', name: 'Química' },
+  farmaceutica: { code: '21', name: 'Farmacêutica' },
+  plasticos: { code: '22', name: 'Borracha e Plásticos' },
+  ceramica: { code: '23', name: 'Cerâmica e Vidro' },
+  metalurgia: { code: '24', name: 'Metalurgia' },
+  metalomecanica: { code: '25', name: 'Metalomecânica' },
+  eletronica: { code: '26-27', name: 'Eletrónica' },
+  automovel: { code: '29', name: 'Automóvel' },
+  mobiliario: { code: '31', name: 'Mobiliário' },
+};
 
 // Section Header Component
 const SectionHeader = ({
@@ -114,13 +151,20 @@ const TextReveal = ({ children, className = "" }: { children: string; className?
 
 export default function Methodology() {
   usePageTitle("Metodologia");
-  const [activeSection, setActiveSection] = useState('potencial');
+  const [activeSection, setActiveSection] = useState('visao-geral');
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    () => Object.fromEntries(methodologySections.map(g => [g.id, true]))
+  );
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 100;
 
-      for (const section of sections) {
+      for (const section of allSections) {
         const element = document.getElementById(section.id);
         if (element) {
           const { offsetTop, offsetHeight } = element;
@@ -160,26 +204,60 @@ export default function Methodology() {
 
             {/* Navigation Links */}
             <nav className="space-y-1">
-              {sections.map((section) => {
-                const Icon = section.icon;
-                const isActive = activeSection === section.id;
+              {methodologySections.map((group) => {
+                const isExpanded = expandedGroups[group.id];
+                const hasActiveChild = group.sections.some(s => s.id === activeSection);
                 return (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className={`
-                      w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-all duration-200
-                      ${isActive
-                        ? 'bg-primary/10 text-primary font-normal shadow-md'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-1'
+                  <div key={group.id}>
+                    <button
+                      onClick={() => toggleGroup(group.id)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all duration-200",
+                        hasActiveChild
+                          ? "text-primary"
+                          : "text-foreground hover:bg-muted"
+                      )}
+                    >
+                      {group.label}
+                      {isExpanded
+                        ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        : <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       }
-                    `}
-                  >
-                    <div className={`p-1.5 rounded-md transition-colors shrink-0 ${isActive ? 'bg-primary/20' : 'bg-muted'}`}>
-                      <Icon className="h-4 w-4" />
+                    </button>
+                    <div
+                      className={cn(
+                        "overflow-hidden transition-all duration-200",
+                        isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                      )}
+                    >
+                      {group.sections.map((section) => {
+                        const Icon = iconMap[section.icon];
+                        const isActive = activeSection === section.id;
+                        return (
+                          <button
+                            key={section.id}
+                            onClick={() => scrollToSection(section.id)}
+                            className={cn(
+                              "w-full flex items-start gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-200 ml-1",
+                              isActive
+                                ? "bg-primary/10 text-primary font-normal shadow-md"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-1"
+                            )}
+                          >
+                            {Icon && (
+                              <div className={cn(
+                                "p-1.5 rounded-md transition-colors shrink-0",
+                                isActive ? "bg-primary/20" : "bg-muted"
+                              )}>
+                                <Icon className="h-4 w-4" />
+                              </div>
+                            )}
+                            {section.label}
+                          </button>
+                        );
+                      })}
                     </div>
-                    {section.label}
-                  </button>
+                  </div>
                 );
               })}
             </nav>
@@ -235,6 +313,250 @@ export default function Methodology() {
         {/* Content Sections */}
         <div className="p-8 max-w-5xl">
 
+          {/* === SECTION: Visão Geral === */}
+          <SectionHeader
+            id="visao-geral"
+            title="Visão Geral do Dash2Zero"
+            icon={BookOpen}
+            description="Plataforma de tracking e gestão de emissões de carbono"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              O Dash2Zero é uma plataforma desenvolvida pela Get2C para ajudar
+              organizações a medir, comparar e reduzir a sua pegada de carbono.
+            </p>
+
+            {/* Card destacado - O que é */}
+            <div className="border rounded-lg p-6 bg-primary/5 border-primary/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-lg bg-primary/20">
+                  <Leaf className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Dash2Zero</h3>
+                  <p className="text-sm text-muted-foreground">For a cooler world</p>
+                </div>
+              </div>
+              <p className="text-muted-foreground">
+                Uma solução completa para organizações que pretendem iniciar ou
+                acelerar o seu percurso de descarbonização, com ferramentas de
+                análise, comparação e planeamento.
+              </p>
+            </div>
+
+            {/* 3 Cards: Medir, Comparar, Reduzir */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="border rounded-lg p-4 bg-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-2 rounded-lg bg-scope-1/10">
+                    <BarChart3 className="h-5 w-5 text-scope-1" />
+                  </div>
+                  <h4 className="font-bold">Medir</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Calcular emissões por âmbito (Scope 1, 2, 3) seguindo
+                  o GHG Protocol internacional.
+                </p>
+              </div>
+
+              <div className="border rounded-lg p-4 bg-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-2 rounded-lg bg-scope-2/10">
+                    <Scale className="h-5 w-5 text-scope-2" />
+                  </div>
+                  <h4 className="font-bold">Comparar</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Benchmarking setorial com dados do INE para identificar
+                  oportunidades de melhoria.
+                </p>
+              </div>
+
+              <div className="border rounded-lg p-4 bg-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-2 rounded-lg bg-status-complete/10">
+                    <TrendingDown className="h-5 w-5 text-status-complete" />
+                  </div>
+                  <h4 className="font-bold">Reduzir</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Planos de acção com medidas concretas e fontes de
+                  financiamento disponíveis.
+                </p>
+              </div>
+            </div>
+
+            {/* Para quem */}
+            <div className="border rounded-lg p-4 bg-card">
+              <h3 className="font-bold mb-3">Para quem é o Dash2Zero?</h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="flex items-start gap-3">
+                  <Landmark className="h-5 w-5 text-purple-500 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-bold">Municípios</p>
+                    <p className="text-sm text-muted-foreground">
+                      Autarquias que pretendem acompanhar e incentivar a
+                      descarbonização das empresas do seu território.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Building2 className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-bold">Empresas</p>
+                    <p className="text-sm text-muted-foreground">
+                      Organizações que querem gerir a pegada de carbono
+                      da sua cadeia de fornecedores.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Tipos de Utilizador === */}
+          <SectionHeader
+            id="utilizadores"
+            title="Tipos de Utilizador"
+            icon={Users}
+            description="Perfis de acesso e funcionalidades disponíveis"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              O Dash2Zero suporta três tipos de utilizador, cada um com
+              funcionalidades adaptadas às suas necessidades.
+            </p>
+
+            <div className="grid gap-4">
+              {/* Card Get2C */}
+              <div className="border rounded-lg p-4 bg-primary/5 border-primary/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-primary/20">
+                    <TowerControl className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">{userTypes.get2c.name}</h3>
+                    <p className="text-sm text-muted-foreground">Administrador</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {userTypes.get2c.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {userTypes.get2c.capabilities.map((cap, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {cap}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card Município */}
+              <div className="border rounded-lg p-4 bg-purple-500/5 border-purple-500/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-purple-500/20">
+                    <Landmark className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">{userTypes.municipio.name}</h3>
+                    <p className="text-sm text-muted-foreground">Autarquia</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {userTypes.municipio.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {userTypes.municipio.capabilities.map((cap, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {cap}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card Empresa */}
+              <div className="border rounded-lg p-4 bg-blue-500/5 border-blue-500/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-blue-500/20">
+                    <Building2 className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">{userTypes.empresa.name}</h3>
+                    <p className="text-sm text-muted-foreground">Organização</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {userTypes.empresa.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {userTypes.empresa.capabilities.map((cap, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {cap}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Nota sobre hierarquia */}
+            <div className="flex items-start gap-2 p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+              <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                <strong>Hierarquia:</strong> Get2C gere múltiplos Municípios e Empresas.
+                Cada Município/Empresa vê apenas os seus próprios dados e funcionalidades
+                autorizadas pelo seu perfil de permissões.
+              </p>
+            </div>
+          </div>
+
+          {/* === SECTION: Glossário === */}
+          <SectionHeader
+            id="glossario"
+            title="Glossário"
+            icon={FileText}
+            description="Termos técnicos utilizados na plataforma"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              Definições dos principais termos técnicos utilizados ao longo
+              desta documentação e na plataforma Dash2Zero.
+            </p>
+
+            <div className="border rounded-lg bg-card overflow-hidden">
+              <div className="grid gap-0 divide-y">
+                {glossary
+                  .slice()
+                  .sort((a, b) => a.term.localeCompare(b.term))
+                  .map((item, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-[140px_1fr] gap-4 p-3 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="font-mono text-sm font-bold text-primary">
+                        {item.term}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.definition}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Nota sobre terminologia */}
+            <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+              <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                Esta documentação utiliza terminologia técnica do GHG Protocol e
+                classificações do INE. Termos em inglês são mantidos quando são
+                padrão internacional (ex: Scope 1, 2, 3).
+              </p>
+            </div>
+          </div>
+
           {/* === SECTION: Potencial de Melhoria === */}
           <SectionHeader
             id="potencial"
@@ -254,7 +576,7 @@ export default function Methodology() {
                     <div className="p-1.5 rounded bg-blue-500/10">
                       <Building2 className="h-4 w-4 text-blue-500" />
                     </div>
-                    <h3 className="font-semibold">Vista Empresa: Potencial de Substituição</h3>
+                    <h3 className="font-bold">Vista Empresa: Potencial de Substituição</h3>
                   </div>
 
                   <p className="text-sm text-muted-foreground">
@@ -292,7 +614,7 @@ export default function Methodology() {
                     <div className="p-1.5 rounded bg-purple-500/10">
                       <Landmark className="h-4 w-4 text-purple-500" />
                     </div>
-                    <h3 className="font-semibold">Vista Município: Potencial de Melhoria Setorial</h3>
+                    <h3 className="font-bold">Vista Município: Potencial de Melhoria Setorial</h3>
                   </div>
 
                   <p className="text-sm text-muted-foreground">
@@ -328,22 +650,22 @@ export default function Methodology() {
 
                 {/* Níveis de Potencial */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Classificação do Nível de Potencial</h3>
+                  <h3 className="font-bold">Classificação do Nível de Potencial</h3>
                   <p className="text-sm text-muted-foreground">
                     O nível de potencial é determinado pela percentagem de redução possível face às emissões atuais:
                   </p>
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="p-3 rounded-lg bg-danger/10 border border-danger/20">
-                      <p className="font-semibold text-danger">Alto</p>
+                      <p className="font-bold text-danger">Alto</p>
                       <p className="text-sm text-muted-foreground mt-1">Redução &gt; 20%</p>
                     </div>
                     <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
-                      <p className="font-semibold text-warning">Médio</p>
+                      <p className="font-bold text-warning">Médio</p>
                       <p className="text-sm text-muted-foreground mt-1">Redução 10-20%</p>
                     </div>
                     <div className="p-3 rounded-lg bg-success/10 border border-success/20">
-                      <p className="font-semibold text-success">Baixo</p>
+                      <p className="font-bold text-success">Baixo</p>
                       <p className="text-sm text-muted-foreground mt-1">Redução ≤ 10%</p>
                     </div>
                   </div>
@@ -366,7 +688,7 @@ export default function Methodology() {
 
                 {/* Scopes */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Âmbitos de Emissões (Scopes)</h3>
+                  <h3 className="font-bold">Âmbitos de Emissões (Scopes)</h3>
 
                   <div className="grid gap-4">
                     <div className="border rounded-lg p-4 bg-card">
@@ -491,7 +813,7 @@ export default function Methodology() {
 
                 {/* Obtenção do Setor */}
                 <div className="border rounded-lg p-4 space-y-4 bg-primary/5 border-primary/20">
-                  <h3 className="font-semibold">Como é obtido o Setor de Atividade?</h3>
+                  <h3 className="font-bold">Como é obtido o Setor de Atividade?</h3>
                   <div className="space-y-3 text-sm">
                     <p className="text-muted-foreground">
                       O setor de atividade é obtido automaticamente a partir do <strong>NIF/NIPC</strong> da empresa
@@ -507,7 +829,7 @@ export default function Methodology() {
 
                 {/* CAE Principal vs Secundário */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">CAE Principal vs CAEs Secundários</h3>
+                  <h3 className="font-bold">CAE Principal vs CAEs Secundários</h3>
                   <p className="text-sm text-muted-foreground">
                     Em Portugal, as empresas podem ter múltiplos códigos CAE:
                   </p>
@@ -544,32 +866,19 @@ export default function Methodology() {
 
                 {/* Setores Principais */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Setores Principais (Secções CAE)</h3>
+                  <h3 className="font-bold">Setores Principais (Secções CAE)</h3>
                   <p className="text-sm text-muted-foreground">
-                    Os setores principais correspondem às secções da CAE e agrupam atividades económicas com características semelhantes.
+                    Os setores principais correspondem às secções da CAE e agrupam
+                    atividades económicas com características semelhantes.
                   </p>
 
                   <div className="grid gap-2">
-                    {[
-                      { code: "A", name: "Agricultura", desc: "Agricultura, produção animal, caça, floresta e pesca" },
-                      { code: "B", name: "Indústrias Extrativas", desc: "Extração de minérios e recursos naturais" },
-                      { code: "C", name: "Indústria", desc: "Indústrias transformadoras (ver subsetores abaixo)" },
-                      { code: "D", name: "Energia", desc: "Eletricidade, gás, vapor, água quente e fria" },
-                      { code: "E", name: "Água e Saneamento", desc: "Captação, tratamento e distribuição de água; gestão de resíduos" },
-                      { code: "F", name: "Construção", desc: "Construção de edifícios e engenharia civil" },
-                      { code: "G", name: "Comércio", desc: "Comércio por grosso e a retalho; reparação de veículos" },
-                      { code: "H", name: "Logística", desc: "Transporte e armazenagem" },
-                      { code: "I", name: "Hotelaria e Restauração", desc: "Alojamento, restauração e similares" },
-                      { code: "J", name: "Tecnologia", desc: "Informação e comunicação" },
-                      { code: "K", name: "Banca e Seguros", desc: "Atividades financeiras e de seguros" },
-                      { code: "M", name: "Consultoria", desc: "Atividades de consultoria, científicas e técnicas" },
-                      { code: "S", name: "Outros Serviços", desc: "Outras atividades de serviços" },
-                    ].map((sector) => (
-                      <div key={sector.code} className="flex items-start gap-3 p-2 rounded hover:bg-muted/50">
-                        <Badge variant="outline" className="font-mono shrink-0">{sector.code}</Badge>
+                    {Object.entries(sectorCAEMapping).map(([key, { code, description }]) => (
+                      <div key={key} className="flex items-start gap-3 p-2 rounded hover:bg-muted/50">
+                        <Badge variant="outline" className="font-mono shrink-0">{code}</Badge>
                         <div>
-                          <span className="font-bold">{sector.name}</span>
-                          <p className="text-xs text-muted-foreground">{sector.desc}</p>
+                          <span className="font-bold">{sectorLabels[key] || key}</span>
+                          <p className="text-xs text-muted-foreground">{description}</p>
                         </div>
                       </div>
                     ))}
@@ -578,34 +887,21 @@ export default function Methodology() {
 
                 {/* Subsetores da Indústria */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Subsetores da Indústria (Divisões CAE - Seção C)</h3>
+                  <h3 className="font-bold">Subsetores da Indústria (Divisões CAE - Seção C)</h3>
                   <p className="text-sm text-muted-foreground">
                     O setor industrial é subdividido em subsetores mais específicos para permitir
                     comparações mais precisas entre empresas com atividades semelhantes.
                   </p>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {[
-                  { code: "10-12", name: "Indústria Alimentar" },
-                  { code: "13-14", name: "Têxtil e Vestuário" },
-                  { code: "17", name: "Papel e Cartão" },
-                  { code: "20", name: "Química" },
-                  { code: "21", name: "Farmacêutica" },
-                  { code: "22", name: "Borracha e Plásticos" },
-                  { code: "23", name: "Cerâmica e Vidro" },
-                  { code: "24", name: "Metalurgia" },
-                  { code: "25", name: "Metalomecânica" },
-                  { code: "26-27", name: "Eletrónica" },
-                  { code: "29", name: "Automóvel" },
-                  { code: "31", name: "Mobiliário" },
-                ].map((sub) => (
-                  <div key={sub.code} className="flex items-center gap-2 p-2 rounded bg-muted/30">
-                    <Badge variant="secondary" className="font-mono text-xs shrink-0">{sub.code}</Badge>
-                    <span className="text-sm">{sub.name}</span>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {Object.entries(industrySubsectors).map(([key, { code, name }]) => (
+                      <div key={key} className="flex items-center gap-2 p-2 rounded bg-muted/30">
+                        <Badge variant="secondary" className="font-mono text-xs shrink-0">{code}</Badge>
+                        <span className="text-sm">{name}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
           </div>
 
           {/* === SECTION: Fatores de Intensidade === */}
@@ -626,7 +922,7 @@ export default function Methodology() {
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
                   <div className="flex items-center gap-2">
                     <Landmark className="h-4 w-4 text-primary" />
-                    <h3 className="font-semibold">Fonte dos Dados</h3>
+                    <h3 className="font-bold">Fonte dos Dados</h3>
                   </div>
                   <div className="space-y-3">
                     <div className="grid grid-cols-[120px_1fr] gap-2 text-sm">
@@ -654,7 +950,9 @@ export default function Methodology() {
 
                 {/* Tabela de Intensidades */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Intensidade de Carbono por Setor (2022)</h3>
+                  <h3 className="font-bold">
+                    Intensidade de Carbono por Setor ({emissionIntensityMetadata.referenceYear})
+                  </h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
@@ -665,29 +963,28 @@ export default function Methodology() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {[
-                          { name: "Energia e Água", intensity: "2.80", source: "INE" },
-                          { name: "Agricultura", intensity: "2.10", source: "INE" },
-                          { name: "Indústrias Extrativas", intensity: "1.80", source: "Est." },
-                          { name: "Logística/Transportes", intensity: "0.95", source: "Calc." },
-                          { name: "Indústria", intensity: "0.85", source: "Calc." },
-                          { name: "Construção", intensity: "0.45", source: "Est." },
-                          { name: "Hotelaria", intensity: "0.18", source: "Est." },
-                          { name: "Comércio", intensity: "0.15", source: "Est." },
-                          { name: "Tecnologia", intensity: "0.08", source: "Calc." },
-                          { name: "Outros Serviços", intensity: "0.029", source: "Calc." },
-                          { name: "Financeiro", intensity: "0.002", source: "Calc." },
-                        ].map((row) => (
-                          <tr key={row.name}>
-                            <td className="py-2 pr-4">{row.name}</td>
-                            <td className="py-2 pr-4 text-right font-mono">{row.intensity}</td>
-                            <td className="py-2">
-                              <Badge variant={row.source === "INE" ? "default" : "outline"} className="text-xs">
-                                {row.source}
-                              </Badge>
-                            </td>
-                          </tr>
-                        ))}
+                        {[...sectorEmissionFactors]
+                          .sort((a, b) => b.intensity - a.intensity)
+                          .map((factor) => (
+                            <tr key={factor.sector}>
+                              <td className="py-2 pr-4">{sectorLabels[factor.sector] || factor.sector}</td>
+                              <td className="py-2 pr-4 text-right font-mono">{factor.intensity.toFixed(2)}</td>
+                              <td className="py-2">
+                                <Badge
+                                  variant={factor.source === 'reported' ? 'default' : 'outline'}
+                                  className={cn(
+                                    "text-xs",
+                                    factor.source === 'reported' && "bg-success/20 text-success border-success/30",
+                                    factor.source === 'calculated' && "bg-blue-500/20 text-blue-500 border-blue-500/30",
+                                    factor.source === 'estimated' && "bg-warning/20 text-warning border-warning/30"
+                                  )}
+                                >
+                                  {factor.source === 'reported' ? 'INE' :
+                                   factor.source === 'calculated' ? 'Calc.' : 'Est.'}
+                                </Badge>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
@@ -698,38 +995,34 @@ export default function Methodology() {
 
                 {/* Subsetores da Indústria */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Intensidade de Subsetores Industriais (Seção C)</h3>
+                  <h3 className="font-bold">Intensidade de Subsetores Industriais (Seção C)</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {[
-                      { name: "Cerâmica/Vidro", intensity: "3.70", highlight: true },
-                      { name: "Metalurgia", intensity: "2.50", highlight: true },
-                      { name: "Química", intensity: "1.80", highlight: false },
-                      { name: "Papel/Cartão", intensity: "1.50", highlight: false },
-                      { name: "Plásticos", intensity: "0.90", highlight: false },
-                      { name: "Metalomecânica", intensity: "0.70", highlight: false },
-                      { name: "Alimentar", intensity: "0.65", highlight: false },
-                      { name: "Madeira/Cortiça", intensity: "0.55", highlight: false },
-                      { name: "Automóvel", intensity: "0.50", highlight: false },
-                      { name: "Têxtil", intensity: "0.45", highlight: false },
-                      { name: "Mobiliário", intensity: "0.40", highlight: false },
-                      { name: "Eletrónica", intensity: "0.35", highlight: false },
-                    ].map((sub) => (
-                      <div
-                        key={sub.name}
-                        className={cn(
-                          "flex items-center justify-between p-2 rounded",
-                          sub.highlight ? "bg-danger/10 border border-danger/30" : "bg-muted/30"
-                        )}
-                      >
-                        <span className="text-sm">{sub.name}</span>
-                        <Badge variant={sub.highlight ? "destructive" : "secondary"} className="font-mono text-xs">
-                          {sub.intensity}
-                        </Badge>
-                      </div>
-                    ))}
+                    {[...industrySubsectorFactors]
+                      .sort((a, b) => b.intensity - a.intensity)
+                      .map((factor) => {
+                        const isHighIntensity = factor.intensity > 1.0;
+                        return (
+                          <div
+                            key={factor.subsector}
+                            className={cn(
+                              "flex items-center justify-between p-2 rounded",
+                              isHighIntensity ? "bg-danger/10 border border-danger/30" : "bg-muted/30"
+                            )}
+                          >
+                            <span className="text-sm">{sectorLabels[factor.subsector] || factor.subsector}</span>
+                            <Badge
+                              variant={isHighIntensity ? "destructive" : "secondary"}
+                              className="font-mono text-xs"
+                            >
+                              {factor.intensity.toFixed(2)}
+                            </Badge>
+                          </div>
+                        );
+                      })}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Valores em kg CO₂eq/€. Subsetores a vermelho têm intensidade acima da média industrial.
+                    Valores em {emissionIntensityMetadata.unit}.
+                    Subsetores a vermelho têm intensidade acima de 1.0 kg/€.
                   </p>
                 </div>
 
@@ -748,7 +1041,7 @@ export default function Methodology() {
 
                 {/* Justificação de Valores */}
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
-                  <h3 className="font-semibold">Classificação dos Valores</h3>
+                  <h3 className="font-bold">Classificação dos Valores</h3>
                   <div className="space-y-3">
                     <div className="flex items-start gap-3 p-2 rounded bg-success/10 border border-success/30">
                       <Badge className="shrink-0">INE</Badge>
@@ -815,7 +1108,7 @@ export default function Methodology() {
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-success" />
-                    <h3 className="font-semibold">Dados Obrigatórios</h3>
+                    <h3 className="font-bold">Dados Obrigatórios</h3>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -882,7 +1175,7 @@ export default function Methodology() {
                 <div className="border rounded-lg p-4 space-y-4 bg-card">
                   <div className="flex items-center gap-2">
                     <Info className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="font-semibold">Dados Opcionais (Recomendados)</h3>
+                    <h3 className="font-bold">Dados Opcionais (Recomendados)</h3>
                   </div>
 
                   <div className="grid gap-2">
@@ -932,7 +1225,7 @@ export default function Methodology() {
 
             {/* Diagrama do Fluxo */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Diagrama do Fluxo</h3>
+              <h3 className="font-bold">Diagrama do Fluxo</h3>
               <div className="p-4 bg-muted/30 rounded-lg overflow-x-auto">
                 <pre className="text-xs font-mono text-muted-foreground whitespace-pre">
 {`┌─────────────────┐
@@ -971,7 +1264,7 @@ export default function Methodology() {
 
             {/* Estados */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Descrição dos Estados</h3>
+              <h3 className="font-bold">Descrição dos Estados</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-status-pending/10 border border-status-pending/30">
                   <Badge className="bg-status-pending shrink-0">1</Badge>
@@ -1045,7 +1338,7 @@ export default function Methodology() {
                   <div className="p-1.5 rounded bg-primary/10">
                     <Leaf className="h-4 w-4 text-primary" />
                   </div>
-                  <h3 className="font-semibold">Caminho Simple</h3>
+                  <h3 className="font-bold">Caminho Simple</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Plataforma self-service onde a empresa preenche os dados e obtém o cálculo automaticamente.
@@ -1062,7 +1355,7 @@ export default function Methodology() {
                   <div className="p-1.5 rounded bg-muted">
                     <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <h3 className="font-semibold">Caminho Formulário</h3>
+                  <h3 className="font-bold">Caminho Formulário</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Formulário manual para empresas que preferem submeter dados sem criar conta.
@@ -1109,7 +1402,7 @@ export default function Methodology() {
                 <div className="p-1.5 rounded bg-primary/10">
                   <Upload className="h-4 w-4 text-primary" />
                 </div>
-                <h3 className="font-semibold">Importação de Empresas</h3>
+                <h3 className="font-bold">Importação de Empresas</h3>
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -1164,7 +1457,7 @@ export default function Methodology() {
                 <div className="p-1.5 rounded bg-blue-500/10">
                   <Users className="h-4 w-4 text-blue-500" />
                 </div>
-                <h3 className="font-semibold">Regras de Deduplicação</h3>
+                <h3 className="font-bold">Regras de Deduplicação</h3>
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -1208,7 +1501,7 @@ export default function Methodology() {
 
             {/* Operações de Clusters */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Operações de Clusters</h3>
+              <h3 className="font-bold">Operações de Clusters</h3>
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-success/10 border border-success/30">
@@ -1251,7 +1544,7 @@ export default function Methodology() {
             <div className="border rounded-lg p-4 space-y-4 bg-warning/5 border-warning/20">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-warning" />
-                <h3 className="font-semibold">Proteção de Dados</h3>
+                <h3 className="font-bold">Proteção de Dados</h3>
               </div>
 
               <div className="space-y-2 text-sm text-muted-foreground">
@@ -1268,6 +1561,120 @@ export default function Methodology() {
                   <strong>Apenas empresas "órfãs" são removidas:</strong> Empresas que só pertencem
                   ao cluster a ser eliminado são efetivamente removidas do sistema.
                 </p>
+              </div>
+            </div>
+
+            {/* Workflow de Criação */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Workflow de Criação de Cluster</h3>
+              <p className="text-sm text-muted-foreground">
+                Criar um cluster é o primeiro passo para organizar empresas na plataforma.
+              </p>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Badge className="shrink-0 bg-primary">1</Badge>
+                  <div>
+                    <p className="font-bold text-sm">Iniciar criação</p>
+                    <p className="text-xs text-muted-foreground">
+                      Clicar no botão "Novo Cluster" no topo da página de Clusters.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Badge className="shrink-0 bg-primary">2</Badge>
+                  <div>
+                    <p className="font-bold text-sm">Definir identidade</p>
+                    <p className="text-xs text-muted-foreground">
+                      Escolher um nome descritivo e seleccionar um ícone identificativo
+                      (ex: 🏭 para fornecedores industriais).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Badge className="shrink-0 bg-primary">3</Badge>
+                  <div>
+                    <p className="font-bold text-sm">Cluster criado</p>
+                    <p className="text-xs text-muted-foreground">
+                      O cluster fica imediatamente disponível para receber empresas
+                      através de importação CSV, colar dados ou entrada manual.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Validação de Dados */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Validação de Dados na Importação</h3>
+              <p className="text-sm text-muted-foreground">
+                O sistema valida automaticamente os dados durante a importação:
+              </p>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Campo</th>
+                      <th className="text-left py-2 pr-4 font-bold">Regra</th>
+                      <th className="text-left py-2 font-bold">Exemplo</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">NIF</td>
+                      <td className="py-2 pr-4 text-muted-foreground">9 dígitos, check-digit válido</td>
+                      <td className="py-2 font-mono text-xs">501234567</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Email</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Formato válido com @</td>
+                      <td className="py-2 font-mono text-xs">info@empresa.pt</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Nome</td>
+                      <td className="py-2 pr-4 text-muted-foreground">Mínimo 2 caracteres</td>
+                      <td className="py-2 font-mono text-xs">Empresa, Lda</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex items-start gap-2 p-3 bg-warning/5 rounded-lg border border-warning/20">
+                <AlertTriangle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
+                <p className="text-sm text-muted-foreground">
+                  <strong>Linhas inválidas:</strong> São sinalizadas mas não bloqueiam a importação.
+                  Pode corrigir os dados e reimportar posteriormente.
+                </p>
+              </div>
+            </div>
+
+            {/* Casos de Uso */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Casos de Uso Típicos</h3>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <Building2 className="h-5 w-5 text-blue-500 mb-2" />
+                  <p className="font-bold text-sm">Fornecedores</p>
+                  <p className="text-xs text-muted-foreground">
+                    Empresa agrupa os seus fornecedores para análise de Scope 3.
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                  <Landmark className="h-5 w-5 text-purple-500 mb-2" />
+                  <p className="font-bold text-sm">Programa Municipal</p>
+                  <p className="text-xs text-muted-foreground">
+                    Município cria cluster para empresas de um programa específico.
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <Briefcase className="h-5 w-5 text-muted-foreground mb-2" />
+                  <p className="font-bold text-sm">Setor Específico</p>
+                  <p className="text-xs text-muted-foreground">
+                    Agrupar empresas do mesmo setor para benchmarking dedicado.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1288,7 +1695,7 @@ export default function Methodology() {
 
             {/* Métricas Principais */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Métricas Principais (KPIs)</h3>
+              <h3 className="font-bold">Métricas Principais (KPIs)</h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -1332,7 +1739,7 @@ export default function Methodology() {
 
             {/* 5 Separadores */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Separadores do Dashboard</h3>
+              <h3 className="font-bold">Separadores do Dashboard</h3>
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
@@ -1394,7 +1801,7 @@ export default function Methodology() {
 
             {/* Filtros Disponíveis */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Filtros Disponíveis</h3>
+              <h3 className="font-bold">Filtros Disponíveis</h3>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="p-3 rounded-lg bg-muted/30 text-center">
@@ -1421,7 +1828,7 @@ export default function Methodology() {
               <div className="border rounded-lg p-4 space-y-3 bg-blue-500/5 border-blue-500/20">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-blue-500" />
-                  <h3 className="font-semibold">Vista Empresa</h3>
+                  <h3 className="font-bold">Vista Empresa</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Foco na gestão de fornecedores e cadeia de valor:
@@ -1437,7 +1844,7 @@ export default function Methodology() {
               <div className="border rounded-lg p-4 space-y-3 bg-purple-500/5 border-purple-500/20">
                 <div className="flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-purple-500" />
-                  <h3 className="font-semibold">Vista Município</h3>
+                  <h3 className="font-bold">Vista Município</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Foco na gestão territorial e políticas públicas:
@@ -1455,7 +1862,7 @@ export default function Methodology() {
             <div className="border rounded-lg p-4 space-y-4 bg-purple-500/5 border-purple-500/20">
               <div className="flex items-center gap-2">
                 <Landmark className="h-4 w-4 text-purple-500" />
-                <h3 className="font-semibold">KPIs de Infraestruturas (Municípios)</h3>
+                <h3 className="font-bold">KPIs de Infraestruturas (Municípios)</h3>
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -1478,6 +1885,500 @@ export default function Methodology() {
                 ))}
               </div>
             </div>
+
+            {/* Detalhes dos Separadores */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Detalhes dos Separadores</h3>
+
+              <div className="space-y-4">
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-bold text-sm">Visão Geral</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Cards de KPI com valores agregados e tendências</li>
+                    <li>Barra de cobertura de dados (percentagem de empresas com pegada calculada)</li>
+                    <li>Top 5 empresas com maior emissão absoluta</li>
+                    <li>Top 5 empresas mais eficientes por intensidade de carbono</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-bold text-sm">Empresas</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Listagem completa com pesquisa, filtros e ordenação</li>
+                    <li>Vista em cards ou tabela (toggle de visualização)</li>
+                    <li>Exportação de dados em CSV</li>
+                    <li>Acesso directo ao detalhe de cada empresa</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-bold text-sm">Detalhes de Emissões</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Distribuição por Scope (1, 2, 3) em gráfico circular</li>
+                    <li>Evolução temporal das emissões</li>
+                    <li>Breakdown por categoria de actividade</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-bold text-sm">Análise por Actividade</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Heatmap região × sector para identificar concentrações</li>
+                    <li>Benchmarking sectorial com médias nacionais</li>
+                    <li>Ranking de sectores por intensidade de carbono</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <p className="font-bold text-sm">Análise Financeira</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Financial Efficiency (FE) = emissões / facturação</li>
+                    <li>Gráfico Pareto 80/20 para priorização</li>
+                    <li>Comparação de eficiência entre empresas</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Sistema de Filtros Avançado */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Sistema de Filtros Avançado</h3>
+              <p className="text-sm text-muted-foreground">
+                Todos os separadores partilham um sistema de filtros persistente que permite
+                refinar a análise em tempo real.
+              </p>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="font-bold text-sm">Filtros de Segmentação</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Por cluster (grupo de empresas)</li>
+                    <li>Por dimensão (Micro, PME, Grande)</li>
+                    <li>Por sector de actividade (CAE)</li>
+                    <li>Por região geográfica</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-bold text-sm">Filtros de Performance</p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Empresas acima/abaixo da média</li>
+                    <li>Com/sem pegada calculada</li>
+                    <li>Por nível de potencial de melhoria</li>
+                    <li>Por intervalo de emissões</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Gráficos e Análises === */}
+          <SectionHeader
+            id="graficos"
+            title="Gráficos e Análises"
+            icon={PieChart}
+            description="Visualizações interactivas para análise de emissões"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              A plataforma disponibiliza múltiplos tipos de gráficos para análise visual das emissões,
+              acessíveis nos diferentes separadores do Dashboard.
+            </p>
+
+            {/* Tipos de Gráficos */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Tipos de Gráficos Disponíveis</h3>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <BarChart3 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Gráficos de Barras</p>
+                    <p className="text-xs text-muted-foreground">
+                      Comparação de emissões entre empresas, sectores ou regiões.
+                      Suportam empilhamento por Scope.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <PieChart className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Gráficos Circulares</p>
+                    <p className="text-xs text-muted-foreground">
+                      Distribuição proporcional de emissões por Scope,
+                      sector ou categoria de actividade.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Grid3X3 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Heatmaps</p>
+                    <p className="text-xs text-muted-foreground">
+                      Matrizes região × sector para identificar concentrações
+                      de emissões no território.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <CircleDot className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Gráficos de Dispersão</p>
+                    <p className="text-xs text-muted-foreground">
+                      Correlação entre variáveis como emissões vs. facturação
+                      ou emissões vs. colaboradores.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Hexagon className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Gráficos Radar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Perfil multidimensional de empresas comparando múltiplos
+                      indicadores simultaneamente.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <TrendingDown className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Gráficos Pareto</p>
+                    <p className="text-xs text-muted-foreground">
+                      Análise 80/20 para identificar as empresas responsáveis
+                      pela maioria das emissões.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactividade */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Interactividade</h3>
+              <p className="text-sm text-muted-foreground">
+                Todos os gráficos são interactivos e oferecem:
+              </p>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <MousePointer className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Hover</p>
+                    <p className="text-xs text-muted-foreground">
+                      Tooltips com valores detalhados ao passar o rato.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <MousePointerClick className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Click</p>
+                    <p className="text-xs text-muted-foreground">
+                      Navegação para detalhe da empresa ou sector clicado.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <Download className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Exportar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Exportação de dados em formato CSV para análise externa.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Métricas Visuais */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Escalas e Codificação Visual</h3>
+              <p className="text-sm text-muted-foreground">
+                A plataforma utiliza codificação consistente em todas as visualizações:
+              </p>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded bg-success shrink-0" />
+                  <p className="text-sm"><span className="font-bold">Verde:</span> <span className="text-muted-foreground">Emissões abaixo da média ou potencial baixo</span></p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded bg-warning shrink-0" />
+                  <p className="text-sm"><span className="font-bold">Amarelo:</span> <span className="text-muted-foreground">Emissões próximas da média ou potencial médio</span></p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded bg-danger shrink-0" />
+                  <p className="text-sm"><span className="font-bold">Vermelho:</span> <span className="text-muted-foreground">Emissões acima da média ou potencial alto</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Planos de Acção === */}
+          <SectionHeader
+            id="planos"
+            title="Planos de Acção"
+            icon={Target}
+            description="Definição de objectivos e estratégias de descarbonização"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              Os Planos de Acção permitem definir objectivos concretos de redução de emissões
+              e acompanhar o progresso ao longo do tempo, tanto a nível individual como territorial.
+            </p>
+
+            {/* Tipos de Planos */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Tipos de Planos</h3>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-blue-500" />
+                    <p className="font-bold text-sm">Plano Empresarial</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Plano individual para uma empresa com metas específicas de redução,
+                    medidas concretas e cronograma de implementação.
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Metas por Scope (1, 2, 3)</li>
+                    <li>Cronograma com milestones</li>
+                    <li>Estimativa de investimento</li>
+                    <li>ROI esperado</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/20 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Landmark className="h-4 w-4 text-purple-500" />
+                    <p className="font-bold text-sm">Plano Territorial</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Plano para um município ou região com objectivos agregados,
+                    políticas públicas e incentivos à descarbonização.
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Metas territoriais agregadas</li>
+                    <li>Políticas públicas de suporte</li>
+                    <li>Programas de incentivo</li>
+                    <li>Monitorização de progresso</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Estados do Plano */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Estados do Plano</h3>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Badge className="shrink-0 bg-muted text-muted-foreground">Rascunho</Badge>
+                  <p className="text-sm text-muted-foreground">
+                    Em preparação. Pode ser editado livremente antes de ser activado.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Badge className="shrink-0 bg-primary">Activo</Badge>
+                  <p className="text-sm text-muted-foreground">
+                    Em execução. As medidas estão a ser implementadas e monitorizadas.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Badge className="shrink-0 bg-success text-success-foreground">Concluído</Badge>
+                  <p className="text-sm text-muted-foreground">
+                    Todas as metas foram atingidas ou o prazo terminou.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Medidas === */}
+          <SectionHeader
+            id="medidas"
+            title="Medidas de Descarbonização"
+            icon={Leaf}
+            description="Catálogo de medidas para redução de emissões"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              A plataforma disponibiliza um catálogo de medidas de descarbonização organizadas
+              por categoria, com estimativa de impacto e custo de implementação.
+            </p>
+
+            {/* Categorias de Medidas */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Categorias de Medidas</h3>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Zap className="h-5 w-5 text-yellow-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Energia</p>
+                    <p className="text-xs text-muted-foreground">
+                      Eficiência energética, energias renováveis, iluminação LED,
+                      painéis solares, bombas de calor.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Car className="h-5 w-5 text-blue-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Mobilidade</p>
+                    <p className="text-xs text-muted-foreground">
+                      Frota eléctrica, car sharing, teletrabalho,
+                      incentivo ao transporte público.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Droplets className="h-5 w-5 text-cyan-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Água e Resíduos</p>
+                    <p className="text-xs text-muted-foreground">
+                      Redução de consumo de água, reciclagem, economia circular,
+                      compostagem.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                  <Factory className="h-5 w-5 text-orange-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Processos</p>
+                    <p className="text-xs text-muted-foreground">
+                      Optimização de processos produtivos, substituição de matérias-primas,
+                      digitalização.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Informação por Medida */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Informação por Medida</h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Campo</th>
+                      <th className="text-left py-2 font-bold">Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Nome</td>
+                      <td className="py-2 text-muted-foreground">Designação da medida</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Categoria</td>
+                      <td className="py-2 text-muted-foreground">Energia, Mobilidade, Água/Resíduos ou Processos</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Impacto estimado</td>
+                      <td className="py-2 text-muted-foreground">Redução esperada em t CO₂e/ano</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Custo</td>
+                      <td className="py-2 text-muted-foreground">Investimento estimado em euros</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Payback</td>
+                      <td className="py-2 text-muted-foreground">Tempo estimado de retorno do investimento</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-bold">Complexidade</td>
+                      <td className="py-2 text-muted-foreground">Baixa, Média ou Alta</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Financiamento === */}
+          <SectionHeader
+            id="financiamento"
+            title="Financiamento"
+            icon={Euro}
+            description="Fontes de financiamento para a descarbonização"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              A secção de financiamento agrega informação sobre programas de apoio,
+              incentivos fiscais e fontes de financiamento disponíveis para projectos
+              de descarbonização.
+            </p>
+
+            {/* Tipos de Financiamento */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Tipos de Financiamento</h3>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <Gift className="h-5 w-5 text-green-500 mb-1" />
+                  <p className="font-bold text-sm">Subsídios</p>
+                  <p className="text-xs text-muted-foreground">
+                    Fundos europeus (PRR, PT2030), programas nacionais
+                    e apoios municipais a fundo perdido.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <Receipt className="h-5 w-5 text-blue-500 mb-1" />
+                  <p className="font-bold text-sm">Incentivos Fiscais</p>
+                  <p className="text-xs text-muted-foreground">
+                    Deduções em IRC, benefícios fiscais para investimentos
+                    verdes e créditos de carbono.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/30 space-y-2">
+                  <Euro className="h-5 w-5 text-purple-500 mb-1" />
+                  <p className="font-bold text-sm">Linhas de Crédito</p>
+                  <p className="text-xs text-muted-foreground">
+                    Linhas de crédito bonificado para projectos de eficiência
+                    energética e transição verde.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Informação por Programa */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Informação por Programa</h3>
+              <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
+                <li><strong>Nome do programa</strong> e entidade promotora</li>
+                <li><strong>Elegibilidade:</strong> Tipos de empresa, sectores, dimensão</li>
+                <li><strong>Montantes:</strong> Valor mínimo e máximo de apoio</li>
+                <li><strong>Prazos:</strong> Datas de candidatura e execução</li>
+                <li><strong>Documentação:</strong> Links para regulamentos e formulários</li>
+              </ul>
+            </div>
+
+            {/* Nota */}
+            <div className="flex items-start gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+              <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                A informação de financiamento é actualizada periodicamente pela equipa Get2C.
+                Consulte sempre as fontes oficiais para confirmar elegibilidade e prazos.
+              </p>
+            </div>
           </div>
 
           {/* === SECTION: Painel de Controlo === */}
@@ -1497,7 +2398,7 @@ export default function Methodology() {
 
             {/* Acesso */}
             <div className="border rounded-lg p-4 space-y-3 bg-card">
-              <h3 className="font-semibold">Acesso</h3>
+              <h3 className="font-bold">Acesso</h3>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                 <li>Disponível apenas para utilizadores do tipo <strong>Get2C</strong></li>
                 <li>Acessível via menu "Painel de controlo" no header</li>
@@ -1507,7 +2408,7 @@ export default function Methodology() {
 
             {/* Gestão de Clientes */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Gestão de Clientes</h3>
+              <h3 className="font-bold">Gestão de Clientes</h3>
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="p-3 rounded-lg bg-muted/30">
                   <p className="font-bold text-sm">Criar Cliente</p>
@@ -1530,7 +2431,7 @@ export default function Methodology() {
 
             {/* Perfis de Permissões */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Perfis de Permissões</h3>
+              <h3 className="font-bold">Perfis de Permissões</h3>
               <p className="text-sm text-muted-foreground">
                 Três perfis pré-definidos para configuração rápida:
               </p>
@@ -1567,7 +2468,7 @@ export default function Methodology() {
 
             {/* Permissões Granulares */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Permissões Granulares</h3>
+              <h3 className="font-bold">Permissões Granulares</h3>
               <p className="text-sm text-muted-foreground">
                 Além dos perfis, cada permissão pode ser configurada individualmente:
               </p>
@@ -1603,7 +2504,7 @@ export default function Methodology() {
 
             {/* Métricas Globais */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Métricas Globais</h3>
+              <h3 className="font-bold">Métricas Globais</h3>
               <p className="text-sm text-muted-foreground">
                 O painel apresenta métricas agregadas de todos os clientes ativos:
               </p>
@@ -1629,7 +2530,7 @@ export default function Methodology() {
 
             {/* Visualizações */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Visualizações</h3>
+              <h3 className="font-bold">Visualizações</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <Badge variant="secondary" className="shrink-0">1</Badge>
@@ -1664,7 +2565,7 @@ export default function Methodology() {
 
             {/* Cards de Cliente */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Cards de Cliente</h3>
+              <h3 className="font-bold">Cards de Cliente</h3>
               <p className="text-sm text-muted-foreground">
                 Cada cliente é apresentado num card com:
               </p>
@@ -1680,7 +2581,7 @@ export default function Methodology() {
 
             {/* Pesquisa e Filtros */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Pesquisa e Filtros</h3>
+              <h3 className="font-bold">Pesquisa e Filtros</h3>
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
                   <p className="font-bold text-sm mb-2">Pesquisa</p>
@@ -1696,6 +2597,168 @@ export default function Methodology() {
                     <li>Por estado: Ativos, Arquivados, Todos</li>
                   </ul>
                 </div>
+              </div>
+            </div>
+
+            {/* Gestão de Clientes */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Gestão de Clientes</h3>
+              <p className="text-sm text-muted-foreground">
+                Operações disponíveis para cada cliente na plataforma:
+              </p>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <Eye className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Visualizar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Aceder ao dashboard e dados do cliente como se fosse o próprio utilizador.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <Settings className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Configurar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Alterar dados do cliente, tipo de conta e permissões de acesso.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <Archive className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Arquivar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Desactivar temporariamente o acesso sem perder dados históricos.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <BarChart3 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Métricas</p>
+                    <p className="text-xs text-muted-foreground">
+                      Ver estatísticas de utilização, número de empresas e clusters.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Métricas Globais */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Métricas Globais</h3>
+              <p className="text-sm text-muted-foreground">
+                O painel apresenta métricas agregadas de toda a plataforma:
+              </p>
+
+              <div className="grid gap-2 md:grid-cols-3">
+                {[
+                  "Total de clientes activos",
+                  "Total de empresas na plataforma",
+                  "Total de clusters",
+                  "Pegadas calculadas",
+                  "Emissões totais agregadas",
+                  "Taxa média de onboarding",
+                ].map((metric) => (
+                  <div key={metric} className="p-2 rounded bg-muted/30">
+                    <span className="text-sm">{metric}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* === SECTION: Permissões === */}
+          <SectionHeader
+            id="permissoes"
+            title="Permissões"
+            icon={Shield}
+            description="Sistema de controlo de acesso e permissões"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              O sistema de permissões controla o acesso às diferentes funcionalidades
+              da plataforma com base no tipo de utilizador e no papel atribuído.
+            </p>
+
+            {/* Níveis de Acesso */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Níveis de Acesso</h3>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-danger/5 border border-danger/20">
+                  <ShieldCheck className="h-5 w-5 text-danger shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Administrador (Get2C)</p>
+                    <p className="text-xs text-muted-foreground">
+                      Acesso total à plataforma. Pode gerir clientes, configurar permissões,
+                      aceder ao painel de controlo e a todas as funcionalidades.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <Building2 className="h-5 w-5 text-blue-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Cliente Empresa</p>
+                    <p className="text-xs text-muted-foreground">
+                      Acesso ao dashboard, clusters e dados dos seus fornecedores.
+                      Pode criar clusters, importar empresas e enviar campanhas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                  <Landmark className="h-5 w-5 text-purple-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm">Cliente Município</p>
+                    <p className="text-xs text-muted-foreground">
+                      Acesso ao dashboard territorial, gestão de programas de incentivo,
+                      infraestruturas municipais e dados das empresas do concelho.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Matriz de Permissões */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Matriz de Permissões</h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Funcionalidade</th>
+                      <th className="text-center py-2 pr-4 font-bold">Admin</th>
+                      <th className="text-center py-2 pr-4 font-bold">Empresa</th>
+                      <th className="text-center py-2 font-bold">Município</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {[
+                      { feat: "Painel de Controlo", admin: true, empresa: false, municipio: false },
+                      { feat: "Dashboard", admin: true, empresa: true, municipio: true },
+                      { feat: "Gestão de Clusters", admin: true, empresa: true, municipio: true },
+                      { feat: "Importar Empresas", admin: true, empresa: true, municipio: true },
+                      { feat: "Campanhas de Email", admin: true, empresa: true, municipio: true },
+                      { feat: "Infraestruturas", admin: true, empresa: false, municipio: true },
+                      { feat: "Planos de Acção", admin: true, empresa: true, municipio: true },
+                      { feat: "Gerir Clientes", admin: true, empresa: false, municipio: false },
+                    ].map((row) => (
+                      <tr key={row.feat}>
+                        <td className="py-2 pr-4">{row.feat}</td>
+                        <td className="py-2 pr-4 text-center">{row.admin ? <CheckCircle2 className="h-4 w-4 text-success inline" /> : <span className="text-muted-foreground">—</span>}</td>
+                        <td className="py-2 pr-4 text-center">{row.empresa ? <CheckCircle2 className="h-4 w-4 text-success inline" /> : <span className="text-muted-foreground">—</span>}</td>
+                        <td className="py-2 text-center">{row.municipio ? <CheckCircle2 className="h-4 w-4 text-success inline" /> : <span className="text-muted-foreground">—</span>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -1717,7 +2780,7 @@ export default function Methodology() {
 
             {/* Sincronização Automática */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Sincronização Automática</h3>
+              <h3 className="font-bold">Sincronização Automática</h3>
               <p className="text-sm text-muted-foreground">
                 Ao criar um cliente do tipo <strong>Município</strong>, o sistema executa automaticamente:
               </p>
@@ -1737,7 +2800,7 @@ export default function Methodology() {
 
             {/* Fontes de Dados */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Fontes de Dados Públicas</h3>
+              <h3 className="font-bold">Fontes de Dados Públicas</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 As seguintes APIs públicas são utilizadas para obter dados de infraestruturas:
               </p>
@@ -1903,7 +2966,7 @@ export default function Methodology() {
 
             {/* Estados de Disponibilidade */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Estados de Disponibilidade</h3>
+              <h3 className="font-bold">Estados de Disponibilidade</h3>
               <div className="grid gap-3 md:grid-cols-3">
                 <div className="p-3 rounded-lg bg-status-complete/5 border border-status-complete/20">
                   <Badge className="mb-2 bg-status-complete/10 text-status-complete border-status-complete/20">
@@ -1934,7 +2997,7 @@ export default function Methodology() {
 
             {/* Configuração no Painel de Controlo */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Configuração no Painel de Controlo</h3>
+              <h3 className="font-bold">Configuração no Painel de Controlo</h3>
               <p className="text-sm text-muted-foreground">
                 A tab "Infraestruturas" no Painel de Controlo permite:
               </p>
@@ -1964,7 +3027,7 @@ export default function Methodology() {
 
             {/* Funil de Onboarding */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Funil de Onboarding (7 Fases)</h3>
+              <h3 className="font-bold">Funil de Onboarding (7 Fases)</h3>
 
               <div className="space-y-2">
                 {[
@@ -1989,7 +3052,7 @@ export default function Methodology() {
 
             {/* Métricas de Campanha */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Métricas de Campanha</h3>
+              <h3 className="font-bold">Métricas de Campanha</h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -2040,7 +3103,7 @@ export default function Methodology() {
             <div className="border rounded-lg p-4 space-y-4 bg-success/5 border-success/20">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-success" />
-                <h3 className="font-semibold">Envio Inteligente</h3>
+                <h3 className="font-bold">Envio Inteligente</h3>
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -2053,6 +3116,173 @@ export default function Methodology() {
                 <li>Otimiza taxa de conversão com base em dados históricos</li>
                 <li>Evita saturação de contactos</li>
               </ul>
+            </div>
+
+            {/* Métricas de Campanha */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Métricas de Campanha</h3>
+              <p className="text-sm text-muted-foreground">
+                Cada campanha de incentivos regista as seguintes métricas:
+              </p>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Taxa de Abertura</p>
+                  <p className="text-xs text-muted-foreground">
+                    Percentagem de emails abertos sobre o total enviado.
+                    Benchmark: &gt;25% é considerado bom.
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Taxa de Conversão</p>
+                  <p className="text-xs text-muted-foreground">
+                    Percentagem de empresas que iniciaram o processo de onboarding
+                    após receberem a campanha.
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Taxa de Bounce</p>
+                  <p className="text-xs text-muted-foreground">
+                    Emails que não foram entregues. Manter abaixo de 5%
+                    para proteger a reputação do domínio.
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="font-bold text-sm">Taxa de Spam</p>
+                  <p className="text-xs text-muted-foreground">
+                    Emails marcados como spam pelos destinatários.
+                    Crítico: &gt;0.5% representa risco de bloqueio.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Segmentação */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Segmentação de Campanhas</h3>
+              <p className="text-sm text-muted-foreground">
+                As campanhas podem ser segmentadas por múltiplos critérios:
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Estado no funil de onboarding (fase 1-7)</li>
+                <li>Cluster de pertença</li>
+                <li>Sector de actividade</li>
+                <li>Dimensão da empresa</li>
+                <li>Tempo desde último contacto</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* === SECTION: Templates de Email === */}
+          <SectionHeader
+            id="templates"
+            title="Templates de Email"
+            icon={FileText}
+            description="Modelos de email pré-configurados para campanhas"
+          />
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              A plataforma disponibiliza templates de email optimizados para cada fase
+              do funil de onboarding, com personalização automática de conteúdo.
+            </p>
+
+            {/* Templates Disponíveis */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Templates Disponíveis</h3>
+
+              <div className="space-y-3">
+                {[
+                  { num: "1", name: "Convite Inicial", desc: "Primeiro contacto. Apresenta a plataforma e convida à participação.", phase: "Por Contactar" },
+                  { num: "2", name: "Lembrete", desc: "Follow-up para empresas que não responderam ao primeiro contacto.", phase: "Contactada" },
+                  { num: "3", name: "Benefícios", desc: "Destaca vantagens competitivas da descarbonização e casos de sucesso.", phase: "Contactada" },
+                  { num: "4", name: "Dados Pendentes", desc: "Solicita o envio de dados em falta para completar a pegada.", phase: "Em Progresso" },
+                  { num: "5", name: "Resultados", desc: "Partilha os resultados da pegada calculada e próximos passos.", phase: "Calculada" },
+                ].map((t) => (
+                  <div key={t.num} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <Badge variant="secondary" className="shrink-0">{t.num}</Badge>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-bold text-sm">{t.name}</p>
+                        <Badge variant="outline" className="text-xs shrink-0">{t.phase}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{t.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Personalização */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Personalização Automática</h3>
+              <p className="text-sm text-muted-foreground">
+                Os templates utilizam variáveis dinâmicas que são substituídas automaticamente:
+              </p>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 pr-4 font-bold">Variável</th>
+                      <th className="text-left py-2 font-bold">Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-2 pr-4 font-mono text-xs">{"{{empresa}}"}</td>
+                      <td className="py-2 text-muted-foreground">Nome da empresa</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-mono text-xs">{"{{contacto}}"}</td>
+                      <td className="py-2 text-muted-foreground">Nome do contacto principal</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-mono text-xs">{"{{cluster}}"}</td>
+                      <td className="py-2 text-muted-foreground">Nome do cluster de origem</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 font-mono text-xs">{"{{link}}"}</td>
+                      <td className="py-2 text-muted-foreground">Link de acesso ao formulário</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Gestão de Templates */}
+            <div className="border rounded-lg p-4 space-y-4 bg-card">
+              <h3 className="font-bold">Gestão de Templates</h3>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <Eye className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Pré-visualizar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Ver como o email ficará com dados reais antes de enviar.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <Pencil className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Editar</p>
+                    <p className="text-xs text-muted-foreground">
+                      Personalizar assunto, corpo e variáveis do template.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
+                  <BarChart3 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm">Métricas</p>
+                    <p className="text-xs text-muted-foreground">
+                      Ver taxas de abertura e conversão por template.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2072,7 +3302,7 @@ export default function Methodology() {
 
             {/* Templates Disponíveis */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Templates Disponíveis</h3>
+              <h3 className="font-bold">Templates Disponíveis</h3>
 
               <div className="grid gap-3">
                 {[
@@ -2095,7 +3325,7 @@ export default function Methodology() {
 
             {/* Gestão de Bounces */}
             <div className="border rounded-lg p-4 space-y-4 bg-card">
-              <h3 className="font-semibold">Gestão de Bounces</h3>
+              <h3 className="font-bold">Gestão de Bounces</h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -2137,7 +3367,7 @@ export default function Methodology() {
             <div className="border rounded-lg p-4 space-y-4 bg-card">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <h3 className="font-semibold">Indicadores de Saturação</h3>
+                <h3 className="font-bold">Indicadores de Saturação</h3>
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -2170,7 +3400,7 @@ export default function Methodology() {
 
             {/* Recomendações */}
             <div className="border rounded-lg p-4 space-y-4 bg-primary/5 border-primary/20">
-              <h3 className="font-semibold">Recomendações</h3>
+              <h3 className="font-bold">Recomendações</h3>
 
               <div className="grid gap-3">
                 <div className="flex items-start gap-2">
@@ -2211,105 +3441,39 @@ export default function Methodology() {
 
           <div className="space-y-6">
             <div className="border rounded-lg p-6 space-y-6 bg-card">
-              {/* Fonte Principal */}
-              <div className="space-y-2 pb-4 border-b">
-                <p className="font-semibold">[1] INE - Contas das Emissões Atmosféricas 1995-2022</p>
-                <p className="text-muted-foreground text-sm">
-                  Instituto Nacional de Estatística. Publicado em 15 de outubro de 2024.
-                </p>
-                <div className="flex flex-wrap gap-3 mt-2">
-                  <a
-                    href="https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_destaques&DESTAQUESdest_boui=691765941&DESTAQUESmodo=2"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    Página INE →
-                  </a>
-                  <a
-                    href="https://www.ine.pt/ngt_server/attachfileu.jsp?look_parentBoui=691766067&att_display=n&att_download=y"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    PDF Completo →
-                  </a>
+              {Object.entries(bibliography).map(([key, source], index) => (
+                <div key={key} className={cn("space-y-2", index > 0 && "pt-4 border-t")}>
+                  <p className="font-bold">[{index + 1}] {source.title}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {source.author}.{source.date ? ` Publicado em ${source.date}.` : ''}
+                  </p>
+                  {source.description && (
+                    <p className="text-muted-foreground text-sm">{source.description}</p>
+                  )}
+                  <div className="flex flex-wrap gap-3 mt-2">
+                    {source.url && (
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Ver fonte →
+                      </a>
+                    )}
+                    {source.pdfUrl && (
+                      <a
+                        href={source.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        PDF →
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              {/* Fonte Secundária */}
-              <div className="space-y-2 pb-4 border-b">
-                <p className="font-semibold">[2] APA - Relatório do Estado do Ambiente</p>
-                <p className="text-muted-foreground text-sm">
-                  Agência Portuguesa do Ambiente. Indicadores de intensidade energética e de carbono.
-                </p>
-                <a
-                  href="https://rea.apambiente.pt/content/intensidade-energ%C3%A9tica-e-carb%C3%B3nica-da-economia"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  Ver indicador →
-                </a>
-              </div>
-
-              {/* Eurostat */}
-              <div className="space-y-2 pb-4 border-b">
-                <p className="font-semibold">[3] Eurostat - Air Emissions Accounts by NACE</p>
-                <p className="text-muted-foreground text-sm">
-                  Base de dados europeia harmonizada de emissões por atividade económica.
-                </p>
-                <div className="flex flex-wrap gap-3 mt-2">
-                  <a
-                    href="https://ec.europa.eu/eurostat/databrowser/view/env_ac_ainah_r2/default/table"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    Emissões por NACE →
-                  </a>
-                  <a
-                    href="https://ec.europa.eu/eurostat/databrowser/view/env_ac_aeint_r2/default/table"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    Intensidades →
-                  </a>
-                </div>
-              </div>
-
-              {/* DEFRA */}
-              <div className="space-y-2 pb-4 border-b">
-                <p className="font-semibold">[4] DEFRA/DESNZ - UK Carbon Footprint</p>
-                <p className="text-muted-foreground text-sm">
-                  Fatores de conversão por código SIC do Reino Unido. Usado para comparação internacional.
-                </p>
-                <a
-                  href="https://www.gov.uk/government/statistics/uks-carbon-footprint"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  UK Statistics →
-                </a>
-              </div>
-
-              {/* GHG Protocol */}
-              <div className="space-y-2">
-                <p className="font-semibold">[5] GHG Protocol - Corporate Value Chain Standard</p>
-                <p className="text-muted-foreground text-sm">
-                  Metodologia internacional para cálculo de emissões Scope 1, 2 e 3.
-                </p>
-                <a
-                  href="https://ghgprotocol.org/corporate-value-chain-scope-3-standard"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  GHG Protocol →
-                </a>
-              </div>
+              ))}
             </div>
           </div>
 
