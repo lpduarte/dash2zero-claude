@@ -1,4 +1,4 @@
-import { Calculator, FileText, Check, HelpCircle, Leaf, ChevronDown, CheckCircle } from "lucide-react";
+import { Calculator, FileText, Check, X, HelpCircle, Leaf, ChevronDown, CheckCircle } from "lucide-react";
 import { usePageTitle } from "@/lib/usePageTitle";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,29 +53,35 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative z-10">
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent [background-size:24px_24px] pointer-events-none" />
-      
+    <div className="min-h-screen bg-diagonal-pattern relative z-10 overflow-hidden">
+      {/* Pulsing background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-primary/30 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-50%, -50%)' }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/40 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(30%, -40%)' }} />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/35 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(20%, -20%)', animationDelay: '0.5s' }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/35 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-30%, 40%)', animationDelay: '1s' }} />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/30 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(-10%, 20%)', animationDelay: '1.5s' }} />
+        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-primary/25 rounded-full blur-2xl animate-pulse-slower" style={{ animationDelay: '0.8s' }} />
+        <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-primary/25 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+      </div>
+
       {/* Section 1: Choice */}
       <section className="min-h-screen flex items-center justify-center p-6 relative">
         <div className="w-full max-w-[1000px] animate-fade-in">
           {/* Logo & Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 mb-8">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Leaf className="h-6 w-6 text-primary" />
-              </div>
-              <span className="text-xl font-bold">Dash2Zero</span>
+            <div className="inline-flex items-center gap-3 mb-8">
+              <Leaf className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold">Dash2Zero</span>
             </div>
             
             <h1 className="text-4xl md:text-4xl font-bold tracking-tight mb-4">
-              Calcule a Pegada de Carbono
+              Calcule ou partilhe
               <br />
-              <span className="text-primary">da sua empresa</span>
+              a Pegada de Carbono <span className="text-primary">da sua empresa</span>
             </h1>
             
-            <p className="text-xl text-muted-foreground max-w-md mx-auto">
+            <p className="text-xl text-muted-foreground max-w-lg mx-auto">
               Escolha a opção que melhor se adequa à sua situação
             </p>
           </div>
@@ -94,7 +100,7 @@ const Onboarding = () => {
                 </div>
                 
                 <h2 className="text-xl font-bold mb-2">
-                  Quero calcular do zero
+                  Quero calcular com o Get2Zero Simple
                 </h2>
                 
                 <p className="text-muted-foreground mb-6">
@@ -106,19 +112,25 @@ const Onboarding = () => {
                     <div className="h-5 w-5 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3 w-3 text-success" />
                     </div>
-                    <span>Passo a passo</span>
+                    <span>Cálculo assistido</span>
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <div className="h-5 w-5 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3 w-3 text-success" />
                     </div>
-                    <span>Guiado</span>
+                    <span>Cenários de mitigação</span>
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <div className="h-5 w-5 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3 w-3 text-success" />
                     </div>
-                    <span>Completo</span>
+                    <span>Oportunidades de poupança</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <div className="h-5 w-5 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="h-3 w-3 text-success" />
+                    </div>
+                    <span>Relatório detalhado</span>
                   </li>
                 </ul>
               </div>
@@ -155,28 +167,28 @@ const Onboarding = () => {
                 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 text-sm">
-                    <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                      <Check className="h-3 w-3 text-muted-foreground" />
+                    <div className="h-5 w-5 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="h-3 w-3 text-success" />
                     </div>
-                    <span>Rápido</span>
+                    <span>Submissão rápida</span>
                   </li>
                   <li className="flex items-center gap-3 text-sm">
-                    <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                      <Check className="h-3 w-3 text-muted-foreground" />
+                    <div className="h-5 w-5 rounded-full bg-danger/10 flex items-center justify-center flex-shrink-0">
+                      <X className="h-3 w-3 text-danger" />
                     </div>
-                    <span>Direto</span>
+                    <span className="text-muted-foreground">Sem cálculo automático</span>
                   </li>
                   <li className="flex items-center gap-3 text-sm">
-                    <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                      <Check className="h-3 w-3 text-muted-foreground" />
+                    <div className="h-5 w-5 rounded-full bg-danger/10 flex items-center justify-center flex-shrink-0">
+                      <X className="h-3 w-3 text-danger" />
                     </div>
-                    <span>Submissão única</span>
+                    <span className="text-muted-foreground">Sem cenários de redução</span>
                   </li>
                 </ul>
               </div>
               
               <Button size="lg" variant="outline" className="w-full" onClick={handleFormClick}>
-                Avançar
+                Partilhar a pegada calculada
               </Button>
             </Card>
           </div>
