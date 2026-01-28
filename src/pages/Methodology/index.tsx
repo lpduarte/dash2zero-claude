@@ -92,7 +92,7 @@ export default function Methodology() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg"
@@ -107,8 +107,7 @@ export default function Methodology() {
         onNavigate={scrollToSection}
       />
 
-      {/* Main Content - bg-grid-pattern provides both gray bg (::before) and grid (::after) */}
-      <main id="main-content" className="flex-1 lg:ml-64 bg-grid-pattern relative z-10">
+      <main id="main-content" className="lg:ml-64 bg-grid-pattern relative z-10">
         <Header />
 
         {/* Content Sections */}
@@ -137,18 +136,18 @@ export default function Methodology() {
           <Infraestruturas />
           <Bibliografia />
         </div>
-      </main>
 
-      {/* Footer with gradient */}
-      <footer className="footer-gradient lg:ml-64 border-t">
-        <div className="footer-gradient-grain" />
-        <div className="relative z-10 max-w-5xl px-8 pt-16 pb-[40rem]">
-          <div className="text-muted-foreground text-sm">
-            <p className="text-foreground font-normal">Get2C · Documentação Metodológica {getVersionString()} · {getVersionDate()}</p>
-            <p className="mt-2">For a cooler world.</p>
+        {/* Footer */}
+        <footer className="footer-gradient border-t">
+          <div className="footer-gradient-grain" />
+          <div className="relative z-10 max-w-5xl px-8 pt-16 pb-[40rem]">
+            <div className="text-muted-foreground text-sm">
+              <p className="text-foreground font-normal">Get2C · Documentação Metodológica {getVersionString()} · {getVersionDate()}</p>
+              <p className="mt-2">For a cooler world.</p>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </main>
     </div>
   );
 }
