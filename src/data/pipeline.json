@@ -154,15 +154,13 @@
     },
     {
       "id": "08",
-      "title": "Loading States e Animações",
-      "description": "Definir estados de loading e incorporar animações (motion.dev/Lottie)",
+      "title": "Animações",
+      "description": "Incorporar animações subtis (motion.dev/Lottie)",
       "category": "normal",
       "status": "pending",
       "priority": 8,
       "briefing": "08-loading-animacoes.md",
       "criteria": [
-        { "text": "Skeleton components para principais elementos", "done": false },
-        { "text": "Padrão de loading definido e documentado", "done": false },
         { "text": "Animações subtis implementadas onde relevante", "done": false }
       ],
       "dependencies": [],

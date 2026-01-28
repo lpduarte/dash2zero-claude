@@ -40,6 +40,7 @@ export const EmissionsBreakdown = ({ suppliers }: EmissionsBreakdownProps) => {
                 outerRadius={100}
                 fill="hsl(var(--scope-1))"
                 dataKey="value"
+                stroke="hsl(var(--card))"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

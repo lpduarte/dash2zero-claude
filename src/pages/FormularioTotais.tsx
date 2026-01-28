@@ -626,15 +626,23 @@ const FormularioTotais = () => {
   // Success screen after submission
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative z-10">
+      <div className="min-h-screen bg-diagonal-pattern relative z-10 overflow-hidden">
+        {/* Pulsing background */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-primary/30 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-50%, -50%)' }} />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/40 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(30%, -40%)' }} />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/35 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(20%, -20%)', animationDelay: '0.5s' }} />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/35 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-30%, 40%)', animationDelay: '1s' }} />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/30 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(-10%, 20%)', animationDelay: '1.5s' }} />
+          <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-primary/25 rounded-full blur-2xl animate-pulse-slower" style={{ animationDelay: '0.8s' }} />
+          <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-primary/25 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        </div>
         <div className="max-w-3xl mx-auto px-6 py-12">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Leaf className="h-6 w-6 text-primary" />
-              </div>
-              <span className="text-xl font-bold">Dash2Zero</span>
+            <div className="inline-flex items-center gap-3">
+              <Leaf className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold">Dash2Zero</span>
             </div>
           </div>
 
@@ -755,25 +763,33 @@ const FormularioTotais = () => {
   // Pre-form selection screen (no stepper)
   if (step === 1 && importMode === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative z-10">
+      <div className="min-h-screen bg-diagonal-pattern relative z-10 overflow-hidden">
+        {/* Pulsing background */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-primary/30 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-50%, -50%)' }} />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/40 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(30%, -40%)' }} />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/35 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(20%, -20%)', animationDelay: '0.5s' }} />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/35 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-30%, 40%)', animationDelay: '1s' }} />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/30 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(-10%, 20%)', animationDelay: '1.5s' }} />
+          <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-primary/25 rounded-full blur-2xl animate-pulse-slower" style={{ animationDelay: '0.8s' }} />
+          <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-primary/25 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        </div>
         <div className="max-w-[800px] mx-auto px-6 py-12">
           {/* Logo */}
           <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Leaf className="h-6 w-6 text-primary" />
-              </div>
-              <span className="text-xl font-bold">Dash2Zero</span>
+            <div className="inline-flex items-center gap-3 mb-4">
+              <Leaf className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold">Dash2Zero</span>
             </div>
           </div>
           
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-2">
-              Submissão de Pegada de Carbono
+              Partilha da Pegada de Carbono
             </h1>
             <p className="text-muted-foreground">
-              Escolha como pretende submeter os seus dados
+              Escolha como pretende submeter os dados da sua empresa
             </p>
           </div>
 
@@ -870,18 +886,27 @@ const FormularioTotais = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative z-10">
+    <div className="min-h-screen bg-diagonal-pattern relative z-10 overflow-hidden">
+      {/* Pulsing background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-primary/30 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-50%, -50%)' }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/40 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(30%, -40%)' }} />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/35 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(20%, -20%)', animationDelay: '0.5s' }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/35 rounded-full blur-3xl animate-pulse-slow" style={{ transform: 'translate(-30%, 40%)', animationDelay: '1s' }} />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/30 rounded-full blur-3xl animate-pulse-slower" style={{ transform: 'translate(-10%, 20%)', animationDelay: '1.5s' }} />
+        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-primary/25 rounded-full blur-2xl animate-pulse-slower" style={{ animationDelay: '0.8s' }} />
+        <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-primary/25 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+      </div>
+
       <div className="max-w-[800px] mx-auto px-6 py-12">
         {/* Logo */}
         <div className="text-center mb-4">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Leaf className="h-6 w-6 text-primary" />
-            </div>
-            <span className="text-xl font-bold">Dash2Zero</span>
+          <div className="inline-flex items-center gap-3 mb-4">
+            <Leaf className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">Dash2Zero</span>
           </div>
         </div>
-        
+
         {/* Welcome message - personalized when company data exists */}
         {companyData ? (
           <div className="text-center mb-8">
