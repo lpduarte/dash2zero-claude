@@ -525,3 +525,87 @@ Brand color: #219F94 = HSL(175, 66%, 38%)
   gap: 0;
   animation: ticker-scroll 20s linear infinite;
 }
+
+/* =================================
+   PRINT STYLES
+   ================================= */
+
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  aside,
+  nav,
+  .footer-gradient,
+  button,
+  [role="navigation"] {
+    display: none !important;
+  }
+
+  main {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+    width: 100% !important;
+  }
+
+  .max-w-5xl {
+    max-width: 100% !important;
+    padding: 0 1cm !important;
+  }
+
+  h1, h2, h3, h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .border.rounded-lg,
+  table,
+  pre,
+  blockquote {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+  }
+
+  th {
+    background: #f5f5f5 !important;
+  }
+
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666 !important;
+  }
+
+  .text-primary,
+  .text-success,
+  .text-warning,
+  .text-danger {
+    color: black !important;
+  }
+
+  .space-y-6 > * {
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+
+  @page :first {
+    margin-top: 3cm;
+  }
+}

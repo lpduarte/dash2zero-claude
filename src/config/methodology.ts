@@ -3,7 +3,7 @@
 
 export const METHODOLOGY_VERSION = {
   major: 2,
-  minor: 0,
+  minor: 1,
   patch: 0,
   date: "2026-01-28",
 };
