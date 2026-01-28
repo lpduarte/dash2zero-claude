@@ -4,7 +4,8 @@ import { Supplier } from "@/types/supplier";
 import { Mail, FileText, Building2, TrendingUp, Euro, UserRound, Maximize2, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getSectorName } from "@/data/sectors";
-import { clusterLabelsSingular } from "@/config/clusters";
+import { useUser } from "@/contexts/UserContext";
+import { getClusterInfo } from "@/config/clusters";
 
 interface SupplierCardProps {
   supplier: Supplier;
@@ -19,16 +20,15 @@ const getRegionLabel = (region: string) => {
   };
   return labels[region] || region;
 };
-const getClusterInfo = (cluster: string) => ({
-  label: clusterLabelsSingular[cluster] || cluster,
-  icon: Building2
-});
 export const SupplierCard = memo(({
   supplier,
   sectorAverage
 }: SupplierCardProps) => {
-  const clusterInfo = getClusterInfo(supplier.clusterIds?.[0] || supplier.cluster);
-  const ClusterIcon = clusterInfo.icon;
+  const { userType } = useUser();
+  const clusterId = supplier.clusterIds?.[0] || supplier.cluster;
+  const clusterInfo = getClusterInfo(userType, clusterId);
+  const ClusterIcon = clusterInfo?.icon || Building2;
+  const clusterLabel = clusterInfo?.label || clusterId;
 
   // Use provided sector average or fallback to supplier's own emissions
   const sectorAvgEmissions = sectorAverage ?? supplier.totalEmissions;
@@ -49,7 +49,7 @@ export const SupplierCard = memo(({
             </Badge>
             <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-border/60 flex items-center gap-1">
               <ClusterIcon className="h-3 w-3" />
-              {clusterInfo.label}
+              {clusterLabel}
             </Badge>
           </div>
         </div>
