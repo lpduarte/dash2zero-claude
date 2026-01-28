@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import {
   BookOpen, Users, FileText, Factory, BarChart3, TrendingDown,
@@ -131,6 +131,8 @@ const Sidebar = ({ activeSection, expandedGroups, onToggleGroup, onNavigate }: S
             </button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 p-0">
+            <SheetTitle className="sr-only">Navegação</SheetTitle>
+            <SheetDescription className="sr-only">Menu de navegação da metodologia</SheetDescription>
             <ScrollArea className="h-full py-6 px-4">
               {sidebarNav(handleMobileNavClick)}
             </ScrollArea>
